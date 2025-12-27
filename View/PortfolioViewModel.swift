@@ -13,13 +13,13 @@ final class PortfolioViewModel: ObservableObject {
     @Published var isLoading = false
     @Published var errorMessage: String?
 
-    func load() async {
+    func load(sid: String) async {
         isLoading = true
         errorMessage = nil
         defer { isLoading = false }
         
         do {
-            positions = try await APIClient.shared.fetchPortfolio()
+            positions = try await APIClient.shared.fetchPortfolio(sid: sid)
         } catch let error as APIError {
             errorMessage = error.errorDescription
             print("Ошибка загрузки портфеля: \(error.localizedDescription)")

@@ -36,7 +36,6 @@ final class APIClient {
 
     // Авторизация по логину и паролю
     func login(username: String, password: String) async throws {
-        // Используем эндпоинт check-login-password согласно документации
         let urlString = baseURL.hasSuffix("/") ? baseURL + "check-login-password".dropFirst() : baseURL + "/check-login-password"
         guard let url = URL(string: urlString) else {
             throw APIError.invalidURL
@@ -50,7 +49,6 @@ final class APIClient {
         request.setValue("application/json", forHTTPHeaderField: "Accept")
         request.timeoutInterval = 30
         
-        // Тело запроса с логином и паролем
         let body = LoginRequestBody(
             login: username,
             password: password,
@@ -84,7 +82,6 @@ final class APIClient {
                 }
             }
             
-            // Пробуем разные форматы ответа
             do {
                 let authResponse = try JSONDecoder().decode(AuthResponse.self, from: data)
                 if let token = authResponse.authToken {
@@ -94,7 +91,6 @@ final class APIClient {
                 }
             } catch {
                 print("⚠️ Could not decode as AuthResponse, trying as string")
-                // Если не получилось декодировать как AuthResponse, пробуем как строку
                 if let tokenString = String(data: data, encoding: .utf8)?.trimmingCharacters(in: .whitespacesAndNewlines),
                    !tokenString.isEmpty {
                     print("✅ Token as string: \(tokenString.prefix(20))...")
@@ -103,9 +99,6 @@ final class APIClient {
                 }
             }
             
-            // Если ответ успешный, но токен не найден в стандартном формате
-            // Возможно, API просто возвращает успех без токена, и токен нужно использовать из сессии
-            // Или токен приходит в заголовках
             if let httpResponse = response as? HTTPURLResponse,
                let setCookieHeader = httpResponse.value(forHTTPHeaderField: "Set-Cookie") {
                 print("🍪 Cookie received: \(setCookieHeader)")
@@ -113,10 +106,7 @@ final class APIClient {
                 return
             }
             
-            // Если токен не найден в ответе, но запрос успешен, возможно нужно использовать логин/пароль как токен
-            // или API использует cookie-based авторизацию
             print("⚠️ No token found in response, but request was successful")
-            // Сохраняем комбинацию логин:пароль как токен для последующих запросов
             let credentials = "\(username):\(password)"
             if let credentialsData = credentials.data(using: .utf8) {
                 let base64Credentials = credentialsData.base64EncodedString()
@@ -137,43 +127,61 @@ final class APIClient {
         KeychainService.deleteToken()
     }
 
-    private func request(path: String) async throws -> Data {
+    // Отправляет тело вида { "q": JSON.stringify(inner) }
+    private func request(q inner: [String: Any]) async throws -> Data {
         // Проверка наличия токена авторизации
         guard let token = authToken, !token.isEmpty else {
             throw APIError.noAuthToken
         }
         
-        // Формирование URL
-        let urlString = baseURL.hasSuffix("/") ? baseURL + path.dropFirst() : baseURL + path
-        guard let url = URL(string: urlString) else {
+        guard let url = URL(string: baseURL) else {
             throw APIError.invalidURL
         }
         
-        var request = URLRequest(url: url)
-        request.httpMethod = "GET"
+        // Сериализуем inner в JSON-строку (эквивалент JSON.stringify)
+        let innerData = try JSONSerialization.data(withJSONObject: inner, options: [])
+        guard let innerJSONString = String(data: innerData, encoding: .utf8) else {
+            throw APIError.decodingError(NSError(domain: "Encoding", code: -1, userInfo: [NSLocalizedDescriptionKey: "Не удалось сформировать JSON-строку для q"]))
+        }
         
-        // Если токен это base64 encoded credentials (login:password), используем Basic Auth
-        // Иначе используем Bearer токен
+        print("🌐 Request to: \(baseURL)")
+        print("📋 q (stringified): \(innerJSONString)")
+        
+        var request = URLRequest(url: url)
+        request.httpMethod = "POST"
+        request.setValue("application/json", forHTTPHeaderField: "Content-Type")
+        request.setValue("application/json", forHTTPHeaderField: "Accept")
+        
         if let credentialsData = Data(base64Encoded: token),
            let credentials = String(data: credentialsData, encoding: .utf8),
            credentials.contains(":") {
-            // Basic Auth
             request.setValue("Basic \(token)", forHTTPHeaderField: "Authorization")
+            print("🔑 Using Basic Auth")
         } else {
-            // Bearer токен или cookie
             request.setValue("Bearer \(token)", forHTTPHeaderField: "Authorization")
+            print("🔑 Using Bearer token")
         }
         
-        request.setValue("application/json", forHTTPHeaderField: "Accept")
+        let outerBody: [String: Any] = ["q": innerJSONString]
+        request.httpBody = try JSONSerialization.data(withJSONObject: outerBody, options: [])
+        
+        if let bodyString = String(data: request.httpBody!, encoding: .utf8) {
+            print("📤 Request body: \(bodyString)")
+        }
+        
         request.timeoutInterval = 30
         
         do {
             let (data, response) = try await URLSession.shared.data(for: request)
             
-            // Проверка HTTP статус кода
             if let httpResponse = response as? HTTPURLResponse {
+                print("📡 HTTP Status: \(httpResponse.statusCode)")
+                
+                if let responseBody = String(data: data, encoding: .utf8) {
+                    print("📥 Response: \(responseBody.prefix(500))")
+                }
+                
                 guard (200...299).contains(httpResponse.statusCode) else {
-                    // Если 401, удаляем токен и требуем повторной авторизации
                     if httpResponse.statusCode == 401 {
                         KeychainService.deleteToken()
                     }
@@ -189,17 +197,41 @@ final class APIClient {
         }
     }
 
-    func fetchPortfolio() async throws -> [PortfolioPosition] {
-        let data = try await request(path: "/portfolio")
+    func fetchPortfolio(sid: String) async throws -> [PortfolioPosition] {
+        let inner: [String: Any] = [
+            "cmd": "getPositionJson",
+            "SID": sid,
+            "params": [:] // пустой объект
+        ]
+        let data = try await request(q: inner)
+        
         do {
-            return try JSONDecoder().decode([PortfolioPosition].self, from: data)
+            let decoder = JSONDecoder()
+            let response = try decoder.decode(PortfolioResponse.self, from: data)
+            
+            if let errorCode = response.code, errorCode != 0 {
+                let errorMessage = response.errMsg ?? "Неизвестная ошибка"
+                print("❌ API Error: code=\(errorCode), message=\(errorMessage)")
+                throw APIError.httpError(statusCode: errorCode)
+            }
+            
+            guard let positions = response.pos else {
+                return []
+            }
+            return positions.map { PortfolioPosition(from: $0) }
+        } catch let error as APIError {
+            throw error
         } catch {
             throw APIError.decodingError(error)
         }
     }
 
     func fetchCashOperations() async throws -> [CashOperation] {
-        let data = try await request(path: "/cash")
+        let inner: [String: Any] = [
+            "cmd": "getUserCashFlows",
+            "params": [:]
+        ]
+        let data = try await request(q: inner)
         do {
             return try JSONDecoder().decode([CashOperation].self, from: data)
         } catch {
@@ -207,4 +239,3 @@ final class APIClient {
         }
     }
 }
-

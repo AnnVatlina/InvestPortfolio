@@ -9,7 +9,7 @@ import SwiftUI
 
 struct PortfolioView: View {
     @StateObject private var vm = PortfolioViewModel()
-
+    @State private var sid: String = ""
     var body: some View {
         Group {
             if vm.isLoading {
@@ -29,7 +29,7 @@ struct PortfolioView: View {
                         .padding()
                     Button("Повторить") {
                         Task {
-                            await vm.load()
+                            await vm.load(sid: sid)
                         }
                     }
                     .buttonStyle(.borderedProminent)
@@ -63,9 +63,9 @@ struct PortfolioView: View {
                 }
             }
         }
-        .task { await vm.load() }
+        .task { await vm.load(sid: sid) }
         .refreshable {
-            await vm.load()
+            await vm.load(sid: sid  )
         }
         .navigationTitle("Portfolio")
     }
