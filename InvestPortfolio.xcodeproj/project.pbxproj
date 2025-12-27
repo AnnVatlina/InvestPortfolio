@@ -30,10 +30,11 @@
 		51AB3E044295A2DF769A31B9 /* InvestPortfolio.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = InvestPortfolio.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		5E8A6769F38550C7E7261987 /* InvestPortfolioApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InvestPortfolioApp.swift; sourceTree = "<group>"; };
 		5EA7CB5A8DFF077953BBDEFF /* APIClient.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = APIClient.swift; sourceTree = "<group>"; };
+		95151F8C2EFFC86800285671 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		9B4950880FE439025F2175B2 /* PortfolioViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PortfolioViewModel.swift; sourceTree = "<group>"; };
-		C37B7EDAF8F936E98437A1F3 /* APIError.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = APIError.swift; sourceTree = "<group>"; };
 		A5F21A614ADC3ACB4086A69B /* PortfolioView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PortfolioView.swift; sourceTree = "<group>"; };
 		B695E2A44B129299FA57D040 /* CashOperation.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CashOperation.swift; sourceTree = "<group>"; };
+		C37B7EDAF8F936E98437A1F3 /* APIError.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = APIError.swift; sourceTree = "<group>"; };
 		D18ED4677AC6505B776798E6 /* MainTabView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainTabView.swift; sourceTree = "<group>"; };
 		DFD34909DABAC5F92DCF45D0 /* PortfolioPosition.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PortfolioPosition.swift; sourceTree = "<group>"; };
 		FF920457E7D4837CBBE69ACE /* KeychainService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KeychainService.swift; sourceTree = "<group>"; };
@@ -87,6 +88,7 @@
 		E8A54F4948D5CE89D5072384 = {
 			isa = PBXGroup;
 			children = (
+				95151F8C2EFFC86800285671 /* Assets.xcassets */,
 				5E8A6769F38550C7E7261987 /* InvestPortfolioApp.swift */,
 				5A11619E4267E97BEF78CC37 /* APIClient */,
 				C6CD1A224B518FD6F436BF8F /* Model */,
@@ -255,6 +257,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
+				ASSETCATALOG_COMPILER_INCLUDE_ALL_APPICON_ASSETS = YES;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_ASSET_PATHS = "";
@@ -284,6 +287,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
+				ASSETCATALOG_COMPILER_INCLUDE_ALL_APPICON_ASSETS = YES;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_ASSET_PATHS = "";
