@@ -10,6 +10,10 @@ import SwiftUI
 struct AuthView: View {
     @StateObject private var vm = AuthViewModel()
 
+    var onAuthorized: (() -> Void)?
+    var onOpenDeposits: (() -> Void)?
+    var onOpenSettings: (() -> Void)?
+
     var body: some View {
         VStack(spacing: 20) {
             Text("Вход в Tradernet")
@@ -37,6 +41,9 @@ struct AuthView: View {
                 Button(action: {
                     Task {
                         await vm.login()
+                        if vm.isAuthorized {
+                            onAuthorized?()
+                        }
                     }
                 }) {
                     if vm.isLoading {
@@ -44,6 +51,7 @@ struct AuthView: View {
                             .progressViewStyle(CircularProgressViewStyle())
                     } else {
                         Text("Войти")
+                            .frame(maxWidth: .infinity)
                     }
                 }
                 .buttonStyle(.borderedProminent)
@@ -53,8 +61,8 @@ struct AuthView: View {
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity)
         .background(Color(.systemBackground))
-        .fullScreenCover(isPresented: $vm.isAuthorized) {
-            MainTabView()
+        .onReceive(NotificationCenter.default.publisher(for: .unauthorized)) { _ in
+            vm.handleUnauthorized()
         }
     }
 }

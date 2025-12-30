@@ -11,11 +11,7 @@ import SwiftUI
 struct InvestPortfolioApp: App {
     var body: some Scene {
         WindowGroup {
-            if KeychainService.loadToken() == nil {
-                AuthView()
-            } else {
-                MainTabView()
-            }
+            RootView()
         }
     }
 }

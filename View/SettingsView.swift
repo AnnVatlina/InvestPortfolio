@@ -8,50 +8,21 @@
 import SwiftUI
 
 struct SettingsView: View {
-    @State private var showLogoutConfirm = false
-
     var body: some View {
-        NavigationView {
-            Form {
-                Section(header: Text("Аккаунт")) {
-                    Button(role: .none) {
-                        showLogoutConfirm = true
-                    } label: {
-                        HStack {
-                            Image(systemName: "briefcase")
-                            Text("Портфель (войти)")
-                        }
-                    }
-                    .confirmationDialog(
-                        "Перейти к авторизации?",
-                        isPresented: $showLogoutConfirm,
-                        titleVisibility: .visible
-                    ) {
-                        Button("Перейти к авторизации", role: .destructive) {
-                            // Логаут и уведомление о неавторизованности
-                            APIClient.shared.logout()
-                            NotificationCenter.default.post(name: .unauthorized, object: nil)
-                        }
-                        Button("Отмена", role: .cancel) { }
-                    } message: {
-                        Text("Мы выйдем из текущей сессии и откроем форму входа.")
-                    }
-                }
-
-                Section(header: Text("Приложение")) {
-                    NavigationLink {
-                        AboutAppView()
-                    } label: {
-                        Label("О приложении", systemImage: "info.circle")
-                    }
+        List {
+            Section {
+                NavigationLink {
+                    AboutAppView()
+                } label: {
+                    Label("О приложении", systemImage: "info.circle")
                 }
             }
-            .navigationTitle("Настройки")
         }
+        .listStyle(.insetGrouped)
+        .navigationTitle("Настройки")
     }
 }
 
-// Простой экран "О приложении"
 struct AboutAppView: View {
     var body: some View {
         VStack(spacing: 12) {

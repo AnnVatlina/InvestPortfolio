@@ -19,7 +19,6 @@ struct AuthPage: View {
             onOpenDeposits: { /* не используется на странице авторизации */ },
             onOpenSettings: { /* не используется на странице авторизации */ }
         )
-        .navigationTitle("Авторизация")
         .navigationBarTitleDisplayMode(.inline)
     }
 }

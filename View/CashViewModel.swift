@@ -21,6 +21,13 @@ final class CashViewModel: ObservableObject {
         do {
             operations = try await APIClient.shared.fetchCashOperations()
         } catch let error as APIError {
+            switch error {
+            case .unauthorized:
+                // Оповещаем об истечении сессии
+                NotificationCenter.default.post(name: .unauthorized, object: nil)
+            default:
+                break
+            }
             errorMessage = error.errorDescription
             print("Ошибка загрузки операций: \(error.localizedDescription)")
         } catch {

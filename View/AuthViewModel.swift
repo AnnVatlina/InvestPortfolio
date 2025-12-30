@@ -15,6 +15,17 @@ final class AuthViewModel: ObservableObject {
     @Published var isLoading = false
     @Published var errorMessage: String?
 
+    init() {
+        isAuthorized = (KeychainService.loadToken() != nil)
+        NotificationCenter.default.addObserver(forName: .unauthorized, object: nil, queue: .main) { [weak self] _ in
+            self?.handleUnauthorized()
+        }
+    }
+
+    deinit {
+        NotificationCenter.default.removeObserver(self, name: .unauthorized, object: nil)
+    }
+
     func login() async {
         isLoading = true
         errorMessage = nil
@@ -34,4 +45,12 @@ final class AuthViewModel: ObservableObject {
             errorMessage = error.localizedDescription
         }
     }
+
+    func handleUnauthorized() {
+        // Сброс состояния и возврат на экран логина
+        APIClient.shared.logout()
+        isAuthorized = false
+        errorMessage = APIError.unauthorized.errorDescription
+    }
 }
+

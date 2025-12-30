@@ -21,6 +21,12 @@ final class PortfolioViewModel: ObservableObject {
         do {
             positions = try await APIClient.shared.fetchPortfolio(sid: sid)
         } catch let error as APIError {
+            switch error {
+            case .unauthorized:
+                NotificationCenter.default.post(name: .unauthorized, object: nil)
+            default:
+                break
+            }
             errorMessage = error.errorDescription
             print("Ошибка загрузки портфеля: \(error.localizedDescription)")
         } catch {

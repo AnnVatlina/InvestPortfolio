@@ -12,6 +12,19 @@
 		46C6D31225696A28546DFA10 /* CashViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 004A57BC698C2A1A48AB8807 /* CashViewModel.swift */; };
 		4BEACA230AD15858BA39424C /* CashView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 05D23F0EE50022B9203DCDE2 /* CashView.swift */; };
 		9380DD9F1204B8281856CB04 /* APIError.swift in Sources */ = {isa = PBXBuildFile; fileRef = C37B7EDAF8F936E98437A1F3 /* APIError.swift */; };
+		950800032F04064E0041AD54 /* DepositsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 950800022F04064E0041AD54 /* DepositsView.swift */; };
+		950800052F0406560041AD54 /* DepositsViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 950800042F0406560041AD54 /* DepositsViewModel.swift */; };
+		950800092F0406650041AD54 /* Deposit.swift in Sources */ = {isa = PBXBuildFile; fileRef = 950800082F0406650041AD54 /* Deposit.swift */; };
+		9508000D2F0406770041AD54 /* DepositsRepository.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9508000C2F0406770041AD54 /* DepositsRepository.swift */; };
+		9508000F2F04077F0041AD54 /* DepositCurrency.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9508000E2F04077E0041AD54 /* DepositCurrency.swift */; };
+		950800112F0409A60041AD54 /* DepositsService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 950800102F0409A50041AD54 /* DepositsService.swift */; };
+		950800132F040B6C0041AD54 /* RootView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 950800122F040B6C0041AD54 /* RootView.swift */; };
+		950800152F040E5A0041AD54 /* SettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 950800142F040E5A0041AD54 /* SettingsView.swift */; };
+		95D967F62F0416EF00079C66 /* AuthPage.swift in Sources */ = {isa = PBXBuildFile; fileRef = 95D967F52F0416EF00079C66 /* AuthPage.swift */; };
+		95D967F82F04193300079C66 /* NotificationName+Unauthorized.swift in Sources */ = {isa = PBXBuildFile; fileRef = 95D967F72F04193300079C66 /* NotificationName+Unauthorized.swift */; };
+		95D967FA2F04193400079C66 /* HomeTabView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 95D967F92F04193400079C66 /* HomeTabView.swift */; };
+		95D967FC2F04193500079C66 /* LandingCard.swift in Sources */ = {isa = PBXBuildFile; fileRef = 95D967FB2F04193500079C66 /* LandingCard.swift */; };
+		95D967FE2F04193500079C66 /* Color+TertiaryLabel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 95D967FD2F04193500079C66 /* Color+TertiaryLabel.swift */; };
 		AC5A762A3849A9DF8D8438ED /* PortfolioPosition.swift in Sources */ = {isa = PBXBuildFile; fileRef = DFD34909DABAC5F92DCF45D0 /* PortfolioPosition.swift */; };
 		B0219953032118B56D7468AC /* AuthView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0A5B8C5687841912689A0D6A /* AuthView.swift */; };
 		C5BDE1EB97711E39E2BB8CF3 /* CashOperation.swift in Sources */ = {isa = PBXBuildFile; fileRef = B695E2A44B129299FA57D040 /* CashOperation.swift */; };
@@ -30,7 +43,20 @@
 		51AB3E044295A2DF769A31B9 /* InvestPortfolio.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = InvestPortfolio.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		5E8A6769F38550C7E7261987 /* InvestPortfolioApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InvestPortfolioApp.swift; sourceTree = "<group>"; };
 		5EA7CB5A8DFF077953BBDEFF /* APIClient.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = APIClient.swift; sourceTree = "<group>"; };
+		950800022F04064E0041AD54 /* DepositsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DepositsView.swift; sourceTree = "<group>"; };
+		950800042F0406560041AD54 /* DepositsViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DepositsViewModel.swift; sourceTree = "<group>"; };
+		950800082F0406650041AD54 /* Deposit.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Deposit.swift; sourceTree = "<group>"; };
+		9508000C2F0406770041AD54 /* DepositsRepository.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DepositsRepository.swift; sourceTree = "<group>"; };
+		9508000E2F04077E0041AD54 /* DepositCurrency.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DepositCurrency.swift; sourceTree = "<group>"; };
+		950800102F0409A50041AD54 /* DepositsService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DepositsService.swift; sourceTree = "<group>"; };
+		950800122F040B6C0041AD54 /* RootView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RootView.swift; sourceTree = "<group>"; };
+		950800142F040E5A0041AD54 /* SettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsView.swift; sourceTree = "<group>"; };
 		95151F8C2EFFC86800285671 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
+		95D967F52F0416EF00079C66 /* AuthPage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AuthPage.swift; sourceTree = "<group>"; };
+		95D967F72F04193300079C66 /* NotificationName+Unauthorized.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "NotificationName+Unauthorized.swift"; sourceTree = "<group>"; };
+		95D967F92F04193400079C66 /* HomeTabView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomeTabView.swift; sourceTree = "<group>"; };
+		95D967FB2F04193500079C66 /* LandingCard.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LandingCard.swift; sourceTree = "<group>"; };
+		95D967FD2F04193500079C66 /* Color+TertiaryLabel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Color+TertiaryLabel.swift"; sourceTree = "<group>"; };
 		9B4950880FE439025F2175B2 /* PortfolioViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PortfolioViewModel.swift; sourceTree = "<group>"; };
 		A5F21A614ADC3ACB4086A69B /* PortfolioView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PortfolioView.swift; sourceTree = "<group>"; };
 		B695E2A44B129299FA57D040 /* CashOperation.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CashOperation.swift; sourceTree = "<group>"; };
@@ -63,7 +89,9 @@
 		C60896E4F8DFA38C232D7907 /* Service */ = {
 			isa = PBXGroup;
 			children = (
+				950800102F0409A50041AD54 /* DepositsService.swift */,
 				FF920457E7D4837CBBE69ACE /* KeychainService.swift */,
+				950800122F040B6C0041AD54 /* RootView.swift */,
 			);
 			path = Service;
 			sourceTree = "<group>";
@@ -71,8 +99,11 @@
 		C6CD1A224B518FD6F436BF8F /* Model */ = {
 			isa = PBXGroup;
 			children = (
+				9508000E2F04077E0041AD54 /* DepositCurrency.swift */,
 				B695E2A44B129299FA57D040 /* CashOperation.swift */,
 				DFD34909DABAC5F92DCF45D0 /* PortfolioPosition.swift */,
+				950800082F0406650041AD54 /* Deposit.swift */,
+				9508000C2F0406770041AD54 /* DepositsRepository.swift */,
 			);
 			path = Model;
 			sourceTree = "<group>";
@@ -108,6 +139,14 @@
 				D18ED4677AC6505B776798E6 /* MainTabView.swift */,
 				A5F21A614ADC3ACB4086A69B /* PortfolioView.swift */,
 				9B4950880FE439025F2175B2 /* PortfolioViewModel.swift */,
+				950800022F04064E0041AD54 /* DepositsView.swift */,
+				950800042F0406560041AD54 /* DepositsViewModel.swift */,
+				950800142F040E5A0041AD54 /* SettingsView.swift */,
+				95D967F52F0416EF00079C66 /* AuthPage.swift */,
+				95D967F72F04193300079C66 /* NotificationName+Unauthorized.swift */,
+				95D967F92F04193400079C66 /* HomeTabView.swift */,
+				95D967FB2F04193500079C66 /* LandingCard.swift */,
+				95D967FD2F04193500079C66 /* Color+TertiaryLabel.swift */,
 			);
 			path = View;
 			sourceTree = "<group>";
@@ -169,18 +208,31 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				950800152F040E5A0041AD54 /* SettingsView.swift in Sources */,
+				950800092F0406650041AD54 /* Deposit.swift in Sources */,
 				F8045D927570703468F14EEE /* InvestPortfolioApp.swift in Sources */,
+				950800032F04064E0041AD54 /* DepositsView.swift in Sources */,
 				9380DD9F1204B8281856CB04 /* APIError.swift in Sources */,
+				950800132F040B6C0041AD54 /* RootView.swift in Sources */,
 				EF9D432CF9BEDF992ABE727D /* APIClient.swift in Sources */,
 				C5BDE1EB97711E39E2BB8CF3 /* CashOperation.swift in Sources */,
 				AC5A762A3849A9DF8D8438ED /* PortfolioPosition.swift in Sources */,
+				95D967FC2F04193500079C66 /* LandingCard.swift in Sources */,
 				CD6D9F04D80A48E58391C3DE /* KeychainService.swift in Sources */,
+				950800112F0409A60041AD54 /* DepositsService.swift in Sources */,
 				B0219953032118B56D7468AC /* AuthView.swift in Sources */,
 				D2B396740B342C974AEE5356 /* AuthViewModel.swift in Sources */,
 				4BEACA230AD15858BA39424C /* CashView.swift in Sources */,
 				46C6D31225696A28546DFA10 /* CashViewModel.swift in Sources */,
+				95D967FA2F04193400079C66 /* HomeTabView.swift in Sources */,
+				95D967F82F04193300079C66 /* NotificationName+Unauthorized.swift in Sources */,
+				950800052F0406560041AD54 /* DepositsViewModel.swift in Sources */,
+				95D967F62F0416EF00079C66 /* AuthPage.swift in Sources */,
+				9508000F2F04077F0041AD54 /* DepositCurrency.swift in Sources */,
 				1A283CB0A1273797A2EDF575 /* MainTabView.swift in Sources */,
 				F3552534641030F610F3E7C2 /* PortfolioView.swift in Sources */,
+				9508000D2F0406770041AD54 /* DepositsRepository.swift in Sources */,
+				95D967FE2F04193500079C66 /* Color+TertiaryLabel.swift in Sources */,
 				28B87BD48DE2E58850C3F9A2 /* PortfolioViewModel.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -261,7 +313,7 @@
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_ASSET_PATHS = "";
-				DEVELOPMENT_TEAM = "";
+				DEVELOPMENT_TEAM = SVVTWN6V74;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
@@ -269,7 +321,7 @@
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
-				IPHONEOS_DEPLOYMENT_TARGET = 15.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 16.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -291,7 +343,7 @@
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_ASSET_PATHS = "";
-				DEVELOPMENT_TEAM = "";
+				DEVELOPMENT_TEAM = SVVTWN6V74;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
@@ -299,7 +351,7 @@
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
-				IPHONEOS_DEPLOYMENT_TARGET = 15.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 16.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",

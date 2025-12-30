@@ -12,10 +12,13 @@ final class DepositsViewModel: ObservableObject {
     @Published var isLoading = false
     @Published var errorMessage: String?
 
-    private let repository: DepositsRepository
+    // Презентационные данные доходов, кэшируем по id
+    @Published private(set) var incomes: [UUID: DepositIncomeSummary] = [:]
 
-    init(repository: DepositsRepository = InMemoryDepositsRepository()) {
-        self.repository = repository
+    private let service: DepositsService
+
+    init(service: DepositsService = DefaultDepositsService(repository: InMemoryDepositsRepository())) {
+        self.service = service
     }
 
     func load() async {
@@ -24,27 +27,60 @@ final class DepositsViewModel: ObservableObject {
         defer { isLoading = false }
 
         do {
-            deposits = try await repository.fetchAll()
+            let items = try await service.fetchAll()
+            deposits = items
+            recomputeIncomes()
         } catch {
             errorMessage = error.localizedDescription
         }
     }
 
-    func addDeposit(title: String, amount: Double, currency: String) async {
-        guard !title.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty,
-              !currency.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
-        else {
-            errorMessage = "Введите название и валюту"
+    func addDeposit(
+        title: String,
+        amount: Double,
+        currency: DepositCurrency,
+        openDate: Date,
+        closeDate: Date?,
+        annualInterestRate: Double
+    ) async {
+        guard !title.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty else {
+            errorMessage = "Введите название"
             return
         }
 
-        let newDeposit = Deposit(title: title, amount: amount, currency: currency)
+        let newDeposit = Deposit(
+            title: title,
+            amount: amount,
+            currency: currency,
+            openDate: openDate,
+            closeDate: closeDate,
+            annualInterestRate: annualInterestRate
+        )
+
         do {
-            try await repository.add(newDeposit)
+            try await service.add(newDeposit)
             await load()
         } catch {
             errorMessage = error.localizedDescription
         }
+    }
+
+    func incomeSummary(for deposit: Deposit) -> DepositIncomeSummary {
+        if let cached = incomes[deposit.id] {
+            return cached
+        }
+        let summary = service.incomeSummary(for: deposit, asOf: Date())
+        incomes[deposit.id] = summary
+        return summary
+    }
+
+    private func recomputeIncomes() {
+        var dict: [UUID: DepositIncomeSummary] = [:]
+        let now = Date()
+        for d in deposits {
+            dict[d.id] = service.incomeSummary(for: d, asOf: now)
+        }
+        incomes = dict
     }
 }
 

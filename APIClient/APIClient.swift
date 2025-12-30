@@ -119,7 +119,7 @@ final class APIClient {
         } catch let error as APIError {
             throw error
         } catch {
-            throw APIError.networkError(error)
+            throw APIError.from(error)
         }
     }
     
@@ -184,6 +184,7 @@ final class APIClient {
                 guard (200...299).contains(httpResponse.statusCode) else {
                     if httpResponse.statusCode == 401 {
                         KeychainService.deleteToken()
+                        throw APIError.unauthorized
                     }
                     throw APIError.httpError(statusCode: httpResponse.statusCode)
                 }
@@ -193,7 +194,7 @@ final class APIClient {
         } catch let error as APIError {
             throw error
         } catch {
-            throw APIError.networkError(error)
+            throw APIError.from(error)
         }
     }
 
@@ -212,7 +213,7 @@ final class APIClient {
             if let errorCode = response.code, errorCode != 0 {
                 let errorMessage = response.errMsg ?? "Неизвестная ошибка"
                 print("❌ API Error: code=\(errorCode), message=\(errorMessage)")
-                throw APIError.httpError(statusCode: errorCode)
+                throw APIError.apiError(code: errorCode, message: response.errMsg)
             }
             
             guard let positions = response.pos else {
@@ -239,3 +240,4 @@ final class APIClient {
         }
     }
 }
+
