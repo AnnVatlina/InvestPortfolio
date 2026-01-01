@@ -19,6 +19,13 @@
 		950800112F0409A60041AD54 /* DepositsService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 950800102F0409A50041AD54 /* DepositsService.swift */; };
 		950800132F040B6C0041AD54 /* RootView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 950800122F040B6C0041AD54 /* RootView.swift */; };
 		950800152F040E5A0041AD54 /* SettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 950800142F040E5A0041AD54 /* SettingsView.swift */; };
+		9511098B2F8161EE00EE2EEE /* DIContainer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9511098A2F8161EE00EE2EEE /* DIContainer.swift */; };
+		9557F9772F810AA20086715E /* APIDTOs.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9557F9762F810AA20086715E /* APIDTOs.swift */; };
+		9557F9792F810AB10086715E /* Settings.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9557F9782F810AB10086715E /* Settings.swift */; };
+		9557F97B2F810AFC0086715E /* CashOperationsRepository.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9557F97A2F810AFC0086715E /* CashOperationsRepository.swift */; };
+		9557F97D2F810AFD0086715E /* PortfolioRepository.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9557F97C2F810AFD0086715E /* PortfolioRepository.swift */; };
+		9557F97F2F810B240086715E /* PortfolioService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9557F97E2F810B240086715E /* PortfolioService.swift */; };
+		9557F9812F810B250086715E /* CashService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9557F9802F810B250086715E /* CashService.swift */; };
 		95D967F62F0416EF00079C66 /* AuthPage.swift in Sources */ = {isa = PBXBuildFile; fileRef = 95D967F52F0416EF00079C66 /* AuthPage.swift */; };
 		95D967F82F04193300079C66 /* NotificationName+Unauthorized.swift in Sources */ = {isa = PBXBuildFile; fileRef = 95D967F72F04193300079C66 /* NotificationName+Unauthorized.swift */; };
 		95D967FA2F04193400079C66 /* HomeTabView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 95D967F92F04193400079C66 /* HomeTabView.swift */; };
@@ -50,10 +57,17 @@
 		950800102F0409A50041AD54 /* DepositsService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DepositsService.swift; sourceTree = "<group>"; };
 		950800122F040B6C0041AD54 /* RootView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RootView.swift; sourceTree = "<group>"; };
 		950800142F040E5A0041AD54 /* SettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsView.swift; sourceTree = "<group>"; };
+		9511098A2F8161EE00EE2EEE /* DIContainer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DIContainer.swift; sourceTree = "<group>"; };
 		95151F8C2EFFC86800285671 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		953C14A02F056E61003998D2 /* Base */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = Base; path = Base.lproj/Localizable.strings; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.plist; };
 		953C14A12F056E61003998D2 /* ru */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = ru; path = ru.lproj/Localizable.strings; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.plist; };
 		953C14A52F056EDD003998D2 /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/Localizable.strings; sourceTree = "<group>"; };
+		9557F9762F810AA20086715E /* APIDTOs.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = APIDTOs.swift; sourceTree = "<group>"; };
+		9557F9782F810AB10086715E /* Settings.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Settings.swift; sourceTree = "<group>"; };
+		9557F97A2F810AFC0086715E /* CashOperationsRepository.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CashOperationsRepository.swift; sourceTree = "<group>"; };
+		9557F97C2F810AFD0086715E /* PortfolioRepository.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PortfolioRepository.swift; sourceTree = "<group>"; };
+		9557F97E2F810B240086715E /* PortfolioService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PortfolioService.swift; sourceTree = "<group>"; };
+		9557F9802F810B250086715E /* CashService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CashService.swift; sourceTree = "<group>"; };
 		95D967F52F0416EF00079C66 /* AuthPage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AuthPage.swift; sourceTree = "<group>"; };
 		95D967F72F04193300079C66 /* NotificationName+Unauthorized.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "NotificationName+Unauthorized.swift"; sourceTree = "<group>"; };
 		95D967F92F04193400079C66 /* HomeTabView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomeTabView.swift; sourceTree = "<group>"; };
@@ -86,8 +100,16 @@
 			children = (
 				5EA7CB5A8DFF077953BBDEFF /* APIClient.swift */,
 				C37B7EDAF8F936E98437A1F3 /* APIError.swift */,
+				9557F9762F810AA20086715E /* APIDTOs.swift */,
 			);
 			path = APIClient;
+			sourceTree = "<group>";
+		};
+		951109882F81614000EE2EEE /* App */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			path = App;
 			sourceTree = "<group>";
 		};
 		953C14A42F056E61003998D2 /* Resources */ = {
@@ -115,6 +137,9 @@
 				950800102F0409A50041AD54 /* DepositsService.swift */,
 				FF920457E7D4837CBBE69ACE /* KeychainService.swift */,
 				950800122F040B6C0041AD54 /* RootView.swift */,
+				9557F97E2F810B240086715E /* PortfolioService.swift */,
+				9557F9802F810B250086715E /* CashService.swift */,
+				9511098A2F8161EE00EE2EEE /* DIContainer.swift */,
 			);
 			path = Service;
 			sourceTree = "<group>";
@@ -127,6 +152,9 @@
 				DFD34909DABAC5F92DCF45D0 /* PortfolioPosition.swift */,
 				950800082F0406650041AD54 /* Deposit.swift */,
 				9508000C2F0406770041AD54 /* DepositsRepository.swift */,
+				9557F9782F810AB10086715E /* Settings.swift */,
+				9557F97A2F810AFC0086715E /* CashOperationsRepository.swift */,
+				9557F97C2F810AFD0086715E /* PortfolioRepository.swift */,
 			);
 			path = Model;
 			sourceTree = "<group>";
@@ -151,6 +179,7 @@
 				FAFE7386D23E096595A28133 /* View */,
 				E6624A5CBCC7422DE34E6EE4 /* Products */,
 				953C14A42F056E61003998D2 /* Resources */,
+				951109882F81614000EE2EEE /* App */,
 			);
 			sourceTree = "<group>";
 		};
@@ -243,6 +272,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				950800152F040E5A0041AD54 /* SettingsView.swift in Sources */,
+				9511098B2F8161EE00EE2EEE /* DIContainer.swift in Sources */,
 				950800092F0406650041AD54 /* Deposit.swift in Sources */,
 				F8045D927570703468F14EEE /* InvestPortfolioApp.swift in Sources */,
 				950800032F04064E0041AD54 /* DepositsView.swift in Sources */,
@@ -253,18 +283,24 @@
 				AC5A762A3849A9DF8D8438ED /* PortfolioPosition.swift in Sources */,
 				95D967FC2F04193500079C66 /* LandingCard.swift in Sources */,
 				CD6D9F04D80A48E58391C3DE /* KeychainService.swift in Sources */,
+				9557F97F2F810B240086715E /* PortfolioService.swift in Sources */,
 				950800112F0409A60041AD54 /* DepositsService.swift in Sources */,
+				9557F97D2F810AFD0086715E /* PortfolioRepository.swift in Sources */,
+				9557F9772F810AA20086715E /* APIDTOs.swift in Sources */,
 				B0219953032118B56D7468AC /* AuthView.swift in Sources */,
 				4BEACA230AD15858BA39424C /* CashView.swift in Sources */,
 				95D967FA2F04193400079C66 /* HomeTabView.swift in Sources */,
 				95D967F82F04193300079C66 /* NotificationName+Unauthorized.swift in Sources */,
 				950800052F0406560041AD54 /* DepositsViewModel.swift in Sources */,
+				9557F9792F810AB10086715E /* Settings.swift in Sources */,
 				95D967F62F0416EF00079C66 /* AuthPage.swift in Sources */,
+				9557F97B2F810AFC0086715E /* CashOperationsRepository.swift in Sources */,
 				9508000F2F04077F0041AD54 /* DepositCurrency.swift in Sources */,
 				1A283CB0A1273797A2EDF575 /* MainTabView.swift in Sources */,
 				F3552534641030F610F3E7C2 /* PortfolioView.swift in Sources */,
 				9508000D2F0406770041AD54 /* DepositsRepository.swift in Sources */,
 				95D967FE2F04193500079C66 /* Color+TertiaryLabel.swift in Sources */,
+				9557F9812F810B250086715E /* CashService.swift in Sources */,
 				28B87BD48DE2E58850C3F9A2 /* PortfolioViewModel.swift in Sources */,
 				95D968042F041B8500079C66 /* AuthViewModel.swift in Sources */,
 				95D968052F041B8500079C66 /* CashViewModel.swift in Sources */,
@@ -342,7 +378,7 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 15.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
 				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
 				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
 				MTL_FAST_MATH = YES;
@@ -370,7 +406,7 @@
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
-				IPHONEOS_DEPLOYMENT_TARGET = 16.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -399,7 +435,7 @@
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
-				IPHONEOS_DEPLOYMENT_TARGET = 16.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -462,7 +498,7 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 15.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
 				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
 				MTL_ENABLE_DEBUG_INFO = NO;
 				MTL_FAST_MATH = YES;

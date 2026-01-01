@@ -36,5 +36,14 @@
 "deposits.closed.format" = "Закрытие: %@";
 "deposits.income.today.format" = "Доход на сегодня: %.2f %@";
 "deposits.income.forecast.format" = "Прогноз к закрытию: %.2f %@";
+"deposits.field.bankName" = "Банк";
+"deposits.edit.title" = "Редактировать вклад";
+"deposits.delete.confirm.title" = "Удалить вклад?";
+"deposits.delete.confirm.message" = "Это действие нельзя отменить.";
+"deposits.delete.action" = "Удалить";
+"deposits.error.emptyTitle" = "Введите название";
+"deposits.notification.title" = "Вклад скоро закрывается";
+"deposits.notification.body.format" = "Вклад «%@» закрывается через 7 дней.";
+"common.save" = "Сохранить";
 
 "cash.load.error.format" = "Ошибка загрузки операций: %@";

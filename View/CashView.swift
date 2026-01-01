@@ -8,7 +8,13 @@
 import SwiftUI
 
 struct CashView: View {
-    @StateObject private var vm = CashViewModel()
+    @StateObject private var vm: CashViewModel
+
+    init(container: DIContainer) {
+        _vm = StateObject(wrappedValue: CashViewModel(
+            service: container.makeCashService()
+        ))
+    }
 
     var body: some View {
         Group {
@@ -66,9 +72,7 @@ struct CashView: View {
             }
         }
         .task { await vm.load() }
-        .refreshable {
-            await vm.load()
-        }
+        .refreshable { await vm.refresh() }
         .navigationTitle("Cash Operations")
     }
 }

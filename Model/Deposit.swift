@@ -5,10 +5,13 @@
 //
 
 import Foundation
+import SwiftData
 
-struct Deposit: Identifiable, Equatable, Codable {
-    let id: UUID
+@Model
+final class Deposit {
+    var id: UUID
     var title: String
+    var bankName: String?
     var amount: Double
     var currency: DepositCurrency
     var createdAt: Date
@@ -20,6 +23,7 @@ struct Deposit: Identifiable, Equatable, Codable {
     init(
         id: UUID = UUID(),
         title: String,
+        bankName: String? = nil,
         amount: Double,
         currency: DepositCurrency,
         createdAt: Date = Date(),
@@ -29,6 +33,7 @@ struct Deposit: Identifiable, Equatable, Codable {
     ) {
         self.id = id
         self.title = title
+        self.bankName = bankName
         self.amount = amount
         self.currency = currency
         self.createdAt = createdAt
@@ -37,4 +42,3 @@ struct Deposit: Identifiable, Equatable, Codable {
         self.annualInterestRate = annualInterestRate
     }
 }
-

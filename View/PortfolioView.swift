@@ -8,8 +8,14 @@
 import SwiftUI
 
 struct PortfolioView: View {
-    @StateObject private var vm = PortfolioViewModel()
+    @StateObject private var vm: PortfolioViewModel
     @State private var sid: String = ""
+
+    init(container: DIContainer) {
+        _vm = StateObject(wrappedValue: PortfolioViewModel(
+            service: container.makePortfolioService()
+        ))
+    }
     var body: some View {
         Group {
             if vm.isLoading {
@@ -64,9 +70,7 @@ struct PortfolioView: View {
             }
         }
         .task { await vm.load(sid: sid) }
-        .refreshable {
-            await vm.load(sid: sid  )
-        }
+        .refreshable { await vm.refresh(sid: sid) }
         .navigationTitle("Portfolio")
     }
 }

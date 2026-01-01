@@ -9,6 +9,7 @@ import SwiftUI
 
 struct MainTabView: View {
     @AppStorage("MainTab_SelectedIndex") private var selectedIndex: Int = 0
+    @EnvironmentObject private var container: DIContainer
 
     // Внешние зависимости: состояние авторизации и колбэк при успешном входе
     var isAuthorized: Bool = (KeychainService.loadToken() != nil)
@@ -34,7 +35,7 @@ struct MainTabView: View {
             NavigationView {
                 Group {
                     if isAuthorized {
-                        PortfolioView()
+                        PortfolioView(container: container)
                             .navigationTitle("home.portfolio.title")
                     } else {
                         AuthView(
@@ -56,7 +57,7 @@ struct MainTabView: View {
 
             // 2: Вклады
             NavigationView {
-                DepositsView()
+                DepositsView(container: container)
                     .navigationTitle("deposits.title")
             }
             .tabItem { Label("deposits.title", systemImage: "banknote.fill") }

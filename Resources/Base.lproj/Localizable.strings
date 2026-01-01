@@ -35,5 +35,26 @@
 "deposits.closed.format" = "Closed: %@";
 "deposits.income.today.format" = "Income to date: %.2f %@";
 "deposits.income.forecast.format" = "Forecast to close: %.2f %@";
+"deposits.field.bankName" = "Bank";
+"deposits.edit.title" = "Edit Deposit";
+"deposits.delete.confirm.title" = "Delete Deposit";
+"deposits.delete.confirm.message" = "This action cannot be undone.";
+"deposits.delete.action" = "Delete";
+"deposits.error.emptyTitle" = "Please enter a title";
+"deposits.notification.title" = "Deposit Expiring Soon";
+"deposits.notification.body.format" = "Your deposit \"%@\" expires in 7 days.";
+"common.save" = "Save";
 
 "cash.load.error.format" = "Failed to load operations: %@";
+"settings.language" = "Language";
+"settings.currencies.title" = "Currencies";
+"settings.currencies.description" = "Select currencies shown when adding a deposit";
+
+"currency.USD" = "USD";
+"currency.EUR" = "EUR";
+"currency.GBP" = "GBP";
+"currency.RUB" = "RUB";
+"currency.CNY" = "CNY";
+"currency.JPY" = "JPY";
+"currency.CHF" = "CHF";
+

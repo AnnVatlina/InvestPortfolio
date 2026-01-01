@@ -197,7 +197,7 @@ final class APIClient {
         }
     }
 
-    func fetchPortfolio(sid: String) async throws -> [PortfolioPosition] {
+    func fetchPortfolio(sid: String) async throws -> [PortfolioPositionDTO] {
         let inner: [String: Any] = [
             "cmd": "getPositionJson",
             "SID": sid,
@@ -218,7 +218,7 @@ final class APIClient {
             guard let positions = response.pos else {
                 return []
             }
-            return positions.map { PortfolioPosition(from: $0) }
+            return positions.map { PortfolioPositionDTO(from: $0) }
         } catch let error as APIError {
             throw error
         } catch {
@@ -226,14 +226,14 @@ final class APIClient {
         }
     }
 
-    func fetchCashOperations() async throws -> [CashOperation] {
+    func fetchCashOperations() async throws -> [CashOperationDTO] {
         let inner: [String: Any] = [
             "cmd": "getUserCashFlows",
             "params": [:]
         ]
         let data = try await request(q: inner)
         do {
-            return try JSONDecoder().decode([CashOperation].self, from: data)
+            return try JSONDecoder().decode([CashOperationDTO].self, from: data)
         } catch {
             throw APIError.decodingError(error)
         }
