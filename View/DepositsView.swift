@@ -19,9 +19,14 @@ struct DepositsView: View {
     @State private var depositToEdit: Deposit? = nil
     @State private var depositToDelete: Deposit? = nil
 
+    private enum ViewMode { case list, report }
+    @State private var viewMode: ViewMode = .list
+
     var body: some View {
         Group {
-            if vm.isLoading && vm.deposits.isEmpty {
+            if viewMode == .report {
+                DepositsReportView(deposits: vm.deposits, incomes: vm.incomes)
+            } else if vm.isLoading && vm.deposits.isEmpty {
                 ProgressView(String(localized: "deposits.loading"))
                     .frame(maxWidth: .infinity, maxHeight: .infinity)
             } else if let error = vm.errorMessage, vm.deposits.isEmpty {
@@ -40,6 +45,16 @@ struct DepositsView: View {
                 } label: {
                     Image(systemName: "plus")
                 }
+                .opacity(viewMode == .list ? 1 : 0)
+                .disabled(viewMode == .report)
+            }
+            ToolbarItem(placement: .topBarLeading) {
+                Picker("", selection: $viewMode.animation()) {
+                    Image(systemName: "list.bullet").tag(ViewMode.list)
+                    Image(systemName: "chart.pie").tag(ViewMode.report)
+                }
+                .pickerStyle(.segmented)
+                .frame(width: 80)
             }
         }
         .sheet(isPresented: $showAddSheet) {
@@ -146,9 +161,15 @@ private struct DepositRow: View {
     let deposit: Deposit
     let summary: DepositIncomeSummary
 
+    private var isClosed: Bool {
+        guard let closeDate = deposit.closeDate else { return false }
+        return closeDate <= Date()
+    }
+
     var body: some View {
         VStack(alignment: .leading, spacing: 6) {
-            HStack {
+            // Заголовок: название + статус
+            HStack(alignment: .top) {
                 VStack(alignment: .leading, spacing: 2) {
                     Text(deposit.title)
                         .font(.headline)
@@ -159,40 +180,77 @@ private struct DepositRow: View {
                     }
                 }
                 Spacer()
-                Text(String(format: String(localized: "deposits.rate.format"), deposit.annualInterestRate))
-                    .font(.caption)
-                    .foregroundColor(.secondary)
+                VStack(alignment: .trailing, spacing: 4) {
+                    // Бейдж статуса
+                    Text(isClosed
+                         ? String(localized: "deposits.status.closed")
+                         : String(localized: "deposits.status.active"))
+                        .font(.caption2)
+                        .fontWeight(.medium)
+                        .padding(.horizontal, 7)
+                        .padding(.vertical, 3)
+                        .background(isClosed ? Color.secondary.opacity(0.15) : Color.green.opacity(0.15))
+                        .foregroundColor(isClosed ? .secondary : .green)
+                        .clipShape(Capsule())
+                    Text(String(format: String(localized: "deposits.rate.format"), deposit.annualInterestRate))
+                        .font(.caption)
+                        .foregroundColor(.secondary)
+                }
             }
 
+            // Сумма и даты
             HStack {
-                Text("\(deposit.amount, specifier: "%.2f") \(deposit.currency.rawValue)")
+                Text("\(deposit.amount, specifier: "%.0f") \(deposit.currency.rawValue)")
+                    .fontWeight(.medium)
                 Spacer()
-                HStack(spacing: 12) {
-                    Text(String(format: String(localized: "deposits.opened.format"), deposit.openDate.formatted(date: .abbreviated, time: .omitted)))
+                HStack(spacing: 6) {
+                    Text(deposit.openDate.formatted(date: .abbreviated, time: .omitted))
                         .font(.caption)
                         .foregroundColor(.secondary)
                     if let close = deposit.closeDate {
-                        Text(String(format: String(localized: "deposits.closed.format"), close.formatted(date: .abbreviated, time: .omitted)))
-                            .font(.caption)
+                        Image(systemName: "arrow.right")
+                            .font(.caption2)
                             .foregroundColor(.secondary)
+                        Text(close.formatted(date: .abbreviated, time: .omitted))
+                            .font(.caption)
+                            .foregroundColor(isClosed ? .secondary : .orange)
                     }
                 }
             }
 
-            VStack(alignment: .leading, spacing: 2) {
-                Text(String(format: String(localized: "deposits.income.today.format"), summary.incomeToDate, deposit.currency.rawValue))
-                    .font(.subheadline)
-                    .foregroundColor(summary.incomeToDate >= 0 ? .green : .red)
+            // Доход
+            HStack(spacing: 16) {
+                // Для закрытых: "Заработано", для активных: "На сегодня"
+                Label {
+                    Text(String(format: String(localized: isClosed
+                                               ? "deposits.income.earned.format"
+                                               : "deposits.income.today.format"),
+                                summary.incomeToDate, deposit.currency.rawValue))
+                        .font(.subheadline)
+                        .foregroundColor(.green)
+                } icon: {
+                    Image(systemName: isClosed ? "checkmark.circle" : "clock")
+                        .font(.caption)
+                        .foregroundColor(.green)
+                }
 
                 if let forecast = summary.forecastIncomeToCloseDate {
-                    Text(String(format: String(localized: "deposits.income.forecast.format"), forecast, deposit.currency.rawValue))
-                        .font(.subheadline)
-                        .foregroundColor(forecast >= 0 ? .green : .red)
+                    Label {
+                        Text(String(format: String(localized: "deposits.income.forecast.format"),
+                                    forecast, deposit.currency.rawValue))
+                            .font(.subheadline)
+                            .foregroundColor(.orange)
+                    } icon: {
+                        Image(systemName: "arrow.right.circle")
+                            .font(.caption)
+                            .foregroundColor(.orange)
+                    }
                 }
             }
             .padding(.top, 2)
         }
-        .padding(.vertical, 4)
+        .padding(.vertical, 6)
+        .opacity(isClosed ? 0.75 : 1.0)
     }
 }
 

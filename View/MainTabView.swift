@@ -18,7 +18,7 @@ struct MainTabView: View {
     var body: some View {
         TabView(selection: $selectedIndex) {
             // 0: Главная
-            NavigationView {
+            NavigationStack {
                 HomeTabView(
                     isAuthorized: isAuthorized,
                     openPortfolio: { selectedIndex = 1 },
@@ -26,13 +26,13 @@ struct MainTabView: View {
                     openSettings: { selectedIndex = 3 }
                 )
                 .navigationBarTitleDisplayMode(.inline)
-                .navigationTitle("Главная")
+                .navigationTitle("home.tab.title")
             }
-            .tabItem { Label("Главная", systemImage: "house.fill") }
+            .tabItem { Label("home.tab.title", systemImage: "house.fill") }
             .tag(0)
 
             // 1: Портфель (если не авторизован — показываем AuthView вместо портфеля)
-            NavigationView {
+            NavigationStack {
                 Group {
                     if isAuthorized {
                         PortfolioView(container: container)
@@ -56,15 +56,14 @@ struct MainTabView: View {
             .tag(1)
 
             // 2: Вклады
-            NavigationView {
+            NavigationStack {
                 DepositsView(container: container)
-                    .navigationTitle("deposits.title")
             }
             .tabItem { Label("deposits.title", systemImage: "banknote.fill") }
             .tag(2)
 
             // 3: Настройки
-            NavigationView {
+            NavigationStack {
                 SettingsView()
                     .navigationTitle("settings.title")
             }

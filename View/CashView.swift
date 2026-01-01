@@ -19,24 +19,22 @@ struct CashView: View {
     var body: some View {
         Group {
             if vm.isLoading {
-                ProgressView("Загрузка операций...")
+                ProgressView(String(localized: "cash.loading"))
                     .frame(maxWidth: .infinity, maxHeight: .infinity)
             } else if let error = vm.errorMessage {
                 VStack(spacing: 16) {
                     Image(systemName: "exclamationmark.triangle")
                         .font(.largeTitle)
                         .foregroundColor(.orange)
-                    Text("Ошибка загрузки")
+                    Text(String(localized: "common.error"))
                         .font(.headline)
                     Text(error)
                         .font(.caption)
                         .foregroundColor(.secondary)
                         .multilineTextAlignment(.center)
                         .padding()
-                    Button("Повторить") {
-                        Task {
-                            await vm.load()
-                        }
+                    Button(String(localized: "common.retry")) {
+                        Task { await vm.load() }
                     }
                     .buttonStyle(.borderedProminent)
                 }
@@ -47,7 +45,7 @@ struct CashView: View {
                     Image(systemName: "dollarsign.circle")
                         .font(.largeTitle)
                         .foregroundColor(.secondary)
-                    Text("Нет операций")
+                    Text(String(localized: "cash.operations.empty"))
                         .font(.headline)
                         .foregroundColor(.secondary)
                 }

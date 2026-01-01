@@ -47,14 +47,18 @@ final class DefaultDepositsService: DepositsService {
     }
 
     func incomeSummary(for deposit: Deposit, asOf date: Date) -> DepositIncomeSummary {
-        let incomeToday = income(for: deposit, until: date)
+        // Для закрытых вкладов доход считается до даты закрытия, не до сегодня
+        let cappedDate = deposit.closeDate.map { min(date, $0) } ?? date
+        let incomeEarned = income(for: deposit, until: cappedDate)
+
+        // Прогноз показываем только если дата закрытия ещё не наступила
         let forecast: Double?
-        if let close = deposit.closeDate, close > deposit.openDate {
+        if let close = deposit.closeDate, close > deposit.openDate, close > date {
             forecast = income(for: deposit, until: close)
         } else {
             forecast = nil
         }
-        return DepositIncomeSummary(incomeToDate: incomeToday, forecastIncomeToCloseDate: forecast)
+        return DepositIncomeSummary(incomeToDate: incomeEarned, forecastIncomeToCloseDate: forecast)
     }
 
     private func income(for deposit: Deposit, until date: Date) -> Double {

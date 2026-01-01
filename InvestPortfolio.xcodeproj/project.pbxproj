@@ -26,6 +26,8 @@
 		9557F97D2F810AFD0086715E /* PortfolioRepository.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9557F97C2F810AFD0086715E /* PortfolioRepository.swift */; };
 		9557F97F2F810B240086715E /* PortfolioService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9557F97E2F810B240086715E /* PortfolioService.swift */; };
 		9557F9812F810B250086715E /* CashService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9557F9802F810B250086715E /* CashService.swift */; };
+		95BD3F7B2F820EE2001EBDF8 /* QuotesAPIClient.swift in Sources */ = {isa = PBXBuildFile; fileRef = 95BD3F7A2F820EE2001EBDF8 /* QuotesAPIClient.swift */; };
+		95BD3F7D2F8210BB001EBDF8 /* DepositsReportView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 95BD3F7C2F8210BB001EBDF8 /* DepositsReportView.swift */; };
 		95D967F62F0416EF00079C66 /* AuthPage.swift in Sources */ = {isa = PBXBuildFile; fileRef = 95D967F52F0416EF00079C66 /* AuthPage.swift */; };
 		95D967F82F04193300079C66 /* NotificationName+Unauthorized.swift in Sources */ = {isa = PBXBuildFile; fileRef = 95D967F72F04193300079C66 /* NotificationName+Unauthorized.swift */; };
 		95D967FA2F04193400079C66 /* HomeTabView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 95D967F92F04193400079C66 /* HomeTabView.swift */; };
@@ -68,6 +70,8 @@
 		9557F97C2F810AFD0086715E /* PortfolioRepository.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PortfolioRepository.swift; sourceTree = "<group>"; };
 		9557F97E2F810B240086715E /* PortfolioService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PortfolioService.swift; sourceTree = "<group>"; };
 		9557F9802F810B250086715E /* CashService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CashService.swift; sourceTree = "<group>"; };
+		95BD3F7A2F820EE2001EBDF8 /* QuotesAPIClient.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = QuotesAPIClient.swift; sourceTree = "<group>"; };
+		95BD3F7C2F8210BB001EBDF8 /* DepositsReportView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DepositsReportView.swift; sourceTree = "<group>"; };
 		95D967F52F0416EF00079C66 /* AuthPage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AuthPage.swift; sourceTree = "<group>"; };
 		95D967F72F04193300079C66 /* NotificationName+Unauthorized.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "NotificationName+Unauthorized.swift"; sourceTree = "<group>"; };
 		95D967F92F04193400079C66 /* HomeTabView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomeTabView.swift; sourceTree = "<group>"; };
@@ -101,6 +105,7 @@
 				5EA7CB5A8DFF077953BBDEFF /* APIClient.swift */,
 				C37B7EDAF8F936E98437A1F3 /* APIError.swift */,
 				9557F9762F810AA20086715E /* APIDTOs.swift */,
+				95BD3F7A2F820EE2001EBDF8 /* QuotesAPIClient.swift */,
 			);
 			path = APIClient;
 			sourceTree = "<group>";
@@ -197,6 +202,7 @@
 				95D967F92F04193400079C66 /* HomeTabView.swift */,
 				95D967FB2F04193500079C66 /* LandingCard.swift */,
 				95D967FD2F04193500079C66 /* Color+TertiaryLabel.swift */,
+				95BD3F7C2F8210BB001EBDF8 /* DepositsReportView.swift */,
 			);
 			path = View;
 			sourceTree = "<group>";
@@ -273,6 +279,7 @@
 			files = (
 				950800152F040E5A0041AD54 /* SettingsView.swift in Sources */,
 				9511098B2F8161EE00EE2EEE /* DIContainer.swift in Sources */,
+				95BD3F7B2F820EE2001EBDF8 /* QuotesAPIClient.swift in Sources */,
 				950800092F0406650041AD54 /* Deposit.swift in Sources */,
 				F8045D927570703468F14EEE /* InvestPortfolioApp.swift in Sources */,
 				950800032F04064E0041AD54 /* DepositsView.swift in Sources */,
@@ -300,6 +307,7 @@
 				F3552534641030F610F3E7C2 /* PortfolioView.swift in Sources */,
 				9508000D2F0406770041AD54 /* DepositsRepository.swift in Sources */,
 				95D967FE2F04193500079C66 /* Color+TertiaryLabel.swift in Sources */,
+				95BD3F7D2F8210BB001EBDF8 /* DepositsReportView.swift in Sources */,
 				9557F9812F810B250086715E /* CashService.swift in Sources */,
 				28B87BD48DE2E58850C3F9A2 /* PortfolioViewModel.swift in Sources */,
 				95D968042F041B8500079C66 /* AuthViewModel.swift in Sources */,

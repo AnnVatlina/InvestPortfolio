@@ -16,27 +16,26 @@ struct PortfolioView: View {
             service: container.makePortfolioService()
         ))
     }
+
     var body: some View {
         Group {
             if vm.isLoading {
-                ProgressView("Загрузка портфеля...")
+                ProgressView(String(localized: "portfolio.loading"))
                     .frame(maxWidth: .infinity, maxHeight: .infinity)
             } else if let error = vm.errorMessage {
                 VStack(spacing: 16) {
                     Image(systemName: "exclamationmark.triangle")
                         .font(.largeTitle)
                         .foregroundColor(.orange)
-                    Text("Ошибка загрузки")
+                    Text(String(localized: "common.error"))
                         .font(.headline)
                     Text(error)
                         .font(.caption)
                         .foregroundColor(.secondary)
                         .multilineTextAlignment(.center)
                         .padding()
-                    Button("Повторить") {
-                        Task {
-                            await vm.load(sid: sid)
-                        }
+                    Button(String(localized: "common.retry")) {
+                        Task { await vm.load(sid: sid) }
                     }
                     .buttonStyle(.borderedProminent)
                 }
@@ -47,7 +46,7 @@ struct PortfolioView: View {
                     Image(systemName: "chart.pie")
                         .font(.largeTitle)
                         .foregroundColor(.secondary)
-                    Text("Портфель пуст")
+                    Text(String(localized: "portfolio.empty"))
                         .font(.headline)
                         .foregroundColor(.secondary)
                 }
@@ -58,9 +57,9 @@ struct PortfolioView: View {
                         Text(position.ticker)
                             .font(.headline)
                         HStack {
-                            Text("Кол-во: \(position.quantity, specifier: "%.2f")")
+                            Text(String(format: String(localized: "portfolio.quantity.format"), position.quantity))
                             Spacer()
-                            Text("P/L: \(position.profit, specifier: "%.2f")")
+                            Text(String(format: String(localized: "portfolio.profit.format"), position.profit))
                                 .foregroundColor(position.profit >= 0 ? .green : .red)
                         }
                         .font(.caption)
@@ -71,6 +70,6 @@ struct PortfolioView: View {
         }
         .task { await vm.load(sid: sid) }
         .refreshable { await vm.refresh(sid: sid) }
-        .navigationTitle("Portfolio")
+        .navigationTitle(String(localized: "home.portfolio.title"))
     }
 }

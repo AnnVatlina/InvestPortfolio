@@ -36,6 +36,9 @@
 "deposits.closed.format" = "Закрытие: %@";
 "deposits.income.today.format" = "Доход на сегодня: %.2f %@";
 "deposits.income.forecast.format" = "Прогноз к закрытию: %.2f %@";
+"deposits.income.earned.format" = "Заработано: %.2f %@";
+"deposits.status.active" = "Активен";
+"deposits.status.closed" = "Закрыт";
 "deposits.field.bankName" = "Банк";
 "deposits.edit.title" = "Редактировать вклад";
 "deposits.delete.confirm.title" = "Удалить вклад?";
@@ -46,4 +49,39 @@
 "deposits.notification.body.format" = "Вклад «%@» закрывается через 7 дней.";
 "common.save" = "Сохранить";
 
+"report.mode.byBank" = "По банку";
+"report.mode.byCurrency" = "По валюте";
+"report.mode.byIncome" = "По доходу";
+"report.noBank" = "Без банка";
+"report.center.banks" = "банков";
+"report.center.currencies" = "валют";
+"report.center.deposits" = "вкладов";
+"report.card.deposits" = "вкл.";
+"report.card.today" = "сегодня";
+"report.card.annual" = "в год";
+"report.empty" = "Нет данных для отчёта";
+"report.monthly.title" = "Доход по месяцам";
+"report.monthly.empty" = "Нет данных за текущий год";
+
+"portfolio.loading" = "Загрузка портфеля...";
+"portfolio.empty" = "Портфель пуст";
+"portfolio.quantity.format" = "Кол-во: %.2f";
+"portfolio.profit.format" = "P/L: %.2f";
+
+"cash.loading" = "Загрузка операций...";
+"cash.operations.empty" = "Нет операций";
 "cash.load.error.format" = "Ошибка загрузки операций: %@";
+
+"home.tab.title" = "Главная";
+"home.portfolio.title2" = "Мой портфель";
+
+"settings.currencies.title" = "Валюты";
+"settings.currencies.description" = "Выберите валюты, доступные при добавлении вклада";
+
+"currency.USD" = "USD";
+"currency.EUR" = "EUR";
+"currency.GBP" = "GBP";
+"currency.RUB" = "RUB";
+"currency.CNY" = "CNY";
+"currency.JPY" = "JPY";
+"currency.CHF" = "CHF";

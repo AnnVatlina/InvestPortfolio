@@ -28,7 +28,27 @@ final class DepositsViewModel: ObservableObject {
 
         do {
             let items = try await service.fetchAll()
-            deposits = items
+            let now = Date()
+            deposits = items.sorted { a, b in
+                // Active deposits (closeDate > now or no closeDate) come first
+                let aActive = a.closeDate.map { $0 > now } ?? true
+                let bActive = b.closeDate.map { $0 > now } ?? true
+                if aActive != bActive { return aActive }
+                if aActive {
+                    // Among active: soonest expiring first; no close date goes last
+                    switch (a.closeDate, b.closeDate) {
+                    case (nil, nil): return a.openDate > b.openDate
+                    case (nil, _):   return false
+                    case (_, nil):   return true
+                    case (let d1?, let d2?): return d1 < d2
+                    }
+                } else {
+                    // Among closed: most recently closed first
+                    let d1 = a.closeDate ?? .distantPast
+                    let d2 = b.closeDate ?? .distantPast
+                    return d1 > d2
+                }
+            }
             recomputeIncomes()
         } catch {
             errorMessage = error.localizedDescription

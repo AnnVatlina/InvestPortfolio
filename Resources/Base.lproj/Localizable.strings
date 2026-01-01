@@ -14,7 +14,8 @@
 "about.title" = "About";
 "about.version" = "Version 1.0";
 
-"home.portfolio.title" = "My Portfolio";
+"home.portfolio.title2" = "My Portfolio";
+"home.portfolio.title" = "Portfolio";
 "home.portfolio.open" = "Open portfolio";
 "home.portfolio.loginRequired" = "Sign in required";
 
@@ -35,6 +36,9 @@
 "deposits.closed.format" = "Closed: %@";
 "deposits.income.today.format" = "Income to date: %.2f %@";
 "deposits.income.forecast.format" = "Forecast to close: %.2f %@";
+"deposits.income.earned.format" = "Earned: %.2f %@";
+"deposits.status.active" = "Active";
+"deposits.status.closed" = "Closed";
 "deposits.field.bankName" = "Bank";
 "deposits.edit.title" = "Edit Deposit";
 "deposits.delete.confirm.title" = "Delete Deposit";
@@ -45,7 +49,30 @@
 "deposits.notification.body.format" = "Your deposit \"%@\" expires in 7 days.";
 "common.save" = "Save";
 
+"report.mode.byBank" = "By Bank";
+"report.mode.byCurrency" = "By Currency";
+"report.mode.byIncome" = "By Income";
+"report.noBank" = "No Bank";
+"report.center.banks" = "banks";
+"report.center.currencies" = "currencies";
+"report.center.deposits" = "deposits";
+"report.card.deposits" = "dep.";
+"report.card.today" = "today";
+"report.card.annual" = "per year";
+"report.empty" = "No data for report";
+"report.monthly.title" = "Monthly Income";
+"report.monthly.empty" = "No income data for current year";
+
+"portfolio.loading" = "Loading portfolio...";
+"portfolio.empty" = "Portfolio is empty";
+"portfolio.quantity.format" = "Qty: %.2f";
+"portfolio.profit.format" = "P/L: %.2f";
+
+"cash.loading" = "Loading operations...";
+"cash.operations.empty" = "No operations";
 "cash.load.error.format" = "Failed to load operations: %@";
+
+"home.tab.title" = "Home";
 "settings.language" = "Language";
 "settings.currencies.title" = "Currencies";
 "settings.currencies.description" = "Select currencies shown when adding a deposit";
