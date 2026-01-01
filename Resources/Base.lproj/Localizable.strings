@@ -1,0 +1,39 @@
+// Localizable.strings — English (en.lproj)
+"app.name" = "InvestPortfolio";
+"app.title" = "My App";
+"common.ok" = "OK";
+"common.cancel" = "Cancel";
+"common.error" = "Error";
+"common.retry" = "Retry";
+"common.add" = "Add";
+"common.percentSign" = "%";
+"common.unknownError.format" = "Unknown error: %@";
+
+"settings.title" = "Settings";
+"settings.language" = "Language";
+"about.title" = "About";
+"about.version" = "Version 1.0";
+
+"home.portfolio.title" = "My Portfolio";
+"home.portfolio.open" = "Open portfolio";
+"home.portfolio.loginRequired" = "Sign in required";
+
+"deposits.title" = "Deposits";
+"deposits.open" = "View deposits";
+"deposits.add.title" = "Add deposit";
+"deposits.field.name" = "Title";
+"deposits.field.amount" = "Amount";
+"deposits.field.currency" = "Currency";
+"deposits.field.openDate" = "Open date";
+"deposits.field.hasCloseDate" = "Specify close date";
+"deposits.field.closeDate" = "Close date";
+"deposits.field.annualInterest" = "Annual rate, %";
+"deposits.loading" = "Loading deposits...";
+"deposits.empty" = "No deposits yet";
+"deposits.rate.format" = "Rate: %.2f%%";
+"deposits.opened.format" = "Opened: %@";
+"deposits.closed.format" = "Closed: %@";
+"deposits.income.today.format" = "Income to date: %.2f %@";
+"deposits.income.forecast.format" = "Forecast to close: %.2f %@";
+
+"cash.load.error.format" = "Failed to load operations: %@";

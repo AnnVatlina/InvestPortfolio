@@ -8,18 +8,34 @@
 import SwiftUI
 
 struct SettingsView: View {
+    @AppStorage("App_LocaleIdentifier") private var localeIdentifier: String = Locale.current.identifier
+
+    private let supportedLocales: [(id: String, name: String)] = [
+        ("ru", "Русский"),
+        ("en", "English")
+    ]
+
     var body: some View {
         List {
+            Section(header: Text("settings.language")) {
+                Picker("settings.language", selection: $localeIdentifier) {
+                    ForEach(supportedLocales, id: \.id) { item in
+                        Text(item.name).tag(item.id as String)
+                    }
+                }
+            }
+
             Section {
                 NavigationLink {
                     AboutAppView()
                 } label: {
-                    Label("О приложении", systemImage: "info.circle")
+                    Label("about.title", systemImage: "info.circle")
                 }
             }
         }
         .listStyle(.insetGrouped)
-        .navigationTitle("Настройки")
+        .environment(\.locale, Locale(identifier: localeIdentifier))
+        .navigationTitle(Text("settings.title"))
     }
 }
 
@@ -29,15 +45,15 @@ struct AboutAppView: View {
             Image(systemName: "app")
                 .font(.system(size: 48))
                 .foregroundColor(.accentColor)
-            Text("InvestPortfolio")
+            Text("app.name")
                 .font(.title2)
                 .fontWeight(.semibold)
-            Text("Версия 1.0")
+            Text("about.version")
                 .foregroundColor(.secondary)
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity)
         .background(Color(.systemBackground))
-        .navigationTitle("О приложении")
+        .navigationTitle(Text("about.title"))
     }
 }
 

@@ -12,7 +12,6 @@ final class DepositsViewModel: ObservableObject {
     @Published var isLoading = false
     @Published var errorMessage: String?
 
-    // Презентационные данные доходов, кэшируем по id
     @Published private(set) var incomes: [UUID: DepositIncomeSummary] = [:]
 
     private let service: DepositsService

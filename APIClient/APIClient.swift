@@ -138,7 +138,6 @@ final class APIClient {
             throw APIError.invalidURL
         }
         
-        // Сериализуем inner в JSON-строку (эквивалент JSON.stringify)
         let innerData = try JSONSerialization.data(withJSONObject: inner, options: [])
         guard let innerJSONString = String(data: innerData, encoding: .utf8) else {
             throw APIError.decodingError(NSError(domain: "Encoding", code: -1, userInfo: [NSLocalizedDescriptionKey: "Не удалось сформировать JSON-строку для q"]))

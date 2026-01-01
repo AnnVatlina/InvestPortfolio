@@ -35,7 +35,7 @@ struct MainTabView: View {
                 Group {
                     if isAuthorized {
                         PortfolioView()
-                            .navigationTitle("Портфель")
+                            .navigationTitle("home.portfolio.title")
                     } else {
                         AuthView(
                             onAuthorized: {
@@ -51,23 +51,23 @@ struct MainTabView: View {
                     }
                 }
             }
-            .tabItem { Label("Портфель", systemImage: "chart.pie.fill") }
+            .tabItem { Label("home.portfolio.title", systemImage: "chart.pie.fill") }
             .tag(1)
 
             // 2: Вклады
             NavigationView {
                 DepositsView()
-                    .navigationTitle("Вклады")
+                    .navigationTitle("deposits.title")
             }
-            .tabItem { Label("Вклады", systemImage: "banknote.fill") }
+            .tabItem { Label("deposits.title", systemImage: "banknote.fill") }
             .tag(2)
 
             // 3: Настройки
             NavigationView {
                 SettingsView()
-                    .navigationTitle("Настройки")
+                    .navigationTitle("settings.title")
             }
-            .tabItem { Label("Настройки", systemImage: "gearshape.fill") }
+            .tabItem { Label("settings.title", systemImage: "gearshape.fill") }
             .tag(3)
         }
         .onAppear {

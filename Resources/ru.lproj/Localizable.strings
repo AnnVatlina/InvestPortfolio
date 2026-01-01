@@ -1,0 +1,40 @@
+// Localizable.strings — Russian (ru.lproj)
+"app.name" = "InvestPortfolio";
+"app.title" = "Моё приложение";
+"common.ok" = "ОК";
+"common.cancel" = "Отмена";
+"common.error" = "Ошибка";
+"common.retry" = "Повторить";
+"common.add" = "Добавить";
+"common.percentSign" = "%";
+"common.unknownError.format" = "Неизвестная ошибка: %@";
+
+"settings.title" = "Настройки";
+"settings.language" = "Язык";
+"about.title" = "О приложении";
+"about.version" = "Версия 1.0";
+
+"home.portfolio.title2" = "Мой портфель";
+"home.portfolio.title" = "Портфель";
+"home.portfolio.open" = "Перейти к портфелю";
+"home.portfolio.loginRequired" = "Требуется вход";
+
+"deposits.title" = "Вклады";
+"deposits.open" = "Просмотреть вклады";
+"deposits.add.title" = "Добавить вклад";
+"deposits.field.name" = "Название";
+"deposits.field.amount" = "Сумма";
+"deposits.field.currency" = "Валюта";
+"deposits.field.openDate" = "Дата открытия";
+"deposits.field.hasCloseDate" = "Указать дату закрытия";
+"deposits.field.closeDate" = "Дата закрытия";
+"deposits.field.annualInterest" = "Годовая ставка, %";
+"deposits.loading" = "Загрузка вкладов...";
+"deposits.empty" = "Пока нет вкладов";
+"deposits.rate.format" = "Ставка: %.2f%%";
+"deposits.opened.format" = "Открыт: %@";
+"deposits.closed.format" = "Закрытие: %@";
+"deposits.income.today.format" = "Доход на сегодня: %.2f %@";
+"deposits.income.forecast.format" = "Прогноз к закрытию: %.2f %@";
+
+"cash.load.error.format" = "Ошибка загрузки операций: %@";

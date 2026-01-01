@@ -20,24 +20,24 @@ struct HomeTabView: View {
                     icon: "building.columns.fill",
                     iconColor: .white,
                     iconBackground: LinearGradient(colors: [Color.purple, Color.blue], startPoint: .topLeading, endPoint: .bottomTrailing),
-                    title: "Мой портфель",
-                    subtitle: isAuthorized ? "Перейти к портфелю" : "Требуется вход"
+                    title: String(localized: "home.portfolio.title"),
+                    subtitle: isAuthorized ? String(localized: "home.portfolio.open") : String(localized: "home.portfolio.loginRequired")
                 ) { openPortfolio() }
 
                 LandingCard(
                     icon: "banknote.fill",
                     iconColor: .white,
                     iconBackground: LinearGradient(colors: [Color.green, Color.teal], startPoint: .topLeading, endPoint: .bottomTrailing),
-                    title: "Вклады",
-                    subtitle: "Просмотреть вклады"
+                    title: String(localized: "deposits.title"),
+                    subtitle: String(localized: "deposits.open")
                 ) { openDeposits() }
 
                 LandingCard(
                     icon: "gearshape.fill",
                     iconColor: .white,
                     iconBackground: LinearGradient(colors: [Color.blue, Color.cyan], startPoint: .topLeading, endPoint: .bottomTrailing),
-                    title: "Настройки",
-                    subtitle: "О приложении"
+                    title: String(localized: "settings.title"),
+                    subtitle: String(localized: "about.title")
                 ) { openSettings() }
             }
             .padding(.horizontal, 20)

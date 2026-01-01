@@ -29,10 +29,10 @@ final class CashViewModel: ObservableObject {
                 break
             }
             errorMessage = error.errorDescription
-            print("Ошибка загрузки операций: \(error.localizedDescription)")
+            print(String(format: String(localized: "cash.load.error.format"), error.localizedDescription))
         } catch {
             errorMessage = error.localizedDescription
-            print("Неизвестная ошибка: \(error)")
+            print(String(format: String(localized: "common.unknownError.format"), String(describing: error)))
         }
     }
 }
