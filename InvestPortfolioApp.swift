@@ -19,7 +19,8 @@ struct InvestPortfolioApp: App {
                 for: Deposit.self,
                      CashOperation.self,
                      PortfolioPosition.self,
-                     Settings.self
+                     Settings.self,
+                     Subscription.self
             )
             _container = StateObject(wrappedValue: DIContainer(modelContainer: modelContainer))
         } catch {

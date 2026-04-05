@@ -11,6 +11,7 @@ struct HomeTabView: View {
     var isAuthorized: Bool
     var openPortfolio: () -> Void
     var openDeposits: () -> Void
+    var openSubscriptions: () -> Void
     var openSettings: () -> Void
 
     var body: some View {
@@ -31,6 +32,14 @@ struct HomeTabView: View {
                     title: String(localized: "deposits.title"),
                     subtitle: String(localized: "deposits.open")
                 ) { openDeposits() }
+
+                LandingCard(
+                    icon: "repeat.circle.fill",
+                    iconColor: .white,
+                    iconBackground: LinearGradient(colors: [Color.orange, Color.pink], startPoint: .topLeading, endPoint: .bottomTrailing),
+                    title: String(localized: "subscriptions.title"),
+                    subtitle: String(localized: "subscriptions.open")
+                ) { openSubscriptions() }
 
                 LandingCard(
                     icon: "gearshape.fill",

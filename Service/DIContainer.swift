@@ -40,6 +40,12 @@ final class DIContainer: ObservableObject {
         )
     }
 
+    func makeSubscriptionsService() -> any SubscriptionsService {
+        DefaultSubscriptionsService(
+            repository: SwiftDataSubscriptionsRepository(modelContainer: modelContainer)
+        )
+    }
+
     // MARK: - Preview
 
     /// Изолированный контейнер для SwiftUI Preview и тестов.
@@ -51,6 +57,7 @@ final class DIContainer: ObservableObject {
                 CashOperation.self,
                 PortfolioPosition.self,
                 Settings.self,
+                Subscription.self,
             configurations: config
         )
         return DIContainer(modelContainer: container)

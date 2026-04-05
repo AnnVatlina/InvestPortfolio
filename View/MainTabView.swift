@@ -1,6 +1,6 @@
 //
 //  MainTabView.swift
-//  
+//
 //
 //  Created by Anna on 26.12.25.
 //
@@ -11,7 +11,6 @@ struct MainTabView: View {
     @AppStorage("MainTab_SelectedIndex") private var selectedIndex: Int = 0
     @EnvironmentObject private var container: DIContainer
 
-    // Внешние зависимости: состояние авторизации и колбэк при успешном входе
     var isAuthorized: Bool = (KeychainService.loadToken() != nil)
     var onAuthorized: (() -> Void)? = nil
 
@@ -23,7 +22,8 @@ struct MainTabView: View {
                     isAuthorized: isAuthorized,
                     openPortfolio: { selectedIndex = 1 },
                     openDeposits: { selectedIndex = 2 },
-                    openSettings: { selectedIndex = 3 }
+                    openSubscriptions: { selectedIndex = 3 },
+                    openSettings: { selectedIndex = 4 }
                 )
                 .navigationBarTitleDisplayMode(.inline)
                 .navigationTitle("home.tab.title")
@@ -31,7 +31,7 @@ struct MainTabView: View {
             .tabItem { Label("home.tab.title", systemImage: "house.fill") }
             .tag(0)
 
-            // 1: Портфель (если не авторизован — показываем AuthView вместо портфеля)
+            // 1: Портфель
             NavigationStack {
                 Group {
                     if isAuthorized {
@@ -39,15 +39,9 @@ struct MainTabView: View {
                             .navigationTitle("home.portfolio.title")
                     } else {
                         AuthView(
-                            onAuthorized: {
-                                onAuthorized?()
-                            },
-                            onOpenDeposits: {
-                                selectedIndex = 2
-                            },
-                            onOpenSettings: {
-                                selectedIndex = 3
-                            }
+                            onAuthorized: { onAuthorized?() },
+                            onOpenDeposits: { selectedIndex = 2 },
+                            onOpenSettings: { selectedIndex = 4 }
                         )
                     }
                 }
@@ -62,17 +56,23 @@ struct MainTabView: View {
             .tabItem { Label("deposits.title", systemImage: "banknote.fill") }
             .tag(2)
 
-            // 3: Настройки
+            // 3: Подписки
+            NavigationStack {
+                SubscriptionsView(container: container)
+            }
+            .tabItem { Label("subscriptions.title", systemImage: "repeat.circle.fill") }
+            .tag(3)
+
+            // 4: Настройки
             NavigationStack {
                 SettingsView()
                     .navigationTitle("settings.title")
             }
             .tabItem { Label("settings.title", systemImage: "gearshape.fill") }
-            .tag(3)
+            .tag(4)
         }
         .onAppear {
-            if !(0...3).contains(selectedIndex) { selectedIndex = 0 }
+            if !(0...4).contains(selectedIndex) { selectedIndex = 0 }
         }
     }
 }
-
