@@ -1,46 +1,13 @@
 //
 //  Subscription.swift
 //
+//  Business logic extensions for Subscription (AppSchemaV2.Subscription).
+//  Stored properties and the @Model definition live in AppSchema.swift.
+//
 
 import Foundation
-import SwiftData
 
-@Model
-final class Subscription {
-    var id: UUID
-    var title: String
-    var amount: Double
-    var currency: DepositCurrency
-    var billingCycle: SubscriptionBillingCycle
-    var startDate: Date
-    var category: String?
-    var iconName: String?        // SF Symbol name
-    var isActive: Bool
-    var createdAt: Date
-
-    init(
-        id: UUID = UUID(),
-        title: String,
-        amount: Double,
-        currency: DepositCurrency,
-        billingCycle: SubscriptionBillingCycle,
-        startDate: Date = Date(),
-        category: String? = nil,
-        iconName: String? = nil,
-        isActive: Bool = true,
-        createdAt: Date = Date()
-    ) {
-        self.id = id
-        self.title = title
-        self.amount = amount
-        self.currency = currency
-        self.billingCycle = billingCycle
-        self.startDate = startDate
-        self.category = category
-        self.iconName = iconName
-        self.isActive = isActive
-        self.createdAt = createdAt
-    }
+extension Subscription {
 
     /// Next upcoming payment date.
     /// For one-time purchases this equals startDate (no future recurrence).
