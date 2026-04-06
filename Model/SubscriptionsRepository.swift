@@ -20,7 +20,8 @@ protocol SubscriptionsRepository: Sendable {
         startDate: Date,
         category: String?,
         iconName: String?,
-        isActive: Bool
+        isActive: Bool,
+        endDate: Date?
     ) async throws
 }
 
@@ -59,7 +60,8 @@ actor SwiftDataSubscriptionsRepository: SubscriptionsRepository {
         startDate: Date,
         category: String?,
         iconName: String?,
-        isActive: Bool
+        isActive: Bool,
+        endDate: Date?
     ) async throws {
         let predicate = #Predicate<Subscription> { $0.id == id }
         let descriptor = FetchDescriptor(predicate: predicate)
@@ -72,6 +74,7 @@ actor SwiftDataSubscriptionsRepository: SubscriptionsRepository {
         item.category = category
         item.iconName = iconName
         item.isActive = isActive
+        item.endDate = endDate
         try modelContext.save()
     }
 }
@@ -102,7 +105,8 @@ final class InMemorySubscriptionsRepository: SubscriptionsRepository {
         startDate: Date,
         category: String?,
         iconName: String?,
-        isActive: Bool
+        isActive: Bool,
+        endDate: Date?
     ) async throws {
         guard let index = items.firstIndex(where: { $0.id == id }) else { return }
         items[index].title = title
@@ -113,5 +117,6 @@ final class InMemorySubscriptionsRepository: SubscriptionsRepository {
         items[index].category = category
         items[index].iconName = iconName
         items[index].isActive = isActive
+        items[index].endDate = endDate
     }
 }

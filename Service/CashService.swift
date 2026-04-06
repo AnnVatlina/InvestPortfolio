@@ -9,6 +9,7 @@ import Foundation
 
 protocol CashService {
     func fetchOperations(forceRefresh: Bool) async throws -> [CashOperation]
+    func fetchAll() async throws -> [CashOperation]
 }
 
 final class DefaultCashService: CashService {
@@ -24,6 +25,10 @@ final class DefaultCashService: CashService {
         self.repository = repository
         self.apiClient = apiClient
         self.maxCacheAge = maxCacheAge
+    }
+
+    func fetchAll() async throws -> [CashOperation] {
+        try await repository.fetchAll()
     }
 
     func fetchOperations(forceRefresh: Bool = false) async throws -> [CashOperation] {

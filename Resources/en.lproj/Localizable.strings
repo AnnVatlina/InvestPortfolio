@@ -133,3 +133,21 @@
 "subscriptions.field.purchaseDate" = "Purchase date";
 "subscriptions.report.chart.title" = "Monthly payments";
 "subscriptions.report.chart.empty" = "No payment data for this year";
+"subscriptions.field.endDate" = "End date";
+"subscriptions.cancelled.on.format" = "Cancelled on %@";
+
+"subscriptions.filter.all" = "All";
+"subscriptions.filter.active" = "Active";
+"subscriptions.filter.cancelled" = "Cancelled";
+"subscriptions.filter.paid" = "Paid";
+"subscriptions.filter.empty" = "No subscriptions match this filter";
+"subscriptions.pageSize.all" = "All";
+"subscriptions.pagination.format" = "Page %d of %d";
+
+// MARK: - Export
+"settings.export.title" = "Export Data";
+"settings.export.deposits" = "Export Deposits";
+"settings.export.subscriptions" = "Export Subscriptions";
+"settings.export.cashOperations" = "Export Cash Operations";
+"settings.export.portfolio" = "Export Portfolio";
+"settings.export.error" = "Failed to create export file";

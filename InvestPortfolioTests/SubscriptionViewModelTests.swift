@@ -8,6 +8,7 @@
 //
 
 import Testing
+import Foundation
 @testable import InvestPortfolio
 
 // MARK: - Helpers
@@ -261,8 +262,8 @@ struct SubscriptionsViewModelUpcomingTests {
         let tomorrow = Calendar.current.date(byAdding: .day, value: 1, to: Date())!
         let nextWeek = Calendar.current.date(byAdding: .day, value: 8, to: Date())!
 
-        let soon = sub(title: "Soon",     startDate: tomorrow, cycle: .monthly, isActive: true)
-        let late = sub(title: "Too late", startDate: nextWeek, cycle: .monthly, isActive: true)
+        let soon = sub(title: "Soon",     cycle: .monthly, startDate: tomorrow, isActive: true)
+        let late = sub(title: "Too late", cycle: .monthly, startDate: nextWeek, isActive: true)
         let vm = await makeVM(with: [soon, late])
 
         let result = vm.upcoming(withinDays: 7)
@@ -272,21 +273,21 @@ struct SubscriptionsViewModelUpcomingTests {
 
     @Test func upcomingExcludesInactiveSubs() async {
         let tomorrow = Calendar.current.date(byAdding: .day, value: 1, to: Date())!
-        let inactive = sub(title: "Cancelled", startDate: tomorrow, cycle: .monthly, isActive: false)
+        let inactive = sub(title: "Cancelled", cycle: .monthly, startDate: tomorrow, isActive: false)
         let vm = await makeVM(with: [inactive])
         #expect(vm.upcoming(withinDays: 7).isEmpty)
     }
 
     @Test func upcomingIncludesOneTimePurchaseInFuture() async {
         let tomorrow = Calendar.current.date(byAdding: .day, value: 1, to: Date())!
-        let purchase = sub(title: "Purchase", startDate: tomorrow, cycle: .oneTime, isActive: true)
+        let purchase = sub(title: "Purchase", cycle: .oneTime, startDate: tomorrow, isActive: true)
         let vm = await makeVM(with: [purchase])
         #expect(vm.upcoming(withinDays: 7).count == 1)
     }
 
     @Test func upcomingExcludesPastOneTimePurchase() async {
         let yesterday = Calendar.current.date(byAdding: .day, value: -1, to: Date())!
-        let purchase = sub(title: "Already bought", startDate: yesterday, cycle: .oneTime, isActive: true)
+        let purchase = sub(title: "Already bought", cycle: .oneTime, startDate: yesterday, isActive: true)
         let vm = await makeVM(with: [purchase])
         #expect(vm.upcoming(withinDays: 7).isEmpty)
     }

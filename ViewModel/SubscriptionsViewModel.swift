@@ -5,16 +5,91 @@
 import Foundation
 @preconcurrency import UserNotifications
 
+// MARK: - Filter & Pagination types
+
+enum SubscriptionStatusFilter: String, CaseIterable, Identifiable, Equatable {
+    case all       = "all"
+    case active    = "active"
+    case cancelled = "cancelled"
+    case paid      = "paid"
+    var id: String { rawValue }
+}
+
+enum SubscriptionPageSize: Int, CaseIterable, Identifiable, Equatable {
+    case five      = 5
+    case ten       = 10
+    case unlimited = 0  // show all
+    var id: Int { rawValue }
+}
+
+// MARK: - ViewModel
+
 @MainActor
 final class SubscriptionsViewModel: ObservableObject {
     @Published private(set) var subscriptions: [Subscription] = []
     @Published var isLoading = false
     @Published var errorMessage: String?
 
+    // Filter & pagination state
+    @Published var statusFilter: SubscriptionStatusFilter = .all
+    @Published var pageSize: SubscriptionPageSize = .ten
+    @Published var currentPage: Int = 1
+
     private let service: any SubscriptionsService
 
     init(service: any SubscriptionsService) {
         self.service = service
+    }
+
+    // MARK: - Filter & pagination computed
+
+    /// Subscriptions matching the current status filter, sorted appropriately.
+    var filteredSubscriptions: [Subscription] {
+        let now = Date()
+        switch statusFilter {
+        case .all:
+            // Reverse chronological — most recently added first
+            return subscriptions.sorted { $0.createdAt > $1.createdAt }
+        case .active:
+            // Keep the smart sort (by next payment date) applied in load()
+            return subscriptions.filter { $0.isActive }
+        case .cancelled:
+            return subscriptions
+                .filter { !$0.isActive }
+                .sorted { ($0.endDate ?? $0.createdAt) > ($1.endDate ?? $1.createdAt) }
+        case .paid:
+            return subscriptions
+                .filter { $0.isActive && !$0.billingCycle.isRecurring && $0.startDate <= now }
+                .sorted { $0.startDate > $1.startDate }
+        }
+    }
+
+    var totalFilteredCount: Int { filteredSubscriptions.count }
+
+    var totalPages: Int {
+        guard pageSize != .unlimited, pageSize.rawValue > 0 else { return 1 }
+        return max(1, (totalFilteredCount + pageSize.rawValue - 1) / pageSize.rawValue)
+    }
+
+    /// Current page's slice of `filteredSubscriptions`.
+    var pagedSubscriptions: [Subscription] {
+        guard pageSize != .unlimited else { return filteredSubscriptions }
+        let count = pageSize.rawValue
+        let start = (currentPage - 1) * count
+        guard start < filteredSubscriptions.count else { return [] }
+        return Array(filteredSubscriptions[start..<min(start + count, filteredSubscriptions.count)])
+    }
+
+    func setFilter(_ filter: SubscriptionStatusFilter) {
+        guard statusFilter != filter else { return }
+        statusFilter = filter
+        currentPage = 1
+    }
+
+    func setPageSize(_ size: SubscriptionPageSize) {
+        guard pageSize != size else { return }
+        pageSize = size
+        currentPage = 1
     }
 
     // MARK: - Monthly payment chart data
@@ -46,7 +121,8 @@ final class SubscriptionsViewModel: ObservableObject {
         // Accumulate: [monthStart: [currency: total]]
         var acc: [Date: [String: Double]] = [:]
 
-        for sub in subscriptions where sub.isActive {
+        // Include active subscriptions + cancelled ones that have an explicit end date recorded
+        for sub in subscriptions where sub.isActive || sub.endDate != nil {
             let dates = paymentDates(for: sub, from: yearStart, to: yearEnd, calendar: cal)
             for date in dates {
                 let monthStart = cal.date(from: cal.dateComponents([.year, .month], from: date)) ?? date
@@ -152,7 +228,8 @@ final class SubscriptionsViewModel: ObservableObject {
         startDate: Date,
         category: String?,
         iconName: String?,
-        isActive: Bool
+        isActive: Bool,
+        endDate: Date?
     ) async {
         do {
             try await service.update(
@@ -164,7 +241,8 @@ final class SubscriptionsViewModel: ObservableObject {
                 startDate: startDate,
                 category: emptyToNil(category),
                 iconName: emptyToNil(iconName),
-                isActive: isActive
+                isActive: isActive,
+                endDate: isActive ? nil : endDate
             )
             await load()
             if let updated = subscriptions.first(where: { $0.id == id }) {
@@ -253,10 +331,13 @@ final class SubscriptionsViewModel: ObservableObject {
     // MARK: - Private helpers
 
     /// All payment dates for a subscription that fall within [from, to).
+    /// For cancelled subscriptions with `endDate`, payments are capped at the end date.
     private func paymentDates(for sub: Subscription, from: Date, to: Date, calendar: Calendar) -> [Date] {
+        // Cap the window at endDate for cancelled subscriptions
+        let effectiveTo = sub.endDate.map { min($0, to) } ?? to
         if !sub.billingCycle.isRecurring {
             // One-time: appears only in the year it was purchased
-            return (sub.startDate >= from && sub.startDate < to) ? [sub.startDate] : []
+            return (sub.startDate >= from && sub.startDate < effectiveTo) ? [sub.startDate] : []
         }
         var dates: [Date] = []
         var current = sub.startDate
@@ -264,7 +345,7 @@ final class SubscriptionsViewModel: ObservableObject {
         while current < from {
             current = Subscription.advance(current, by: sub.billingCycle, calendar: calendar)
         }
-        while current < to {
+        while current < effectiveTo {
             dates.append(current)
             current = Subscription.advance(current, by: sub.billingCycle, calendar: calendar)
         }

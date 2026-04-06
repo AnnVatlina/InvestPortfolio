@@ -81,7 +81,8 @@ struct SubscriptionsView: View {
                         startDate: formData.startDate,
                         category: formData.category,
                         iconName: formData.iconName,
-                        isActive: formData.isActive
+                        isActive: formData.isActive,
+                        endDate: formData.endDate
                     )
                 }
             }
@@ -109,53 +110,159 @@ struct SubscriptionsView: View {
     // MARK: - List
 
     private var subscriptionsList: some View {
-        List {
-            // Upcoming payments (next 7 days)
-            let soon = vm.upcoming(withinDays: 7)
-            if !soon.isEmpty {
-                Section(String(localized: "subscriptions.section.upcoming")) {
-                    ForEach(soon) { sub in
-                        upcomingRow(sub)
+        VStack(spacing: 0) {
+            filterBar
+            List {
+                // Upcoming payments (next 7 days)
+                let soon = vm.upcoming(withinDays: 7)
+                if !soon.isEmpty {
+                    Section(String(localized: "subscriptions.section.upcoming")) {
+                        ForEach(soon) { sub in upcomingRow(sub) }
                     }
                 }
-            }
 
-            // Monthly cost summary (recurring only)
-            if !vm.activeCurrencies.filter({ vm.totalMonthlyCost(in: $0) > 0 }).isEmpty {
-                Section(String(localized: "subscriptions.section.summary")) {
-                    ForEach(vm.activeCurrencies, id: \.self) { currency in
-                        let cost = vm.totalMonthlyCost(in: currency)
-                        if cost > 0 {
-                            HStack {
-                                Text(String(localized: "subscriptions.summary.monthly"))
-                                    .foregroundColor(.secondary)
-                                Spacer()
-                                Text(String(format: "%.2f %@", cost, currency.rawValue))
-                                    .fontWeight(.semibold)
+                // Monthly cost summary (recurring only, always from active subs)
+                if !vm.activeCurrencies.filter({ vm.totalMonthlyCost(in: $0) > 0 }).isEmpty {
+                    Section(String(localized: "subscriptions.section.summary")) {
+                        ForEach(vm.activeCurrencies, id: \.self) { currency in
+                            let cost = vm.totalMonthlyCost(in: currency)
+                            if cost > 0 {
+                                HStack {
+                                    Text(String(localized: "subscriptions.summary.monthly"))
+                                        .foregroundColor(.secondary)
+                                    Spacer()
+                                    Text(String(format: "%.2f %@", cost, currency.rawValue))
+                                        .fontWeight(.semibold)
+                                }
                             }
                         }
                     }
                 }
-            }
 
-            // All subscriptions
-            Section(String(localized: "subscriptions.section.all")) {
-                ForEach(vm.subscriptions) { sub in
-                    SubscriptionRow(
-                        subscription: sub,
-                        monthlyCost: vm.monthlyCost(for: sub)
-                    )
-                    .contentShape(Rectangle())
-                    .onTapGesture { subscriptionToEdit = sub }
-                }
-                .onDelete { indexSet in
-                    if let index = indexSet.first {
-                        subscriptionToDelete = vm.subscriptions[index]
+                // Filtered & paginated section
+                Section {
+                    if vm.pagedSubscriptions.isEmpty {
+                        Text(String(localized: "subscriptions.filter.empty"))
+                            .font(.subheadline).foregroundColor(.secondary)
+                            .frame(maxWidth: .infinity, alignment: .center)
+                            .padding(.vertical, 12)
+                            .listRowBackground(Color.clear)
                     }
+                    ForEach(vm.pagedSubscriptions) { sub in
+                        SubscriptionRow(
+                            subscription: sub,
+                            monthlyCost: vm.monthlyCost(for: sub)
+                        )
+                        .contentShape(Rectangle())
+                        .onTapGesture { subscriptionToEdit = sub }
+                    }
+                    .onDelete { indexSet in
+                        if let index = indexSet.first {
+                            subscriptionToDelete = vm.pagedSubscriptions[index]
+                        }
+                    }
+
+                    // Pagination row
+                    if vm.totalPages > 1 {
+                        paginationRow
+                    }
+                } header: {
+                    filteredSectionHeader
                 }
             }
+            .listStyle(.insetGrouped)
         }
-        .listStyle(.insetGrouped)
+    }
+
+    // MARK: - Filter bar
+
+    private var filterBar: some View {
+        ScrollView(.horizontal, showsIndicators: false) {
+            HStack(spacing: 8) {
+                ForEach(SubscriptionStatusFilter.allCases) { filter in
+                    Button { vm.setFilter(filter) } label: {
+                        Text(filterLabel(for: filter))
+                            .font(.subheadline)
+                            .fontWeight(vm.statusFilter == filter ? .semibold : .regular)
+                            .padding(.horizontal, 14).padding(.vertical, 7)
+                            .background(vm.statusFilter == filter
+                                        ? Color.accentColor
+                                        : Color(.secondarySystemFill))
+                            .foregroundColor(vm.statusFilter == filter ? .white : .primary)
+                            .clipShape(Capsule())
+                    }
+                    .buttonStyle(.plain)
+                    .animation(.easeInOut(duration: 0.18), value: vm.statusFilter)
+                }
+            }
+            .padding(.horizontal, 16)
+            .padding(.vertical, 10)
+        }
+        .background(Color(.systemGroupedBackground))
+    }
+
+    // MARK: - Section header (filter label + count + page size picker)
+
+    private var filteredSectionHeader: some View {
+        HStack(spacing: 4) {
+            Text("\(filterLabel(for: vm.statusFilter)) · \(vm.totalFilteredCount)")
+                .foregroundColor(.secondary)
+            Spacer()
+            Picker("", selection: Binding(
+                get: { vm.pageSize },
+                set: { vm.setPageSize($0) }
+            )) {
+                ForEach(SubscriptionPageSize.allCases) { size in
+                    Text(size == .unlimited
+                         ? String(localized: "subscriptions.pageSize.all")
+                         : "\(size.rawValue)")
+                        .tag(size)
+                }
+            }
+            .pickerStyle(.menu)
+            .font(.caption)
+        }
+        .textCase(nil)
+    }
+
+    // MARK: - Pagination row
+
+    private var paginationRow: some View {
+        HStack {
+            Button { vm.currentPage -= 1 } label: {
+                Image(systemName: "chevron.left").padding(.trailing, 4)
+            }
+            .disabled(vm.currentPage <= 1)
+
+            Spacer()
+
+            Text(String(
+                format: String(localized: "subscriptions.pagination.format"),
+                vm.currentPage, vm.totalPages
+            ))
+            .font(.footnote).monospacedDigit().foregroundColor(.secondary)
+
+            Spacer()
+
+            Button { vm.currentPage += 1 } label: {
+                Image(systemName: "chevron.right").padding(.leading, 4)
+            }
+            .disabled(vm.currentPage >= vm.totalPages)
+        }
+        .buttonStyle(.borderless)
+        .foregroundColor(.accentColor)
+        .listRowBackground(Color.clear)
+    }
+
+    // MARK: - Helpers
+
+    private func filterLabel(for filter: SubscriptionStatusFilter) -> String {
+        switch filter {
+        case .all:       return String(localized: "subscriptions.filter.all")
+        case .active:    return String(localized: "subscriptions.filter.active")
+        case .cancelled: return String(localized: "subscriptions.filter.cancelled")
+        case .paid:      return String(localized: "subscriptions.filter.paid")
+        }
     }
 
     private func upcomingRow(_ sub: Subscription) -> some View {
@@ -268,6 +375,15 @@ private struct SubscriptionRow: View {
                                     .font(.caption2).foregroundColor(.secondary)
                             }
                         }
+                    }
+                } else if let end = subscription.endDate {
+                    // Cancelled with recorded end date
+                    HStack(spacing: 4) {
+                        Image(systemName: "xmark.circle")
+                            .font(.caption2).foregroundColor(.secondary)
+                        Text(String(format: String(localized: "subscriptions.cancelled.on.format"),
+                                    end.formatted(date: .abbreviated, time: .omitted)))
+                            .font(.caption).foregroundColor(.secondary)
                     }
                 }
             }
@@ -684,6 +800,7 @@ struct SubscriptionFormData {
     var category: String
     var iconName: String
     var isActive: Bool
+    var endDate: Date?
 }
 
 enum SubscriptionFormMode {
@@ -711,6 +828,7 @@ struct SubscriptionFormSheet: View {
     @State private var category: String
     @State private var selectedIcon: String
     @State private var isActive: Bool
+    @State private var endDate: Date
     @State private var validationError: String?
 
     static let iconPresets: [(symbol: String, label: String)] = [
@@ -741,6 +859,7 @@ struct SubscriptionFormSheet: View {
             _category = State(initialValue: "")
             _selectedIcon = State(initialValue: "repeat.circle.fill")
             _isActive = State(initialValue: true)
+            _endDate = State(initialValue: Date())
         case .edit(let sub):
             _title = State(initialValue: sub.title)
             _amountText = State(initialValue: String(sub.amount))
@@ -750,6 +869,7 @@ struct SubscriptionFormSheet: View {
             _category = State(initialValue: sub.category ?? "")
             _selectedIcon = State(initialValue: sub.iconName ?? "repeat.circle.fill")
             _isActive = State(initialValue: sub.isActive)
+            _endDate = State(initialValue: sub.endDate ?? Date())
         }
     }
 
@@ -819,6 +939,13 @@ struct SubscriptionFormSheet: View {
                 if case .edit = mode {
                     Section {
                         Toggle(String(localized: "subscriptions.field.isActive"), isOn: $isActive)
+                        if !isActive {
+                            DatePicker(
+                                String(localized: "subscriptions.field.endDate"),
+                                selection: $endDate,
+                                displayedComponents: .date
+                            )
+                        }
                     }
                 }
 
@@ -872,7 +999,8 @@ struct SubscriptionFormSheet: View {
             startDate: startDate,
             category: category.trimmingCharacters(in: .whitespacesAndNewlines),
             iconName: selectedIcon,
-            isActive: isActive
+            isActive: isActive,
+            endDate: isActive ? nil : endDate
         ))
         dismiss()
     }

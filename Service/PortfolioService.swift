@@ -9,6 +9,7 @@ import Foundation
 
 protocol PortfolioService {
     func fetchPositions(sid: String, forceRefresh: Bool) async throws -> [PortfolioPosition]
+    func fetchAll() async throws -> [PortfolioPosition]
 }
 
 final class DefaultPortfolioService: PortfolioService {
@@ -24,6 +25,10 @@ final class DefaultPortfolioService: PortfolioService {
         self.repository = repository
         self.apiClient = apiClient
         self.maxCacheAge = maxCacheAge
+    }
+
+    func fetchAll() async throws -> [PortfolioPosition] {
+        try await repository.fetchAll()
     }
 
     func fetchPositions(sid: String, forceRefresh: Bool = false) async throws -> [PortfolioPosition] {

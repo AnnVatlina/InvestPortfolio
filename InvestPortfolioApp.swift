@@ -14,9 +14,12 @@ struct InvestPortfolioApp: App {
     @AppStorage("App_LocaleIdentifier") private var localeIdentifier: String = Locale.current.identifier
 
     init() {
-        // Install bundle override BEFORE any localized string is read
+        // Install bundle override BEFORE any localized string is read.
+        // Falls back to device language so first-launch strings match the system language.
         LanguageBundle.activate()
-        let savedLocale = UserDefaults.standard.string(forKey: "App_LocaleIdentifier") ?? ""
+        let savedLocale = UserDefaults.standard.string(forKey: "App_LocaleIdentifier")
+            ?? Locale.current.languageCode
+            ?? "en"
         LanguageBundle.set(languageCode: savedLocale)
 
         do {
@@ -25,8 +28,7 @@ struct InvestPortfolioApp: App {
                      CashOperation.self,
                      PortfolioPosition.self,
                      Settings.self,
-                     Subscription.self,
-                migrationPlan: AppMigrationPlan.self
+                     Subscription.self
             )
             _container = StateObject(wrappedValue: DIContainer(modelContainer: modelContainer))
         } catch {

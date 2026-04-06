@@ -19,7 +19,8 @@ protocol SubscriptionsService: Sendable {
         startDate: Date,
         category: String?,
         iconName: String?,
-        isActive: Bool
+        isActive: Bool,
+        endDate: Date?
     ) async throws
 
     /// Cost normalized to one month
@@ -62,13 +63,15 @@ final class DefaultSubscriptionsService: SubscriptionsService {
         startDate: Date,
         category: String?,
         iconName: String?,
-        isActive: Bool
+        isActive: Bool,
+        endDate: Date?
     ) async throws {
         try await repository.update(
             id: id, title: title, amount: amount,
             currency: currency, billingCycle: billingCycle,
             startDate: startDate, category: category,
-            iconName: iconName, isActive: isActive
+            iconName: iconName, isActive: isActive,
+            endDate: endDate
         )
     }
 

@@ -133,3 +133,21 @@
 "subscriptions.field.purchaseDate" = "Дата покупки";
 "subscriptions.report.chart.title" = "Платежи по месяцам";
 "subscriptions.report.chart.empty" = "Нет данных о платежах за этот год";
+"subscriptions.field.endDate" = "Дата окончания";
+"subscriptions.cancelled.on.format" = "Отменено %@";
+
+"subscriptions.filter.all" = "Все";
+"subscriptions.filter.active" = "Активные";
+"subscriptions.filter.cancelled" = "Отменённые";
+"subscriptions.filter.paid" = "Оплаченные";
+"subscriptions.filter.empty" = "Нет подписок по выбранному фильтру";
+"subscriptions.pageSize.all" = "Все";
+"subscriptions.pagination.format" = "Стр. %d из %d";
+
+// MARK: - Export
+"settings.export.title" = "Экспорт данных";
+"settings.export.deposits" = "Экспорт вкладов";
+"settings.export.subscriptions" = "Экспорт подписок";
+"settings.export.cashOperations" = "Экспорт операций";
+"settings.export.portfolio" = "Экспорт портфеля";
+"settings.export.error" = "Не удалось создать файл экспорта";

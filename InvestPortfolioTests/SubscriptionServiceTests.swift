@@ -8,6 +8,7 @@
 //
 
 import Testing
+import Foundation
 @testable import InvestPortfolio
 
 // MARK: - Cost calculation tests
