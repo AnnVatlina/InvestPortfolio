@@ -1,7 +1,6 @@
 //
 //  MainTabView.swift
 //
-//
 //  Created by Anna on 26.12.25.
 //
 
@@ -10,19 +9,23 @@ import SwiftUI
 struct MainTabView: View {
     @AppStorage("MainTab_SelectedIndex") private var selectedIndex: Int = 0
     @EnvironmentObject private var container: DIContainer
+    @Environment(\.locale) private var locale
 
     var isAuthorized: Bool = (KeychainService.loadToken() != nil)
     var onAuthorized: (() -> Void)? = nil
 
     var body: some View {
-        TabView(selection: $selectedIndex) {
+        _ = locale // re-render on language change
+        return TabView(selection: $selectedIndex) {
+
             // 0: Главная
             NavigationStack {
                 HomeTabView(
                     isAuthorized: isAuthorized,
-                    openPortfolio: { selectedIndex = 1 },
-                    openDeposits: { selectedIndex = 2 },
-                    openSubscriptions: { selectedIndex = 3 },
+                    openPortfolio: { /* Portfolio tab hidden */ },
+                    openDeposits: { selectedIndex = 1 },
+                    openSubscriptions: { selectedIndex = 2 },
+                    openAnalytics: { selectedIndex = 3 },
                     openSettings: { selectedIndex = 4 }
                 )
                 .navigationBarTitleDisplayMode(.inline)
@@ -31,36 +34,26 @@ struct MainTabView: View {
             .tabItem { Label("home.tab.title", systemImage: "house.fill") }
             .tag(0)
 
-            // 1: Портфель
-            NavigationStack {
-                Group {
-                    if isAuthorized {
-                        PortfolioView(container: container)
-                            .navigationTitle("home.portfolio.title")
-                    } else {
-                        AuthView(
-                            onAuthorized: { onAuthorized?() },
-                            onOpenDeposits: { selectedIndex = 2 },
-                            onOpenSettings: { selectedIndex = 4 }
-                        )
-                    }
-                }
-            }
-            .tabItem { Label("home.portfolio.title", systemImage: "chart.pie.fill") }
-            .tag(1)
-
-            // 2: Вклады
+            // 1: Вклады
             NavigationStack {
                 DepositsView(container: container)
             }
             .tabItem { Label("deposits.title", systemImage: "banknote.fill") }
-            .tag(2)
+            .tag(1)
 
-            // 3: Подписки
+            // 2: Подписки
             NavigationStack {
                 SubscriptionsView(container: container)
             }
             .tabItem { Label("subscriptions.title", systemImage: "repeat.circle.fill") }
+            .tag(2)
+
+            // 3: Аналитика
+            NavigationStack {
+                AnalyticsView(container: container)
+                    .navigationTitle("analytics.title")
+            }
+            .tabItem { Label("analytics.title", systemImage: "chart.bar.fill") }
             .tag(3)
 
             // 4: Настройки
@@ -70,9 +63,13 @@ struct MainTabView: View {
             }
             .tabItem { Label("settings.title", systemImage: "gearshape.fill") }
             .tag(4)
+
+            // Портфель скрыт из TabBar (код сохранён в PortfolioView.swift)
+            // Для восстановления: добавить таб с tag(5) и PortfolioView(container:)
         }
         .onAppear {
             if !(0...4).contains(selectedIndex) { selectedIndex = 0 }
         }
+
     }
 }

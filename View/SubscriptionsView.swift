@@ -14,6 +14,7 @@ struct SubscriptionsView: View {
         ))
     }
 
+    @Environment(\.locale) private var locale
     @State private var showAddSheet = false
     @State private var subscriptionToEdit: Subscription? = nil
     @State private var subscriptionToDelete: Subscription? = nil
@@ -26,7 +27,7 @@ struct SubscriptionsView: View {
             if viewMode == .report {
                 SubscriptionsReportView(vm: vm)
             } else if vm.isLoading && vm.subscriptions.isEmpty {
-                ProgressView(String(localized: "subscriptions.loading"))
+                ProgressView("subscriptions.loading")
                     .frame(maxWidth: .infinity, maxHeight: .infinity)
             } else if let error = vm.errorMessage, vm.subscriptions.isEmpty {
                 errorView(error)
@@ -36,7 +37,7 @@ struct SubscriptionsView: View {
                 subscriptionsList
             }
         }
-        .navigationTitle(String(localized: "subscriptions.title"))
+        .navigationTitle("subscriptions.title")
         .toolbar {
             ToolbarItem(placement: .primaryAction) {
                 Button { showAddSheet = true } label: {
@@ -87,21 +88,21 @@ struct SubscriptionsView: View {
                 }
             }
         }
-        .alert(String(localized: "subscriptions.delete.confirm.title"), isPresented: Binding(
+        .alert("subscriptions.delete.confirm.title", isPresented: Binding(
             get: { subscriptionToDelete != nil },
             set: { if !$0 { subscriptionToDelete = nil } }
         )) {
-            Button(String(localized: "subscriptions.delete.action"), role: .destructive) {
+            Button("subscriptions.delete.action", role: .destructive) {
                 if let sub = subscriptionToDelete {
                     Task { await vm.deleteSubscription(sub) }
                 }
                 subscriptionToDelete = nil
             }
-            Button(String(localized: "common.cancel"), role: .cancel) {
+            Button("common.cancel", role: .cancel) {
                 subscriptionToDelete = nil
             }
         } message: {
-            Text(String(localized: "subscriptions.delete.confirm.message"))
+            Text("subscriptions.delete.confirm.message")
         }
         .task { await vm.load() }
         .refreshable { await vm.load() }
@@ -116,19 +117,19 @@ struct SubscriptionsView: View {
                 // Upcoming payments (next 7 days)
                 let soon = vm.upcoming(withinDays: 7)
                 if !soon.isEmpty {
-                    Section(String(localized: "subscriptions.section.upcoming")) {
+                    Section("subscriptions.section.upcoming") {
                         ForEach(soon) { sub in upcomingRow(sub) }
                     }
                 }
 
                 // Monthly cost summary (recurring only, always from active subs)
                 if !vm.activeCurrencies.filter({ vm.totalMonthlyCost(in: $0) > 0 }).isEmpty {
-                    Section(String(localized: "subscriptions.section.summary")) {
+                    Section("subscriptions.section.summary") {
                         ForEach(vm.activeCurrencies, id: \.self) { currency in
                             let cost = vm.totalMonthlyCost(in: currency)
                             if cost > 0 {
                                 HStack {
-                                    Text(String(localized: "subscriptions.summary.monthly"))
+                                    Text("subscriptions.summary.monthly")
                                         .foregroundColor(.secondary)
                                     Spacer()
                                     Text(String(format: "%.2f %@", cost, currency.rawValue))
@@ -142,7 +143,7 @@ struct SubscriptionsView: View {
                 // Filtered & paginated section
                 Section {
                     if vm.pagedSubscriptions.isEmpty {
-                        Text(String(localized: "subscriptions.filter.empty"))
+                        Text("subscriptions.filter.empty")
                             .font(.subheadline).foregroundColor(.secondary)
                             .frame(maxWidth: .infinity, alignment: .center)
                             .padding(.vertical, 12)
@@ -286,9 +287,9 @@ struct SubscriptionsView: View {
         VStack(spacing: 12) {
             Image(systemName: "repeat.circle")
                 .font(.system(size: 48)).foregroundColor(.secondary)
-            Text(String(localized: "subscriptions.empty"))
+            Text("subscriptions.empty")
                 .foregroundColor(.secondary)
-            Button(String(localized: "subscriptions.add.title")) {
+            Button("subscriptions.add.title") {
                 showAddSheet = true
             }
             .buttonStyle(.bordered)
@@ -298,10 +299,10 @@ struct SubscriptionsView: View {
 
     private func errorView(_ error: String) -> some View {
         VStack(spacing: 8) {
-            Text(String(localized: "common.error")).font(.headline)
+            Text("common.error").font(.headline)
             Text(error).font(.caption).foregroundColor(.secondary)
                 .multilineTextAlignment(.center).padding(.horizontal)
-            Button(String(localized: "common.retry")) { Task { await vm.load() } }
+            Button("common.retry") { Task { await vm.load() } }
                 .buttonStyle(.bordered)
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity)
@@ -520,7 +521,7 @@ private struct SubscriptionsReportView: View {
             // Header row: title + year selector
             HStack {
                 VStack(alignment: .leading, spacing: 4) {
-                    Text(String(localized: "subscriptions.report.chart.title"))
+                    Text("subscriptions.report.chart.title")
                         .font(.subheadline).foregroundColor(.secondary)
                     if points.isEmpty {
                         Text("—").font(.title3).fontWeight(.bold)
@@ -560,7 +561,7 @@ private struct SubscriptionsReportView: View {
             .padding(.horizontal, 16)
 
             if points.isEmpty {
-                Text(String(localized: "subscriptions.report.chart.empty"))
+                Text("subscriptions.report.chart.empty")
                     .font(.callout).foregroundColor(.secondary)
                     .frame(maxWidth: .infinity, alignment: .center)
                     .padding(.vertical, 24)

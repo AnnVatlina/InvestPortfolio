@@ -1,6 +1,6 @@
 // Localizable.strings — English (en.lproj)
-"app.name" = "InvestPortfolio";
-"app.title" = "My App";
+"app.name" = "Rendita";
+"app.title" = "Rendita: Personal Finance";
 "common.ok" = "OK";
 "common.cancel" = "Cancel";
 "common.error" = "Error";
@@ -142,6 +142,47 @@
 "subscriptions.filter.empty" = "No subscriptions match this filter";
 "subscriptions.pageSize.all" = "All";
 "subscriptions.pagination.format" = "Page %d of %d";
+
+// MARK: - Onboarding
+"onboarding.tagline" = "Personal Finance";
+"onboarding.feature.deposits" = "Track interest income from bank deposits";
+"onboarding.feature.subscriptions" = "Control recurring expenses";
+"onboarding.feature.analytics" = "See income vs expenses at a glance";
+"onboarding.tryDemo" = "Try with sample data";
+"onboarding.startFresh" = "Start with empty data";
+"onboarding.loading" = "Loading sample data...";
+
+// MARK: - Settings: Reset
+"settings.reset.title" = "Danger Zone";
+"settings.reset.action" = "Delete all data";
+"settings.reset.footer" = "Removes all deposits and subscriptions. This action cannot be undone.";
+"settings.reset.confirm.title" = "Delete all data?";
+"settings.reset.confirm.message" = "All deposits and subscriptions will be permanently deleted.";
+"settings.reset.confirm.action" = "Delete";
+
+// MARK: - Analytics
+"analytics.title" = "Analytics";
+"analytics.open" = "View analysis";
+"analytics.loading" = "Loading data...";
+"analytics.empty" = "Add deposits or subscriptions to see analysis";
+"analytics.income" = "Income";
+"analytics.expenses" = "Expenses";
+"analytics.net" = "Net";
+"analytics.todate.title" = "To date";
+"analytics.todate.subtitle" = "Actual amounts from Jan 1 to today";
+"analytics.year.title" = "Full year";
+"analytics.year.subtitle" = "Includes forecast for remaining months";
+"analytics.chart.title" = "Income vs Expenses";
+"analytics.chart.empty" = "No data for this year";
+"analytics.legend.income" = "Income";
+"analytics.legend.expenses" = "Expenses";
+
+// MARK: - Import
+"settings.import.title" = "Import Data";
+"settings.import.deposits" = "Import Deposits";
+"settings.import.subscriptions" = "Import Subscriptions";
+"settings.import.result.title" = "Import Complete";
+"settings.import.result.format" = "Imported: %d\nSkipped (duplicates): %d\nFailed to parse: %d";
 
 // MARK: - Export
 "settings.export.title" = "Export Data";

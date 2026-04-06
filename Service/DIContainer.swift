@@ -46,6 +46,18 @@ final class DIContainer: ObservableObject {
         )
     }
 
+    // MARK: - Reset
+
+    /// Deletes all user-created data (deposits + subscriptions).
+    func resetAllData() async throws {
+        let context = ModelContext(modelContainer)
+        let deposits = try context.fetch(FetchDescriptor<Deposit>())
+        deposits.forEach { context.delete($0) }
+        let subscriptions = try context.fetch(FetchDescriptor<Subscription>())
+        subscriptions.forEach { context.delete($0) }
+        try context.save()
+    }
+
     // MARK: - Preview
 
     /// Изолированный контейнер для SwiftUI Preview и тестов.

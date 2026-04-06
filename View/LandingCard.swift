@@ -11,8 +11,8 @@ struct LandingCard: View {
     let icon: String
     let iconColor: Color
     let iconBackground: LinearGradient
-    let title: String
-    let subtitle: String
+    let title: LocalizedStringKey
+    let subtitle: LocalizedStringKey
     let action: () -> Void
 
     var body: some View {

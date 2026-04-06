@@ -1,6 +1,6 @@
 // Localizable.strings — Russian (ru.lproj)
-"app.name" = "InvestPortfolio";
-"app.title" = "Моё приложение";
+"app.name" = "Rendita";
+"app.title" = "Rendita: Personal Finance";
 "common.ok" = "ОК";
 "common.cancel" = "Отмена";
 "common.error" = "Ошибка";
@@ -143,6 +143,47 @@
 "subscriptions.filter.empty" = "Нет подписок по выбранному фильтру";
 "subscriptions.pageSize.all" = "Все";
 "subscriptions.pagination.format" = "Стр. %d из %d";
+
+// MARK: - Онбординг
+"onboarding.tagline" = "Личные финансы";
+"onboarding.feature.deposits" = "Отслеживайте доход с банковских вкладов";
+"onboarding.feature.subscriptions" = "Контролируйте регулярные расходы";
+"onboarding.feature.analytics" = "Смотрите доходы и расходы в одном месте";
+"onboarding.tryDemo" = "Попробовать с примером данных";
+"onboarding.startFresh" = "Начать с чистого листа";
+"onboarding.loading" = "Загрузка примера...";
+
+// MARK: - Настройки: Сброс
+"settings.reset.title" = "Опасная зона";
+"settings.reset.action" = "Удалить все данные";
+"settings.reset.footer" = "Удаляет все вклады и подписки. Действие нельзя отменить.";
+"settings.reset.confirm.title" = "Удалить все данные?";
+"settings.reset.confirm.message" = "Все вклады и подписки будут безвозвратно удалены.";
+"settings.reset.confirm.action" = "Удалить";
+
+// MARK: - Аналитика
+"analytics.title" = "Аналитика";
+"analytics.open" = "Посмотреть анализ";
+"analytics.loading" = "Загрузка данных...";
+"analytics.empty" = "Добавьте вклады или подписки для анализа";
+"analytics.income" = "Доходы";
+"analytics.expenses" = "Расходы";
+"analytics.net" = "Итого";
+"analytics.todate.title" = "Фактически";
+"analytics.todate.subtitle" = "Реальные суммы с 1 января по сегодня";
+"analytics.year.title" = "За год";
+"analytics.year.subtitle" = "Включает прогноз на оставшиеся месяцы";
+"analytics.chart.title" = "Доходы и расходы";
+"analytics.chart.empty" = "Нет данных за этот год";
+"analytics.legend.income" = "Доходы";
+"analytics.legend.expenses" = "Расходы";
+
+// MARK: - Import
+"settings.import.title" = "Импорт данных";
+"settings.import.deposits" = "Импорт вкладов";
+"settings.import.subscriptions" = "Импорт подписок";
+"settings.import.result.title" = "Импорт завершён";
+"settings.import.result.format" = "Добавлено: %d\nПропущено (дубли): %d\nОшибки разбора: %d";
 
 // MARK: - Export
 "settings.export.title" = "Экспорт данных";

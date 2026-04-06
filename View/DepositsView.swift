@@ -15,6 +15,7 @@ struct DepositsView: View {
         ))
     }
 
+    @Environment(\.locale) private var locale
     @State private var showAddSheet = false
     @State private var depositToEdit: Deposit? = nil
     @State private var depositToDelete: Deposit? = nil
@@ -27,7 +28,7 @@ struct DepositsView: View {
             if viewMode == .report {
                 DepositsReportView(deposits: vm.deposits, incomes: vm.incomes)
             } else if vm.isLoading && vm.deposits.isEmpty {
-                ProgressView(String(localized: "deposits.loading"))
+                ProgressView("deposits.loading")
                     .frame(maxWidth: .infinity, maxHeight: .infinity)
             } else if let error = vm.errorMessage, vm.deposits.isEmpty {
                 errorView(error)
@@ -37,7 +38,7 @@ struct DepositsView: View {
                 depositsList
             }
         }
-        .navigationTitle(String(localized: "deposits.title"))
+        .navigationTitle("deposits.title")
         .toolbar {
             ToolbarItem(placement: .primaryAction) {
                 Button {
