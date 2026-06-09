@@ -10,18 +10,28 @@ import SwiftData
 @Model
 final class Deposit {
     var id: UUID
+    /// UUID from the Rentivo backend — used to match local cache records to API records.
+    var serverId: UUID?
     var title: String
     var bankName: String?
     var amount: Double
-    var currency: DepositCurrency
+    // Stored as String to avoid SwiftData lazy-load cast failure with custom enums (iOS 26)
+    var currencyRaw: String
     var createdAt: Date
 
     var openDate: Date
     var closeDate: Date?
     var annualInterestRate: Double
 
+    /// Typed accessor — computed, not stored by SwiftData.
+    var currency: DepositCurrency {
+        get { DepositCurrency(rawValue: currencyRaw) ?? .RUB }
+        set { currencyRaw = newValue.rawValue }
+    }
+
     init(
         id: UUID = UUID(),
+        serverId: UUID? = nil,
         title: String,
         bankName: String? = nil,
         amount: Double,
@@ -32,10 +42,11 @@ final class Deposit {
         annualInterestRate: Double
     ) {
         self.id = id
+        self.serverId = serverId
         self.title = title
         self.bankName = bankName
         self.amount = amount
-        self.currency = currency
+        self.currencyRaw = currency.rawValue
         self.createdAt = createdAt
         self.openDate = openDate
         self.closeDate = closeDate

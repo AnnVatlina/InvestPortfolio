@@ -1,8 +1,9 @@
 //
 //  AuthView.swift
-//  
+//  InvestPortfolio
 //
-//  Created by Anna on 26.12.25.
+//  Portfolio-tab auth card: prompts Rentivo login when the portfolio
+//  section requires an authenticated session.
 //
 
 import SwiftUI
@@ -16,28 +17,29 @@ struct AuthView: View {
 
     var body: some View {
         VStack(spacing: 20) {
-            Text("Вход в Tradernet")
+            Text(String(localized: "auth.login.title"))
                 .font(.largeTitle)
                 .fontWeight(.bold)
-            
+
             VStack(spacing: 16) {
-                TextField("Логин", text: $vm.username)
+                TextField(String(localized: "auth.field.email"), text: $vm.email)
                     .textFieldStyle(.roundedBorder)
-                    .textContentType(.username)
+                    .textContentType(.emailAddress)
+                    .keyboardType(.emailAddress)
                     .autocorrectionDisabled()
                     .textInputAutocapitalization(.never)
-                
-                SecureField("Пароль", text: $vm.password)
+
+                SecureField(String(localized: "auth.field.password"), text: $vm.password)
                     .textFieldStyle(.roundedBorder)
                     .textContentType(.password)
-                
+
                 if let error = vm.errorMessage {
                     Text(error)
                         .font(.caption)
                         .foregroundColor(.red)
                         .multilineTextAlignment(.center)
                 }
-                
+
                 Button(action: {
                     Task {
                         await vm.login()
@@ -50,12 +52,12 @@ struct AuthView: View {
                         ProgressView()
                             .progressViewStyle(CircularProgressViewStyle())
                     } else {
-                        Text("Войти")
+                        Text(String(localized: "auth.login.action"))
                             .frame(maxWidth: .infinity)
                     }
                 }
                 .buttonStyle(.borderedProminent)
-                .disabled(vm.isLoading || vm.username.isEmpty || vm.password.isEmpty)
+                .disabled(vm.isLoading || vm.email.isEmpty || vm.password.isEmpty)
             }
             .padding()
         }

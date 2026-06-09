@@ -1,6 +1,6 @@
 // Localizable.strings — Russian (ru.lproj)
-"app.name" = "Rendita";
-"app.title" = "Rendita: Personal Finance";
+"app.name" = "Rentivo";
+"app.title" = "Rentivo: Personal Finance";
 "common.ok" = "ОК";
 "common.cancel" = "Отмена";
 "common.error" = "Ошибка";
@@ -8,12 +8,18 @@
 "common.add" = "Добавить";
 "common.percentSign" = "%";
 "common.unknownError.format" = "Неизвестная ошибка: %@";
+"network.offline" = "Нет соединения";
 
 "settings.title" = "Настройки";
 "settings.language" = "Язык";
+"settings.currencies.title" = "Валюты";
+"settings.data.title" = "Данные";
+"settings.currencies.footer" = "Выбранные валюты отображаются во вкладах, подписках и аналитике. Нельзя отключить все валюты.";
 "about.title" = "О приложении";
 "about.version" = "Версия 1.0";
 
+"home.summary.deposits" = "Вклады";
+"home.summary.monthly" = "Подписки / мес";
 "home.portfolio.title2" = "Мой портфель";
 "home.portfolio.title" = "Портфель";
 "home.portfolio.open" = "Перейти к портфелю";
@@ -192,3 +198,18 @@
 "settings.export.cashOperations" = "Экспорт операций";
 "settings.export.portfolio" = "Экспорт портфеля";
 "settings.export.error" = "Не удалось создать файл экспорта";
+
+// MARK: - Auth (Rentivo)
+"auth.login.title" = "Вход";
+"auth.register.title" = "Создать аккаунт";
+"auth.field.email" = "Email";
+"auth.field.password" = "Пароль";
+"auth.field.confirmPassword" = "Подтвердите пароль";
+"auth.login.action" = "Войти";
+"auth.register.action" = "Создать аккаунт";
+"auth.switch.toRegister" = "Нет аккаунта? Зарегистрируйтесь";
+"auth.switch.toLogin" = "Уже есть аккаунт? Войти";
+"auth.error.emptyEmail" = "Введите email";
+"auth.error.emptyPassword" = "Введите пароль";
+"auth.error.passwordMismatch" = "Пароли не совпадают";
+"auth.logout.action" = "Выйти";

@@ -11,6 +11,8 @@ import SwiftData
 struct InvestPortfolioApp: App {
 
     @StateObject private var container: DIContainer
+    @StateObject private var authVM: AuthViewModel
+    @StateObject private var networkMonitor = NetworkMonitor()
     @AppStorage("App_LocaleIdentifier") private var localeIdentifier: String = Locale.current.identifier
 
     init() {
@@ -18,33 +20,49 @@ struct InvestPortfolioApp: App {
         // Falls back to device language so first-launch strings match the system language.
         LanguageBundle.activate()
         let savedLocale = UserDefaults.standard.string(forKey: "App_LocaleIdentifier")
-            ?? Locale.current.languageCode
+            ?? Locale.current.language.languageCode?.identifier
             ?? "en"
         LanguageBundle.set(languageCode: savedLocale)
 
+        let schema = Schema([
+            Deposit.self,
+            Settings.self,
+            Subscription.self
+        ])
+        let modelContainer: ModelContainer
         do {
-            let modelContainer = try ModelContainer(
-                for: Deposit.self,
-                     CashOperation.self,
-                     PortfolioPosition.self,
-                     Settings.self,
-                     Subscription.self
-            )
-            _container = StateObject(wrappedValue: DIContainer(modelContainer: modelContainer))
+            modelContainer = try ModelContainer(for: schema)
         } catch {
-            fatalError("Не удалось создать ModelContainer: \(error)")
+            // Файл базы недоступен (напр. после смены Bundle ID) — удаляем и создаём заново.
+            let storeURL = URL.applicationSupportDirectory.appending(path: "default.store")
+            try? FileManager.default.removeItem(at: storeURL)
+            try? FileManager.default.removeItem(at: storeURL.appendingPathExtension("shm"))
+            try? FileManager.default.removeItem(at: storeURL.appendingPathExtension("wal"))
+            do {
+                modelContainer = try ModelContainer(for: schema)
+            } catch {
+                fatalError("Не удалось создать ModelContainer: \(error)")
+            }
         }
+        _container = StateObject(wrappedValue: DIContainer(modelContainer: modelContainer))
+        _authVM = StateObject(wrappedValue: AuthViewModel())
     }
 
     var body: some Scene {
         WindowGroup {
-            RootView()
-                .environmentObject(container)
-                .environment(\.locale, Locale(identifier: localeIdentifier))
-                .onChange(of: localeIdentifier) { _, newValue in
-                    // Re-point the bundle override so String(localized:) picks up the change
-                    LanguageBundle.set(languageCode: newValue)
+            Group {
+                if authVM.isAuthorized {
+                    RootView()
+                } else {
+                    LoginView()
                 }
+            }
+            .id(localeIdentifier)           // rebuild full view tree on language change
+            .environmentObject(container)
+            .environmentObject(authVM)
+            .environmentObject(networkMonitor)
+            .tint(.brand)
+            .environment(\.locale, Locale(identifier: localeIdentifier))
         }
         // Передаём контейнер в среду SwiftUI (для @Query и @Environment(\.modelContext))
         .modelContainer(container.modelContainer)

@@ -23,30 +23,81 @@ struct MonthlyAnalyticsPoint: Identifiable {
 
     private let depositsService: any DepositsService
     private let subscriptionsService: any SubscriptionsService
+    private let depositsAPI: any DepositsAPIProtocol
+    private let subscriptionsAPI: any SubscriptionsAPIProtocol
     private let calendar: Calendar = {
         var cal = Calendar(identifier: .gregorian)
         cal.timeZone = TimeZone.current
         return cal
     }()
 
-    init(depositsService: any DepositsService, subscriptionsService: any SubscriptionsService) {
+    init(
+        depositsService: any DepositsService,
+        subscriptionsService: any SubscriptionsService,
+        depositsAPI: any DepositsAPIProtocol = DepositsAPI(),
+        subscriptionsAPI: any SubscriptionsAPIProtocol = SubscriptionsAPI()
+    ) {
         self.depositsService = depositsService
         self.subscriptionsService = subscriptionsService
+        self.depositsAPI = depositsAPI
+        self.subscriptionsAPI = subscriptionsAPI
         self.selectedYear = Calendar.current.component(.year, from: Date())
     }
 
-    // MARK: - Load
+    // MARK: - Load (cache-first, then sync from API)
 
     func load() async {
         isLoading = true
         errorMessage = nil
         defer { isLoading = false }
+
+        // 1. Show cached data immediately
+        if let cached = try? await depositsService.fetchAll() { deposits = cached }
+        if let cached = try? await subscriptionsService.fetchAll() { subscriptions = cached }
+
+        // 2. Sync both from API concurrently
         do {
+            async let depsRemote = depositsAPI.getDeposits()
+            async let subsRemote = subscriptionsAPI.getSubscriptions()
+            let (depsResult, subsResult) = try await (depsRemote, subsRemote)
+
+            for dto in depsResult {
+                try await depositsService.upsert(
+                    serverId: dto.id,
+                    title: dto.title,
+                    bankName: dto.bankName,
+                    amount: dto.amountDouble,
+                    currency: dto.depositCurrency,
+                    openDate: dto.openDate,
+                    closeDate: dto.closeDate,
+                    annualInterestRate: dto.annualRateDouble,
+                    createdAt: dto.createdAt
+                )
+            }
+            for dto in subsResult {
+                try await subscriptionsService.upsert(
+                    serverId: dto.id,
+                    title: dto.title,
+                    amount: dto.amountDouble,
+                    currency: dto.depositCurrency,
+                    billingCycle: dto.subscriptionBillingCycle,
+                    startDate: dto.startDate,
+                    endDate: dto.endDate,
+                    category: dto.category,
+                    iconName: dto.iconName,
+                    isActive: dto.isActive,
+                    createdAt: dto.createdAt
+                )
+            }
+
             async let deps = depositsService.fetchAll()
             async let subs = subscriptionsService.fetchAll()
             (deposits, subscriptions) = try await (deps, subs)
         } catch {
-            errorMessage = error.localizedDescription
+            // Keep cached data visible; only surface error if nothing to show
+            if deposits.isEmpty && subscriptions.isEmpty {
+                errorMessage = error.localizedDescription
+            }
         }
     }
 

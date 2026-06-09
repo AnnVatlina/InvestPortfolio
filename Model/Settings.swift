@@ -17,7 +17,7 @@ final class Settings {
 
     init(
         id: UUID = UUID(),
-        selectedCurrencies: [String] = ["USD", "EUR", "GBP", "RUB"],
+        selectedCurrencies: [String] = DepositCurrency.allCases.map(\.rawValue),
         localeIdentifier: String = Locale.current.identifier,
         lastSyncDate: Date? = nil
     ) {
