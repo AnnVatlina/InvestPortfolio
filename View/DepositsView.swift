@@ -16,18 +16,14 @@ struct DepositsView: View {
     }
 
     @Environment(\.locale) private var locale
+    @EnvironmentObject private var networkMonitor: NetworkMonitor
     @State private var showAddSheet = false
     @State private var depositToEdit: Deposit? = nil
     @State private var depositToDelete: Deposit? = nil
 
-    private enum ViewMode { case list, report }
-    @State private var viewMode: ViewMode = .list
-
     var body: some View {
         Group {
-            if viewMode == .report {
-                DepositsReportView(deposits: vm.deposits, incomes: vm.incomes)
-            } else if vm.isLoading && vm.deposits.isEmpty {
+            if vm.isLoading && vm.deposits.isEmpty {
                 ProgressView("deposits.loading")
                     .frame(maxWidth: .infinity, maxHeight: .infinity)
             } else if let error = vm.errorMessage, vm.deposits.isEmpty {
@@ -38,6 +34,13 @@ struct DepositsView: View {
                 depositsList
             }
         }
+        .safeAreaInset(edge: .top, spacing: 0) {
+            if !networkMonitor.isConnected {
+                OfflineBanner()
+                    .transition(.move(edge: .top).combined(with: .opacity))
+            }
+        }
+        .animation(.easeInOut(duration: 0.25), value: networkMonitor.isConnected)
         .navigationTitle("deposits.title")
         .toolbar {
             ToolbarItem(placement: .primaryAction) {
@@ -46,16 +49,6 @@ struct DepositsView: View {
                 } label: {
                     Image(systemName: "plus")
                 }
-                .opacity(viewMode == .list ? 1 : 0)
-                .disabled(viewMode == .report)
-            }
-            ToolbarItem(placement: .topBarLeading) {
-                Picker("", selection: $viewMode.animation()) {
-                    Image(systemName: "list.bullet").tag(ViewMode.list)
-                    Image(systemName: "chart.pie").tag(ViewMode.report)
-                }
-                .pickerStyle(.segmented)
-                .frame(width: 80)
             }
         }
         .sheet(isPresented: $showAddSheet) {
@@ -107,6 +100,14 @@ struct DepositsView: View {
         }
         .task { await vm.load() }
         .refreshable { await vm.load() }
+        .alert(String(localized: "common.error"), isPresented: Binding(
+            get: { vm.operationError != nil },
+            set: { if !$0 { vm.operationError = nil } }
+        )) {
+            Button(String(localized: "common.ok"), role: .cancel) { vm.operationError = nil }
+        } message: {
+            Text(vm.operationError ?? "")
+        }
     }
 
     // MARK: - Subviews
@@ -190,8 +191,8 @@ private struct DepositRow: View {
                         .fontWeight(.medium)
                         .padding(.horizontal, 7)
                         .padding(.vertical, 3)
-                        .background(isClosed ? Color.secondary.opacity(0.15) : Color.green.opacity(0.15))
-                        .foregroundColor(isClosed ? .secondary : .green)
+                        .background(isClosed ? Color.secondary.opacity(0.15) : Color.brand.opacity(0.15))
+                        .foregroundColor(isClosed ? .secondary : .brand)
                         .clipShape(Capsule())
                     Text(String(format: String(localized: "deposits.rate.format"), deposit.annualInterestRate))
                         .font(.caption)
@@ -219,6 +220,15 @@ private struct DepositRow: View {
                 }
             }
 
+            // Прогресс срока (только для вкладов с датой закрытия)
+            if let closeDate = deposit.closeDate {
+                let total = closeDate.timeIntervalSince(deposit.openDate)
+                let elapsed = Date().timeIntervalSince(deposit.openDate)
+                let progress = total > 0 ? min(1.0, max(0.0, elapsed / total)) : 1.0
+                ProgressView(value: progress)
+                    .tint(isClosed ? .secondary : .brand)
+            }
+
             // Доход
             HStack(spacing: 16) {
                 // Для закрытых: "Заработано", для активных: "На сегодня"
@@ -228,11 +238,11 @@ private struct DepositRow: View {
                                                : "deposits.income.today.format"),
                                 summary.incomeToDate, deposit.currency.rawValue))
                         .font(.subheadline)
-                        .foregroundColor(.green)
+                        .foregroundColor(.brand)
                 } icon: {
                     Image(systemName: isClosed ? "checkmark.circle" : "clock")
                         .font(.caption)
-                        .foregroundColor(.green)
+                        .foregroundColor(.brand)
                 }
 
                 if let forecast = summary.forecastIncomeToCloseDate {
@@ -277,7 +287,7 @@ private struct DepositFormSheet: View {
     let onSave: (DepositFormData) -> Void
 
     @Environment(\.dismiss) private var dismiss
-    @AppStorage("Settings_SelectedCurrencies") private var selectedCurrenciesRaw: String = "USD,EUR,GBP,RUB"
+    @AppStorage("Settings_SelectedCurrencies") private var selectedCurrenciesRaw: String = DepositCurrency.defaultSelection
     private var selectedCurrencies: Set<String> { Set(selectedCurrenciesRaw.split(separator: ",").map { String($0) }) }
 
     @State private var title: String

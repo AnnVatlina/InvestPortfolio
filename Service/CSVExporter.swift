@@ -52,46 +52,6 @@ enum CSVExporter {
         return rows.joined(separator: "\n")
     }
 
-    // MARK: - Cash Operations
-
-    static func csv(for operations: [CashOperation]) -> String {
-        var rows: [String] = ["ID,Date,Type,Amount,Currency,Comment,FetchedAt"]
-        let fmt = iso8601Formatter()
-        for op in operations {
-            rows.append([
-                op.id.uuidString,
-                escape(op.date),
-                escape(op.type),
-                String(op.amount),
-                escape(op.currency),
-                escape(op.comment ?? ""),
-                fmt.string(from: op.fetchedAt)
-            ].joined(separator: ","))
-        }
-        return rows.joined(separator: "\n")
-    }
-
-    // MARK: - Portfolio Positions
-
-    static func csv(for positions: [PortfolioPosition]) -> String {
-        var rows: [String] = ["ID,Ticker,Name,Quantity,AvgPrice,CurrentPrice,Profit,Currency,FetchedAt"]
-        let fmt = iso8601Formatter()
-        for p in positions {
-            rows.append([
-                p.id.uuidString,
-                escape(p.ticker),
-                escape(p.name ?? ""),
-                String(p.quantity),
-                String(p.avgPrice),
-                String(p.currentPrice),
-                String(p.profit),
-                escape(p.currency ?? ""),
-                fmt.string(from: p.fetchedAt)
-            ].joined(separator: ","))
-        }
-        return rows.joined(separator: "\n")
-    }
-
     // MARK: - File Writing
 
     /// Writes CSV content to a temp file and returns its URL.

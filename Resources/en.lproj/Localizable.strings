@@ -1,6 +1,6 @@
 // Localizable.strings — English (en.lproj)
-"app.name" = "Rendita";
-"app.title" = "Rendita: Personal Finance";
+"app.name" = "Rentivo";
+"app.title" = "Rentivo: Personal Finance";
 "common.ok" = "OK";
 "common.cancel" = "Cancel";
 "common.error" = "Error";
@@ -8,12 +8,18 @@
 "common.add" = "Add";
 "common.percentSign" = "%";
 "common.unknownError.format" = "Unknown error: %@";
+"network.offline" = "No connection";
 
 "settings.title" = "Settings";
 "settings.language" = "Language";
+"settings.currencies.title" = "Currencies";
+"settings.data.title" = "Data";
+"settings.currencies.footer" = "Selected currencies appear in deposits, subscriptions and analytics. At least one must remain active.";
 "about.title" = "About";
 "about.version" = "Version 1.0";
 
+"home.summary.deposits" = "Deposits";
+"home.summary.monthly" = "Subscriptions / mo";
 "home.portfolio.title2" = "My Portfolio";
 "home.portfolio.title" = "Portfolio";
 "home.portfolio.open" = "Open portfolio";
@@ -192,3 +198,18 @@
 "settings.export.cashOperations" = "Export Cash Operations";
 "settings.export.portfolio" = "Export Portfolio";
 "settings.export.error" = "Failed to create export file";
+
+// MARK: - Auth (Rentivo)
+"auth.login.title" = "Sign In";
+"auth.register.title" = "Create Account";
+"auth.field.email" = "Email";
+"auth.field.password" = "Password";
+"auth.field.confirmPassword" = "Confirm Password";
+"auth.login.action" = "Sign In";
+"auth.register.action" = "Create Account";
+"auth.switch.toRegister" = "Don't have an account? Register";
+"auth.switch.toLogin" = "Already have an account? Sign In";
+"auth.error.emptyEmail" = "Please enter your email";
+"auth.error.emptyPassword" = "Please enter your password";
+"auth.error.passwordMismatch" = "Passwords do not match";
+"auth.logout.action" = "Sign Out";

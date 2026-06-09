@@ -14,17 +14,6 @@ struct SettingsView: View {
     @Environment(\.locale) private var locale
     @EnvironmentObject private var container: DIContainer
 
-    @State private var exportItem: ExportItem?
-    @State private var isExporting = false
-    @State private var exportError: String?
-
-    // Import state
-    @State private var isImportingDeposits = false
-    @State private var isImportingSubscriptions = false
-    @State private var isImporting = false
-    @State private var importSummary: ImportSummary?
-
-    // Reset state
     @AppStorage("App_HasCompletedOnboarding") private var hasCompletedOnboarding = true
     @State private var showResetConfirm = false
     @State private var isResetting = false
@@ -34,14 +23,12 @@ struct SettingsView: View {
         ("en", "English")
     ]
 
-    // Custom binding: updates LanguageBundle BEFORE changing @AppStorage so the bundle
-    // is ready when SwiftUI schedules the next render (onChange fires AFTER rendering).
     private var languageBinding: Binding<String> {
         Binding(
             get: { localeIdentifier },
             set: { newValue in
-                LanguageBundle.set(languageCode: newValue)   // bundle first
-                localeIdentifier = newValue                   // then trigger re-render
+                LanguageBundle.set(languageCode: newValue)
+                localeIdentifier = newValue
             }
         )
     }
@@ -56,48 +43,21 @@ struct SettingsView: View {
                 }
             }
 
-            // MARK: Export
-            Section(header: Text("settings.export.title")) {
-                exportButton(
-                    title: "settings.export.deposits",
-                    icon: "banknote",
-                    filename: "deposits.csv"
-                ) {
-                    let service = container.makeDepositsService()
-                    let data = try await service.fetchAll()
-                    return CSVExporter.csv(for: data)
+            Section {
+                NavigationLink {
+                    CurrenciesSettingsView()
+                } label: {
+                    Label("settings.currencies.title", systemImage: "dollarsign.circle")
                 }
 
-                exportButton(
-                    title: "settings.export.subscriptions",
-                    icon: "repeat.circle",
-                    filename: "subscriptions.csv"
-                ) {
-                    let service = container.makeSubscriptionsService()
-                    let data = try await service.fetchAll()
-                    return CSVExporter.csv(for: data)
+                NavigationLink {
+                    DataSettingsView()
+                        .environmentObject(container)
+                } label: {
+                    Label("settings.data.title", systemImage: "arrow.up.arrow.down.circle")
                 }
-
-
             }
-            .disabled(isExporting)
 
-            // MARK: Import
-            Section(header: Text("settings.import.title")) {
-                importButton(
-                    title: "settings.import.deposits",
-                    icon: "square.and.arrow.down",
-                    isPresented: $isImportingDeposits
-                )
-                importButton(
-                    title: "settings.import.subscriptions",
-                    icon: "square.and.arrow.down",
-                    isPresented: $isImportingSubscriptions
-                )
-            }
-            .disabled(isImporting || isExporting)
-
-            // MARK: Danger zone
             Section {
                 Button(role: .destructive) {
                     showResetConfirm = true
@@ -122,6 +82,107 @@ struct SettingsView: View {
         .listStyle(.insetGrouped)
         .environment(\.locale, Locale(identifier: localeIdentifier))
         .navigationTitle(Text("settings.title"))
+        .alert("settings.reset.confirm.title", isPresented: $showResetConfirm) {
+            Button("settings.reset.confirm.action", role: .destructive) {
+                Task {
+                    isResetting = true
+                    defer { isResetting = false }
+                    try? await container.resetAllData()
+                    hasCompletedOnboarding = false
+                }
+            }
+            Button("common.cancel", role: .cancel) {}
+        } message: {
+            Text("settings.reset.confirm.message")
+        }
+    }
+}
+
+// MARK: - Currencies Settings
+
+struct CurrenciesSettingsView: View {
+    @AppStorage("Settings_SelectedCurrencies") private var selectedCurrenciesRaw: String = DepositCurrency.defaultSelection
+
+    private var selectedCurrencySet: Set<String> {
+        Set(selectedCurrenciesRaw.split(separator: ",").map { String($0) })
+    }
+
+    private func currencyBinding(for currency: DepositCurrency) -> Binding<Bool> {
+        Binding(
+            get: { selectedCurrencySet.contains(currency.rawValue) },
+            set: { newValue in
+                var current = selectedCurrencySet
+                if newValue {
+                    current.insert(currency.rawValue)
+                } else {
+                    guard current.count > 1 else { return }
+                    current.remove(currency.rawValue)
+                }
+                selectedCurrenciesRaw = DepositCurrency.allCases
+                    .map(\.rawValue)
+                    .filter { current.contains($0) }
+                    .joined(separator: ",")
+            }
+        )
+    }
+
+    var body: some View {
+        List {
+            Section {
+                ForEach(DepositCurrency.allCases) { currency in
+                    Toggle(isOn: currencyBinding(for: currency)) {
+                        Text(currency.rawValue)
+                    }
+                    .disabled(selectedCurrencySet.count == 1 && selectedCurrencySet.contains(currency.rawValue))
+                }
+            } footer: {
+                Text("settings.currencies.footer")
+            }
+        }
+        .listStyle(.insetGrouped)
+        .navigationTitle("settings.currencies.title")
+        .navigationBarTitleDisplayMode(.inline)
+    }
+}
+
+// MARK: - Data Settings (Import / Export)
+
+struct DataSettingsView: View {
+    @EnvironmentObject private var container: DIContainer
+
+    @State private var exportItem: ExportItem?
+    @State private var isExporting = false
+    @State private var exportError: String?
+
+    private enum ImportType { case deposits, subscriptions }
+    @State private var currentImportType: ImportType? = nil
+    @State private var isShowingImporter = false
+    @State private var isImporting = false
+    @State private var importSummary: ImportSummary?
+
+    var body: some View {
+        List {
+            Section(header: Text("settings.export.title")) {
+                exportButton(title: "settings.export.deposits", icon: "banknote", filename: "deposits.csv") {
+                    let service = container.makeDepositsService()
+                    return CSVExporter.csv(for: try await service.fetchAll())
+                }
+                exportButton(title: "settings.export.subscriptions", icon: "repeat.circle", filename: "subscriptions.csv") {
+                    let service = container.makeSubscriptionsService()
+                    return CSVExporter.csv(for: try await service.fetchAll())
+                }
+            }
+            .disabled(isExporting)
+
+            Section(header: Text("settings.import.title")) {
+                importButton(title: "settings.import.deposits", icon: "square.and.arrow.down", type: .deposits)
+                importButton(title: "settings.import.subscriptions", icon: "square.and.arrow.down", type: .subscriptions)
+            }
+            .disabled(isImporting || isExporting)
+        }
+        .listStyle(.insetGrouped)
+        .navigationTitle("settings.data.title")
+        .navigationBarTitleDisplayMode(.inline)
         .overlay {
             if isExporting || isImporting {
                 ProgressView()
@@ -130,138 +191,54 @@ struct SettingsView: View {
             }
         }
         .sheet(item: $exportItem) { item in
-            ActivityView(url: item.url)
-                .ignoresSafeArea()
+            ActivityView(url: item.url).ignoresSafeArea()
         }
-        .alert(
-            "common.error",
-            isPresented: Binding(
-                get: { exportError != nil },
-                set: { if !$0 { exportError = nil } }
-            )
-        ) {
+        .alert("common.error", isPresented: Binding(
+            get: { exportError != nil },
+            set: { if !$0 { exportError = nil } }
+        )) {
             Button("common.ok") { exportError = nil }
         } message: {
             Text(exportError ?? "")
         }
-        .alert(
-            "settings.import.result.title",
-            isPresented: Binding(
-                get: { importSummary != nil },
-                set: { if !$0 { importSummary = nil } }
-            )
-        ) {
+        .alert("settings.import.result.title", isPresented: Binding(
+            get: { importSummary != nil },
+            set: { if !$0 { importSummary = nil } }
+        )) {
             Button("common.ok") { importSummary = nil }
         } message: {
             if let s = importSummary {
                 Text(String(format: String(localized: "settings.import.result.format"), s.imported, s.skipped, s.failed))
             }
         }
-        .alert("settings.reset.confirm.title", isPresented: $showResetConfirm) {
-            Button("settings.reset.confirm.action", role: .destructive) {
+        .fileImporter(
+            isPresented: $isShowingImporter,
+            allowedContentTypes: [.commaSeparatedText, .plainText],
+            onCompletion: { result in
+                let type = currentImportType
+                currentImportType = nil
                 Task {
-                    isResetting = true
-                    defer { isResetting = false }
-                    try? await container.resetAllData()
-                    hasCompletedOnboarding = false   // показать онбординг снова
+                    switch type {
+                    case .deposits: await handleDepositImport(result)
+                    case .subscriptions: await handleSubscriptionImport(result)
+                    case nil: break
+                    }
                 }
             }
-            Button("common.cancel", role: .cancel) {}
-        } message: {
-            Text("settings.reset.confirm.message")
-        }
-        .fileImporter(
-            isPresented: $isImportingDeposits,
-            allowedContentTypes: [.commaSeparatedText],
-            onCompletion: { result in
-                Task { await handleDepositImport(result) }
-            }
-        )
-        .fileImporter(
-            isPresented: $isImportingSubscriptions,
-            allowedContentTypes: [.commaSeparatedText],
-            onCompletion: { result in
-                Task { await handleSubscriptionImport(result) }
-            }
         )
     }
 
-    // MARK: - Import Handlers
-
-    private func handleDepositImport(_ result: Result<URL, Error>) async {
-        isImporting = true
-        defer { isImporting = false }
-        do {
-            let url = try result.get()
-            guard url.startAccessingSecurityScopedResource() else { return }
-            defer { url.stopAccessingSecurityScopedResource() }
-
-            let csv = try String(contentsOf: url, encoding: .utf8)
-            let parsed = CSVImporter.parseDeposits(csv)
-
-            let service = container.makeDepositsService()
-            let existing = try await service.fetchAll()
-            let existingIDs = Set(existing.map { $0.id })
-
-            let toAdd = parsed.items.filter { !existingIDs.contains($0.id) }
-            let skipped = parsed.items.count - toAdd.count
-            for d in toAdd { try await service.add(d) }
-
-            importSummary = ImportSummary(imported: toAdd.count, skipped: skipped, failed: parsed.failed)
-        } catch {
-            exportError = error.localizedDescription
-        }
-    }
-
-    private func handleSubscriptionImport(_ result: Result<URL, Error>) async {
-        isImporting = true
-        defer { isImporting = false }
-        do {
-            let url = try result.get()
-            guard url.startAccessingSecurityScopedResource() else { return }
-            defer { url.stopAccessingSecurityScopedResource() }
-
-            let csv = try String(contentsOf: url, encoding: .utf8)
-            let parsed = CSVImporter.parseSubscriptions(csv)
-
-            let service = container.makeSubscriptionsService()
-            let existing = try await service.fetchAll()
-            let existingIDs = Set(existing.map { $0.id })
-
-            let toAdd = parsed.items.filter { !existingIDs.contains($0.id) }
-            let skipped = parsed.items.count - toAdd.count
-            for s in toAdd { try await service.add(s) }
-
-            importSummary = ImportSummary(imported: toAdd.count, skipped: skipped, failed: parsed.failed)
-        } catch {
-            exportError = error.localizedDescription
-        }
-    }
-
-    // MARK: - Import Button
-
-    @ViewBuilder
-    private func importButton(
-        title: LocalizedStringKey,
-        icon: String,
-        isPresented: Binding<Bool>
-    ) -> some View {
+    private func importButton(title: LocalizedStringKey, icon: String, type: ImportType) -> some View {
         Button {
-            isPresented.wrappedValue = true
+            currentImportType = type
+            isShowingImporter = true
         } label: {
             Label(title, systemImage: icon)
         }
     }
 
-    // MARK: - Export Helpers
-
     @ViewBuilder
-    private func exportButton(
-        title: LocalizedStringKey,
-        icon: String,
-        filename: String,
-        build: @escaping () async throws -> String
-    ) -> some View {
+    private func exportButton(title: LocalizedStringKey, icon: String, filename: String, build: @escaping () async throws -> String) -> some View {
         Button {
             Task {
                 isExporting = true
@@ -280,6 +257,105 @@ struct SettingsView: View {
         } label: {
             Label(title, systemImage: icon)
         }
+    }
+
+    private func handleDepositImport(_ result: Result<URL, Error>) async {
+        isImporting = true
+        defer { isImporting = false }
+        do {
+            let url = try result.get()
+            let csv = try readCSV(from: url)
+            let parsed = CSVImporter.parseDeposits(csv)
+            let api = container.makeDepositsAPI()
+            let service = container.makeDepositsService()
+            let existingIDs = Set(try await service.fetchAll().map { $0.id })
+            let toAdd = parsed.items.filter { !existingIDs.contains($0.id) }
+            var imported = 0
+            var failed = parsed.failed
+            for d in toAdd {
+                do {
+                    let body = DepositCreate(
+                        title: d.title,
+                        bankName: d.bankName,
+                        amount: d.amount,
+                        currency: d.currency,
+                        openDate: d.openDate,
+                        closeDate: d.closeDate,
+                        annualInterestRate: d.annualInterestRate
+                    )
+                    let dto = try await api.createDeposit(body)
+                    try await service.upsert(
+                        serverId: dto.id,
+                        title: dto.title,
+                        bankName: dto.bankName,
+                        amount: dto.amountDouble,
+                        currency: dto.depositCurrency,
+                        openDate: dto.openDate,
+                        closeDate: dto.closeDate,
+                        annualInterestRate: dto.annualRateDouble,
+                        createdAt: dto.createdAt
+                    )
+                    imported += 1
+                } catch {
+                    failed += 1
+                }
+            }
+            importSummary = ImportSummary(imported: imported, skipped: parsed.items.count - toAdd.count, failed: failed)
+        } catch {
+            exportError = error.localizedDescription
+        }
+    }
+
+    private func handleSubscriptionImport(_ result: Result<URL, Error>) async {
+        isImporting = true
+        defer { isImporting = false }
+        do {
+            let url = try result.get()
+            let csv = try readCSV(from: url)
+            let parsed = CSVImporter.parseSubscriptions(csv)
+            let api = container.makeSubscriptionsAPI()
+            let service = container.makeSubscriptionsService()
+            let existingIDs = Set(try await service.fetchAll().map { $0.id })
+            let toAdd = parsed.items.filter { !existingIDs.contains($0.id) }
+            var imported = 0
+            var failed = parsed.failed
+            for s in toAdd {
+                do {
+                    let dto = try await api.createSubscription(SubscriptionCreate(from: s))
+                    try await service.upsert(
+                        serverId: dto.id,
+                        title: dto.title,
+                        amount: dto.amountDouble,
+                        currency: dto.depositCurrency,
+                        billingCycle: dto.subscriptionBillingCycle,
+                        startDate: dto.startDate,
+                        endDate: dto.endDate,
+                        category: dto.category,
+                        iconName: dto.iconName,
+                        isActive: dto.isActive,
+                        createdAt: dto.createdAt
+                    )
+                    imported += 1
+                } catch {
+                    failed += 1
+                }
+            }
+            importSummary = ImportSummary(imported: imported, skipped: parsed.items.count - toAdd.count, failed: failed)
+        } catch {
+            exportError = error.localizedDescription
+        }
+    }
+
+    private func readCSV(from url: URL) throws -> String {
+        let needsStop = url.startAccessingSecurityScopedResource()
+        defer { if needsStop { url.stopAccessingSecurityScopedResource() } }
+        let data = try Data(contentsOf: url)
+        for encoding: String.Encoding in [.utf8, .windowsCP1252, .isoLatin1, .utf16] {
+            if let str = String(data: data, encoding: encoding) {
+                return str.hasPrefix("\u{FEFF}") ? String(str.dropFirst()) : str
+            }
+        }
+        throw CocoaError(.fileReadUnknownStringEncoding)
     }
 }
 

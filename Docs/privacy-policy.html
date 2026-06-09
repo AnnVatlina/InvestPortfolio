@@ -1,0 +1,292 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Rentivo — Privacy Policy</title>
+  <style>
+    :root {
+      --bg: #f9f9fb;
+      --surface: #ffffff;
+      --accent: #5b4fcf;
+      --text: #1c1c1e;
+      --secondary: #6e6e73;
+      --border: #e5e5ea;
+      --radius: 12px;
+    }
+
+    @media (prefers-color-scheme: dark) {
+      :root {
+        --bg: #1c1c1e;
+        --surface: #2c2c2e;
+        --accent: #a89cff;
+        --text: #f2f2f7;
+        --secondary: #aeaeb2;
+        --border: #3a3a3c;
+      }
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.65;
+      padding: 24px 16px 64px;
+    }
+
+    .container {
+      max-width: 720px;
+      margin: 0 auto;
+    }
+
+    header {
+      text-align: center;
+      padding: 48px 0 40px;
+    }
+
+    .app-icon {
+      width: 80px;
+      height: 80px;
+      background: linear-gradient(135deg, #7c6ff7, #4f46e5);
+      border-radius: 18px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      margin-bottom: 16px;
+      box-shadow: 0 4px 20px rgba(91, 79, 207, 0.35);
+    }
+
+    .app-icon svg {
+      width: 44px;
+      height: 44px;
+      fill: white;
+    }
+
+    h1 {
+      font-size: 2rem;
+      font-weight: 700;
+      letter-spacing: -0.5px;
+      color: var(--text);
+    }
+
+    .subtitle {
+      margin-top: 8px;
+      color: var(--secondary);
+      font-size: 1rem;
+    }
+
+    .lang-switcher {
+      display: flex;
+      justify-content: center;
+      gap: 8px;
+      margin: 24px 0 40px;
+    }
+
+    .lang-btn {
+      padding: 6px 18px;
+      border-radius: 20px;
+      border: 1.5px solid var(--border);
+      background: transparent;
+      color: var(--secondary);
+      font-size: 0.875rem;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.15s;
+    }
+
+    .lang-btn.active {
+      background: var(--accent);
+      border-color: var(--accent);
+      color: #fff;
+    }
+
+    .card {
+      background: var(--surface);
+      border-radius: var(--radius);
+      border: 1px solid var(--border);
+      padding: 28px 32px;
+      margin-bottom: 16px;
+    }
+
+    h2 {
+      font-size: 1.1rem;
+      font-weight: 600;
+      color: var(--accent);
+      margin-bottom: 12px;
+    }
+
+    p { margin-bottom: 12px; }
+    p:last-child { margin-bottom: 0; }
+
+    ul {
+      padding-left: 20px;
+      margin-bottom: 12px;
+    }
+
+    ul li { margin-bottom: 6px; }
+
+    .updated {
+      text-align: center;
+      color: var(--secondary);
+      font-size: 0.85rem;
+      margin-top: 40px;
+    }
+
+    a { color: var(--accent); text-decoration: none; }
+    a:hover { text-decoration: underline; }
+
+    .hidden { display: none; }
+  </style>
+</head>
+<body>
+<div class="container">
+
+  <header>
+    <div class="app-icon">
+      <!-- Simple chart icon -->
+      <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+        <path d="M3 3v18h18M7 16l4-4 3 3 5-5" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+      </svg>
+    </div>
+    <h1>Rentivo</h1>
+    <p class="subtitle">Personal Finance Tracker</p>
+  </header>
+
+  <div class="lang-switcher">
+    <button class="lang-btn active" onclick="setLang('en')">English</button>
+    <button class="lang-btn" onclick="setLang('ru')">Русский</button>
+  </div>
+
+  <!-- ══════════════════════════════ ENGLISH ══════════════════════════════ -->
+  <div id="en">
+
+    <div class="card">
+      <h2>Privacy Policy</h2>
+      <p>This Privacy Policy describes how Rentivo ("we", "the app") handles your information. We are committed to protecting your privacy. The short version: <strong>your data never leaves your device.</strong></p>
+    </div>
+
+    <div class="card">
+      <h2>Data We Collect</h2>
+      <p>Rentivo does <strong>not</strong> collect, transmit, or share any personal data. All information you enter — deposits, subscriptions, financial figures — is stored exclusively on your device using Apple's SwiftData framework.</p>
+      <ul>
+        <li>No account or sign-up required.</li>
+        <li>No analytics or tracking SDKs are included.</li>
+        <li>No advertising identifiers are used.</li>
+        <li>No data is sent to any server operated by us.</li>
+      </ul>
+    </div>
+
+    <div class="card">
+      <h2>Local Storage</h2>
+      <p>All your financial data (deposits, subscriptions, notes) is stored locally in the app's private container on your device. It is included in iCloud Backup if you have iCloud Backup enabled — this is controlled entirely by your device settings and Apple's infrastructure.</p>
+    </div>
+
+    <div class="card">
+      <h2>Push Notifications</h2>
+      <p>Rentivo can send local push notifications to remind you about upcoming deposit closings or subscription renewals. These notifications are scheduled locally on your device and are never routed through our servers. You can disable them at any time in your device's Settings → Notifications.</p>
+    </div>
+
+    <div class="card">
+      <h2>Third-Party Services</h2>
+      <p>Rentivo does not integrate any third-party analytics, advertising, or crash-reporting services. The app does not communicate with any external servers owned by us.</p>
+      <p>If you use the optional portfolio sync feature, it connects to the Tradernet API (<a href="https://tradernet.ru" target="_blank" rel="noopener">tradernet.ru</a>) using credentials you provide. In that case, Tradernet's own privacy policy applies to that connection. We do not store your credentials anywhere other than the device's secure Keychain.</p>
+    </div>
+
+    <div class="card">
+      <h2>Data Export &amp; Import</h2>
+      <p>You can export your data as CSV files and import them back. These files are created locally and only shared if you explicitly choose to do so (e.g., via AirDrop or email). We have no access to these files.</p>
+    </div>
+
+    <div class="card">
+      <h2>Children's Privacy</h2>
+      <p>Rentivo is not directed at children under 13. We do not knowingly collect data from children.</p>
+    </div>
+
+    <div class="card">
+      <h2>Changes to This Policy</h2>
+      <p>We may update this Privacy Policy from time to time. The "Last updated" date below will reflect any changes. Continued use of the app constitutes acceptance of the updated policy.</p>
+    </div>
+
+    <div class="card">
+      <h2>Contact</h2>
+      <p>If you have any questions about this Privacy Policy, please contact us at <a href="mailto:privacy@rentivo.io">privacy@rentivo.io</a>.</p>
+    </div>
+
+  </div>
+  <!-- /en -->
+
+  <!-- ══════════════════════════════ RUSSIAN ══════════════════════════════ -->
+  <div id="ru" class="hidden">
+
+    <div class="card">
+      <h2>Политика конфиденциальности</h2>
+      <p>Этот документ описывает, как приложение Rentivo обрабатывает ваши данные. Мы ценим вашу конфиденциальность. Коротко: <strong>ваши данные никогда не покидают ваше устройство.</strong></p>
+    </div>
+
+    <div class="card">
+      <h2>Какие данные мы собираем</h2>
+      <p>Rentivo <strong>не собирает</strong>, не передаёт и не передаёт третьим лицам никаких персональных данных. Вся информация, которую вы вводите — вклады, подписки, финансовые показатели — хранится исключительно на вашем устройстве с использованием фреймворка SwiftData от Apple.</p>
+      <ul>
+        <li>Регистрация или создание аккаунта не требуются.</li>
+        <li>В приложении нет аналитических или рекламных SDK.</li>
+        <li>Рекламные идентификаторы не используются.</li>
+        <li>Никакие данные не отправляются на наши серверы.</li>
+      </ul>
+    </div>
+
+    <div class="card">
+      <h2>Локальное хранение</h2>
+      <p>Все ваши финансовые данные (вклады, подписки, заметки) хранятся локально в изолированном контейнере приложения на вашем устройстве. Они включаются в резервную копию iCloud, если вы включили iCloud Backup — это полностью контролируется настройками вашего устройства и инфраструктурой Apple.</p>
+    </div>
+
+    <div class="card">
+      <h2>Push-уведомления</h2>
+      <p>Rentivo может отправлять локальные push-уведомления о предстоящем закрытии вкладов или продлении подписок. Эти уведомления планируются локально на вашем устройстве и не проходят через наши серверы. Вы можете отключить их в любой момент: Настройки → Уведомления.</p>
+    </div>
+
+    <div class="card">
+      <h2>Сторонние сервисы</h2>
+      <p>Rentivo не использует сторонние аналитические, рекламные или crash-репортинговые сервисы. Приложение не взаимодействует с внешними серверами, принадлежащими нам.</p>
+      <p>Если вы используете функцию синхронизации портфеля, приложение подключается к API Tradernet (<a href="https://tradernet.ru" target="_blank" rel="noopener">tradernet.ru</a>) с использованием введённых вами учётных данных. В этом случае применяется политика конфиденциальности Tradernet. Ваши учётные данные хранятся только в защищённом Keychain вашего устройства.</p>
+    </div>
+
+    <div class="card">
+      <h2>Экспорт и импорт данных</h2>
+      <p>Вы можете экспортировать данные в формате CSV и импортировать их обратно. Эти файлы создаются локально и передаются только если вы явно решите это сделать (например, через AirDrop или email). У нас нет доступа к этим файлам.</p>
+    </div>
+
+    <div class="card">
+      <h2>Конфиденциальность детей</h2>
+      <p>Приложение не предназначено для детей до 13 лет. Мы намеренно не собираем данные детей.</p>
+    </div>
+
+    <div class="card">
+      <h2>Изменения политики</h2>
+      <p>Мы можем периодически обновлять эту Политику конфиденциальности. Дата "Последнего обновления" ниже отражает любые изменения. Продолжение использования приложения означает принятие обновлённой политики.</p>
+    </div>
+
+    <div class="card">
+      <h2>Контакт</h2>
+      <p>Если у вас есть вопросы по этой Политике конфиденциальности, напишите нам на <a href="mailto:privacy@rentivo.io">privacy@rentivo.io</a>.</p>
+    </div>
+
+  </div>
+  <!-- /ru -->
+
+  <p class="updated">Last updated: April 19, 2026</p>
+
+</div>
+
+<script>
+  function setLang(lang) {
+    document.getElementById('en').classList.toggle('hidden', lang !== 'en');
+    document.getElementById('ru').classList.toggle('hidden', lang !== 'ru');
+    document.querySelectorAll('.lang-btn').forEach(function(btn) {
+      btn.classList.toggle('active', btn.textContent.toLowerCase().startsWith(lang === 'en' ? 'en' : 'ру'));
+    });
+  }
+</script>
+</body>
+</html>

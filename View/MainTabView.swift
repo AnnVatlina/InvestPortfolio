@@ -11,9 +11,6 @@ struct MainTabView: View {
     @EnvironmentObject private var container: DIContainer
     @Environment(\.locale) private var locale
 
-    var isAuthorized: Bool = (KeychainService.loadToken() != nil)
-    var onAuthorized: (() -> Void)? = nil
-
     var body: some View {
         _ = locale // re-render on language change
         return TabView(selection: $selectedIndex) {
@@ -21,8 +18,6 @@ struct MainTabView: View {
             // 0: Главная
             NavigationStack {
                 HomeTabView(
-                    isAuthorized: isAuthorized,
-                    openPortfolio: { /* Portfolio tab hidden */ },
                     openDeposits: { selectedIndex = 1 },
                     openSubscriptions: { selectedIndex = 2 },
                     openAnalytics: { selectedIndex = 3 },
@@ -64,8 +59,6 @@ struct MainTabView: View {
             .tabItem { Label("settings.title", systemImage: "gearshape.fill") }
             .tag(4)
 
-            // Портфель скрыт из TabBar (код сохранён в PortfolioView.swift)
-            // Для восстановления: добавить таб с tag(5) и PortfolioView(container:)
         }
         .onAppear {
             if !(0...4).contains(selectedIndex) { selectedIndex = 0 }

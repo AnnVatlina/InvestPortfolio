@@ -18,6 +18,9 @@ protocol DepositsService {
     func add(_ deposit: Deposit) async throws
     func delete(id: UUID) async throws
     func update(id: UUID, title: String, bankName: String?, amount: Double, currency: DepositCurrency, openDate: Date, closeDate: Date?, annualInterestRate: Double) async throws
+    /// Insert-or-update cache record matched by serverId (from API response).
+    func upsert(serverId: UUID, title: String, bankName: String?, amount: Double, currency: DepositCurrency, openDate: Date, closeDate: Date?, annualInterestRate: Double, createdAt: Date) async throws
+    func deleteByServerId(_ serverId: UUID) async throws
     func incomeSummary(for deposit: Deposit, asOf date: Date) -> DepositIncomeSummary
 }
 
@@ -44,6 +47,14 @@ final class DefaultDepositsService: DepositsService {
 
     func update(id: UUID, title: String, bankName: String?, amount: Double, currency: DepositCurrency, openDate: Date, closeDate: Date?, annualInterestRate: Double) async throws {
         try await repository.update(id: id, title: title, bankName: bankName, amount: amount, currency: currency, openDate: openDate, closeDate: closeDate, annualInterestRate: annualInterestRate)
+    }
+
+    func upsert(serverId: UUID, title: String, bankName: String?, amount: Double, currency: DepositCurrency, openDate: Date, closeDate: Date?, annualInterestRate: Double, createdAt: Date) async throws {
+        try await repository.upsert(serverId: serverId, title: title, bankName: bankName, amount: amount, currency: currency, openDate: openDate, closeDate: closeDate, annualInterestRate: annualInterestRate, createdAt: createdAt)
+    }
+
+    func deleteByServerId(_ serverId: UUID) async throws {
+        try await repository.deleteByServerId(serverId)
     }
 
     func incomeSummary(for deposit: Deposit, asOf date: Date) -> DepositIncomeSummary {
