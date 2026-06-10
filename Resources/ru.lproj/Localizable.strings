@@ -105,8 +105,8 @@
 "subscriptions.error.emptyTitle" = "Введите название";
 "subscriptions.status.active" = "Активна";
 "subscriptions.status.cancelled" = "Отменена";
-"subscriptions.notification.title" = "Платёж завтра";
-"subscriptions.notification.body.format" = "\"%@\" — платёж %@ %@ запланирован на завтра.";
+"subscriptions.notification.title" = "Оплата подписки сегодня";
+"subscriptions.notification.body.format" = "\"%@\" — сегодня спишется %@ %@.";
 "subscriptions.cycle.weekly" = "Еженедельно";
 "subscriptions.cycle.monthly" = "Ежемесячно";
 "subscriptions.cycle.quarterly" = "Ежеквартально";

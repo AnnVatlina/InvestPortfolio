@@ -188,6 +188,7 @@ final class SubscriptionsViewModel: ObservableObject {
             }
             let updated = try await service.fetchAll()
             subscriptions = applySort(updated)
+            rescheduleAllNotifications()
         } catch {
             if subscriptions.isEmpty {
                 errorMessage = error.localizedDescription
@@ -237,7 +238,7 @@ final class SubscriptionsViewModel: ObservableObject {
             await load()
             if billingCycle.isRecurring,
                let sub = subscriptions.first(where: { $0.serverId == response.id }) {
-                scheduleNotification(for: sub)
+                scheduleNotifications(for: sub)
             }
         } catch {
             operationError = error.localizedDescription
@@ -245,7 +246,7 @@ final class SubscriptionsViewModel: ObservableObject {
     }
 
     func deleteSubscription(_ subscription: Subscription) async {
-        cancelNotification(for: subscription)
+        cancelNotifications(for: subscription)
         do {
             if let serverId = subscription.serverId {
                 try await api.deleteSubscription(id: serverId)
@@ -317,9 +318,9 @@ final class SubscriptionsViewModel: ObservableObject {
             )
             await load()
             if let updated = subscriptions.first(where: { $0.id == id }) {
-                cancelNotification(for: updated)
+                cancelNotifications(for: updated)
                 if updated.isActive && updated.billingCycle.isRecurring {
-                    scheduleNotification(for: updated)
+                    scheduleNotifications(for: updated)
                 }
             }
         } catch {
@@ -368,40 +369,113 @@ final class SubscriptionsViewModel: ObservableObject {
 
     // MARK: - Notifications
 
-    private func scheduleNotification(for subscription: Subscription) {
-        let id = subscription.id.uuidString
-        let title = subscription.title
-        let amount = subscription.amount
-        let currency = subscription.currency.rawValue
-        let nextPayment = subscription.nextPaymentDate
+    /// Cancels all pending subscription notifications and re-schedules them
+    /// for the next 12 months. Called after every load() so notifications
+    /// survive app reinstalls and remain accurate after server sync.
+    func rescheduleAllNotifications() {
+        let cal = Calendar.current
+        let now = Date()
+        guard let horizon = cal.date(byAdding: .month, value: 12, to: now) else { return }
 
+        let infos: [SubScheduleInfo] = subscriptions
+            .filter { $0.isActive && $0.billingCycle.isRecurring }
+            .compactMap { sub in
+                let dates = paymentDates(for: sub, from: now, to: horizon, calendar: cal)
+                guard !dates.isEmpty else { return nil }
+                return SubScheduleInfo(
+                    id: sub.id.uuidString,
+                    title: sub.title,
+                    amount: String(format: "%.2f", sub.amount),
+                    currency: sub.currency.rawValue,
+                    dates: dates
+                )
+            }
+
+        let notifTitle = String(localized: "subscriptions.notification.title")
+        let bodyFormat = String(localized: "subscriptions.notification.body.format")
         let center = UNUserNotificationCenter.current()
         center.requestAuthorization(options: [.alert, .sound]) { granted, _ in
             guard granted else { return }
-            let content = UNMutableNotificationContent()
-            content.title = String(localized: "subscriptions.notification.title")
-            content.body = String(format: String(localized: "subscriptions.notification.body.format"),
-                                  title,
-                                  String(format: "%.2f", amount),
-                                  currency)
-            content.sound = .default
+            center.getPendingNotificationRequests { pending in
+                let staleIds = pending.map(\.identifier).filter { $0.hasPrefix("subscription-") }
+                center.removePendingNotificationRequests(withIdentifiers: staleIds)
+                for info in infos {
+                    SubscriptionsViewModel.scheduleRequests(info: info, notifTitle: notifTitle,
+                                                            bodyFormat: bodyFormat, calendar: cal, center: center)
+                }
+            }
+        }
+    }
 
-            guard let triggerDate = Calendar.current.date(byAdding: .day, value: -1, to: nextPayment),
-                  triggerDate > Date() else { return }
-            let comps = Calendar.current.dateComponents([.year, .month, .day, .hour, .minute], from: triggerDate)
+    private func scheduleNotifications(for subscription: Subscription) {
+        guard subscription.isActive, subscription.billingCycle.isRecurring else { return }
+        let cal = Calendar.current
+        let now = Date()
+        guard let horizon = cal.date(byAdding: .month, value: 12, to: now) else { return }
+        let dates = paymentDates(for: subscription, from: now, to: horizon, calendar: cal)
+        guard !dates.isEmpty else { return }
+
+        let info = SubScheduleInfo(
+            id: subscription.id.uuidString,
+            title: subscription.title,
+            amount: String(format: "%.2f", subscription.amount),
+            currency: subscription.currency.rawValue,
+            dates: dates
+        )
+        let notifTitle = String(localized: "subscriptions.notification.title")
+        let bodyFormat = String(localized: "subscriptions.notification.body.format")
+        let center = UNUserNotificationCenter.current()
+        center.requestAuthorization(options: [.alert, .sound]) { granted, _ in
+            guard granted else { return }
+            SubscriptionsViewModel.scheduleRequests(info: info, notifTitle: notifTitle,
+                                                    bodyFormat: bodyFormat, calendar: cal, center: center)
+        }
+    }
+
+    private func cancelNotifications(for subscription: Subscription) {
+        let cal = Calendar.current
+        let now = Date()
+        guard let horizon = cal.date(byAdding: .month, value: 12, to: now) else { return }
+        let ids = paymentDates(for: subscription, from: now, to: horizon, calendar: cal)
+            .map { date -> String in
+                let c = cal.dateComponents([.year, .month, .day], from: date)
+                return "subscription-\(subscription.id.uuidString)-\(c.year!)-\(c.month!)-\(c.day!)"
+            }
+        UNUserNotificationCenter.current().removePendingNotificationRequests(withIdentifiers: ids)
+    }
+
+    private struct SubScheduleInfo: Sendable {
+        let id: String
+        let title: String
+        let amount: String
+        let currency: String
+        let dates: [Date]
+    }
+
+    nonisolated private static func scheduleRequests(
+        info: SubScheduleInfo,
+        notifTitle: String,
+        bodyFormat: String,
+        calendar: Calendar,
+        center: UNUserNotificationCenter
+    ) {
+        let content = UNMutableNotificationContent()
+        content.title = notifTitle
+        content.body = String(format: bodyFormat, info.title, info.amount, info.currency)
+        content.sound = .default
+        for date in info.dates {
+            var comps = calendar.dateComponents([.year, .month, .day], from: date)
+            comps.hour = 9
+            comps.minute = 0
             let trigger = UNCalendarNotificationTrigger(dateMatching: comps, repeats: false)
+            let dateKey = "\(comps.year!)-\(comps.month!)-\(comps.day!)"
             let request = UNNotificationRequest(
-                identifier: "subscription-\(id)",
+                identifier: "subscription-\(info.id)-\(dateKey)",
                 content: content,
                 trigger: trigger
             )
             center.add(request)
         }
-    }
-
-    private func cancelNotification(for subscription: Subscription) {
-        UNUserNotificationCenter.current()
-            .removePendingNotificationRequests(withIdentifiers: ["subscription-\(subscription.id.uuidString)"])
     }
 
     // MARK: - Private helpers
