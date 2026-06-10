@@ -55,7 +55,7 @@ struct MonthlyAnalyticsPoint: Identifiable {
         if let cached = try? await depositsService.fetchAll() { deposits = cached }
         if let cached = try? await subscriptionsService.fetchAll() { subscriptions = cached }
 
-        // 2. Sync both from API concurrently
+        // 2. Sync both from API concurrently, then remove stale entries
         do {
             async let depsRemote = depositsAPI.getDeposits()
             async let subsRemote = subscriptionsAPI.getSubscriptions()
@@ -74,6 +74,12 @@ struct MonthlyAnalyticsPoint: Identifiable {
                     createdAt: dto.createdAt
                 )
             }
+            let depRemoteIds = Set(depsResult.map(\.id))
+            let allLocalDeps = try await depositsService.fetchAll()
+            for staleId in allLocalDeps.compactMap(\.serverId) where !depRemoteIds.contains(staleId) {
+                try await depositsService.deleteByServerId(staleId)
+            }
+
             for dto in subsResult {
                 try await subscriptionsService.upsert(
                     serverId: dto.id,
@@ -88,6 +94,11 @@ struct MonthlyAnalyticsPoint: Identifiable {
                     isActive: dto.isActive,
                     createdAt: dto.createdAt
                 )
+            }
+            let subRemoteIds = Set(subsResult.map(\.id))
+            let allLocalSubs = try await subscriptionsService.fetchAll()
+            for staleId in allLocalSubs.compactMap(\.serverId) where !subRemoteIds.contains(staleId) {
+                try await subscriptionsService.deleteByServerId(staleId)
             }
 
             async let deps = depositsService.fetchAll()
