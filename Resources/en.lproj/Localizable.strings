@@ -105,8 +105,8 @@
 "subscriptions.error.emptyTitle" = "Please enter a title";
 "subscriptions.status.active" = "Active";
 "subscriptions.status.cancelled" = "Cancelled";
-"subscriptions.notification.title" = "Payment Tomorrow";
-"subscriptions.notification.body.format" = "\"%@\" — payment of %@ %@ is due tomorrow.";
+"subscriptions.notification.title" = "Subscription Payment Today";
+"subscriptions.notification.body.format" = "\"%@\" — %@ %@ will be charged today.";
 "subscriptions.cycle.weekly" = "Weekly";
 "subscriptions.cycle.monthly" = "Monthly";
 "subscriptions.cycle.quarterly" = "Quarterly";
