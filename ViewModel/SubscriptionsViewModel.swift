@@ -163,7 +163,7 @@ final class SubscriptionsViewModel: ObservableObject {
             subscriptions = applySort(cached)
         }
 
-        // 2. Fetch from API, upsert into cache, reload
+        // 2. Fetch from API, upsert into cache, remove stale entries, reload
         do {
             let remoteList = try await api.getSubscriptions()
             for dto in remoteList {
@@ -180,6 +180,11 @@ final class SubscriptionsViewModel: ObservableObject {
                     isActive: dto.isActive,
                     createdAt: dto.createdAt
                 )
+            }
+            let remoteIds = Set(remoteList.map(\.id))
+            let allLocal = try await service.fetchAll()
+            for staleId in allLocal.compactMap(\.serverId) where !remoteIds.contains(staleId) {
+                try await service.deleteByServerId(staleId)
             }
             let updated = try await service.fetchAll()
             subscriptions = applySort(updated)
