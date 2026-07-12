@@ -10,7 +10,6 @@
 		1A283CB0A1273797A2EDF575 /* MainTabView.swift in Sources */ = {isa = PBXBuildFile; fileRef = D18ED4677AC6505B776798E6 /* MainTabView.swift */; };
 		42FE55B393A3181535CBC9F8 /* SubscriptionRepositoryTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3D043D3718FB956DCC29034F /* SubscriptionRepositoryTests.swift */; };
 		518517179F516B8CCFD2E88F /* SubscriptionServiceTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 80D08C636718C70D9EAA979A /* SubscriptionServiceTests.swift */; };
-		9380DD9F1204B8281856CB04 /* APIError.swift in Sources */ = {isa = PBXBuildFile; fileRef = C37B7EDAF8F936E98437A1F3 /* APIError.swift */; };
 		950800032F04064E0041AD54 /* DepositsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 950800022F04064E0041AD54 /* DepositsView.swift */; };
 		950800052F0406560041AD54 /* DepositsViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 950800042F0406560041AD54 /* DepositsViewModel.swift */; };
 		950800092F0406650041AD54 /* Deposit.swift in Sources */ = {isa = PBXBuildFile; fileRef = 950800082F0406650041AD54 /* Deposit.swift */; };
@@ -20,24 +19,11 @@
 		950800132F040B6C0041AD54 /* RootView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 950800122F040B6C0041AD54 /* RootView.swift */; };
 		950800152F040E5A0041AD54 /* SettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 950800142F040E5A0041AD54 /* SettingsView.swift */; };
 		9511098B2F8161EE00EE2EEE /* DIContainer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9511098A2F8161EE00EE2EEE /* DIContainer.swift */; };
-		9523DD982FBB502000E24324 /* AuthToken.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9523DD972FBB502000E24324 /* AuthToken.swift */; };
-		9523DD9A2FBB503900E24324 /* TokenStorage.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9523DD992FBB503900E24324 /* TokenStorage.swift */; };
-		9523DD9C2FBB506800E24324 /* RentivoAPIClient.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9523DD9B2FBB506800E24324 /* RentivoAPIClient.swift */; };
-		9523DD9E2FBB508300E24324 /* AuthAPI.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9523DD9D2FBB508300E24324 /* AuthAPI.swift */; };
-		9523DDA12FBB50C400E24324 /* LoginView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9523DDA02FBB50C400E24324 /* LoginView.swift */; };
-		9523DDA32FBB50CD00E24324 /* RegisterView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9523DDA22FBB50CD00E24324 /* RegisterView.swift */; };
-		9523DDA52FBB513200E24324 /* TokenStorageTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9523DDA42FBB513200E24324 /* TokenStorageTests.swift */; };
-		9523DDA72FBB855900E24324 /* DepositResponse.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9523DDA62FBB855900E24324 /* DepositResponse.swift */; };
-		9523DDA92FBB856C00E24324 /* DepositsAPI.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9523DDA82FBB856C00E24324 /* DepositsAPI.swift */; };
 		9523DDAB2FBB85F400E24324 /* DepositsViewModelTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9523DDAA2FBB85F400E24324 /* DepositsViewModelTests.swift */; };
-		9523DDAD2FBC23DD00E24324 /* SubscriptionResponse.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9523DDAC2FBC23DD00E24324 /* SubscriptionResponse.swift */; };
-		9523DDAF2FBC23DD00E24324 /* SubscriptionsAPI.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9523DDAE2FBC23DD00E24324 /* SubscriptionsAPI.swift */; };
 		9539C4222F93FC9D003A105C /* AnalyticsViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9539C4212F93FC9D003A105C /* AnalyticsViewModel.swift */; };
 		9539C4242F93FCB9003A105C /* AnalyticsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9539C4232F93FCB9003A105C /* AnalyticsView.swift */; };
 		9557F9792F810AB10086715E /* Settings.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9557F9782F810AB10086715E /* Settings.swift */; };
 		95892D362F95F07500A30CA9 /* Color+Brand.swift in Sources */ = {isa = PBXBuildFile; fileRef = 95892D352F95F07500A30CA9 /* Color+Brand.swift */; };
-		95930B9D2FC99B7D00442F0F /* NetworkMonitor.swift in Sources */ = {isa = PBXBuildFile; fileRef = 95930B9C2FC99B7D00442F0F /* NetworkMonitor.swift */; };
-		95930B9F2FC99B7E00442F0F /* OfflineBanner.swift in Sources */ = {isa = PBXBuildFile; fileRef = 95930B9E2FC99B7E00442F0F /* OfflineBanner.swift */; };
 		95A86BD02F82B8BD009B94CF /* AppSchema.swift in Sources */ = {isa = PBXBuildFile; fileRef = 95A86BCF2F82B8BD009B94CF /* AppSchema.swift */; };
 		95A86BD22F82BBA2009B94CF /* LanguageBundle.swift in Sources */ = {isa = PBXBuildFile; fileRef = 95A86BD12F82BBA2009B94CF /* LanguageBundle.swift */; };
 		95A86BD42F82BDF8009B94CF /* CSVExporter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 95A86BD32F82BDF8009B94CF /* CSVExporter.swift */; };
@@ -48,11 +34,9 @@
 		95AD90862F8252A50064CD19 /* SubscriptionsViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 95AD90852F8252A50064CD19 /* SubscriptionsViewModel.swift */; };
 		95AD90882F8252CA0064CD19 /* SubscriptionsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 95AD90872F8252CA0064CD19 /* SubscriptionsView.swift */; };
 		95CCEE182FC9886E00694936 /* AnalyticsViewModelTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 95CCEE172FC9886E00694936 /* AnalyticsViewModelTests.swift */; };
-		95D967F82F04193300079C66 /* NotificationName+Unauthorized.swift in Sources */ = {isa = PBXBuildFile; fileRef = 95D967F72F04193300079C66 /* NotificationName+Unauthorized.swift */; };
 		95D967FA2F04193400079C66 /* HomeTabView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 95D967F92F04193400079C66 /* HomeTabView.swift */; };
 		95D967FC2F04193500079C66 /* LandingCard.swift in Sources */ = {isa = PBXBuildFile; fileRef = 95D967FB2F04193500079C66 /* LandingCard.swift */; };
 		95D967FE2F04193500079C66 /* Color+TertiaryLabel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 95D967FD2F04193500079C66 /* Color+TertiaryLabel.swift */; };
-		95D968042F041B8500079C66 /* AuthViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 95D968012F041B8500079C66 /* AuthViewModel.swift */; };
 		95E87C1F2F9493A600E238D5 /* CSVImporter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 95E87C1E2F9493A600E238D5 /* CSVImporter.swift */; };
 		95E87C212F94A27D00E238D5 /* SampleDataService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 95E87C202F94A27D00E238D5 /* SampleDataService.swift */; };
 		95E87C232F94A28C00E238D5 /* OnboardingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 95E87C222F94A28C00E238D5 /* OnboardingView.swift */; };
@@ -90,18 +74,7 @@
 		950800142F040E5A0041AD54 /* SettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsView.swift; sourceTree = "<group>"; };
 		9511098A2F8161EE00EE2EEE /* DIContainer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DIContainer.swift; sourceTree = "<group>"; };
 		95151F8C2EFFC86800285671 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
-		9523DD972FBB502000E24324 /* AuthToken.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AuthToken.swift; sourceTree = "<group>"; };
-		9523DD992FBB503900E24324 /* TokenStorage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TokenStorage.swift; sourceTree = "<group>"; };
-		9523DD9B2FBB506800E24324 /* RentivoAPIClient.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RentivoAPIClient.swift; sourceTree = "<group>"; };
-		9523DD9D2FBB508300E24324 /* AuthAPI.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AuthAPI.swift; sourceTree = "<group>"; };
-		9523DDA02FBB50C400E24324 /* LoginView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LoginView.swift; sourceTree = "<group>"; };
-		9523DDA22FBB50CD00E24324 /* RegisterView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RegisterView.swift; sourceTree = "<group>"; };
-		9523DDA42FBB513200E24324 /* TokenStorageTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TokenStorageTests.swift; sourceTree = "<group>"; };
-		9523DDA62FBB855900E24324 /* DepositResponse.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DepositResponse.swift; sourceTree = "<group>"; };
-		9523DDA82FBB856C00E24324 /* DepositsAPI.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DepositsAPI.swift; sourceTree = "<group>"; };
 		9523DDAA2FBB85F400E24324 /* DepositsViewModelTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DepositsViewModelTests.swift; sourceTree = "<group>"; };
-		9523DDAC2FBC23DD00E24324 /* SubscriptionResponse.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SubscriptionResponse.swift; sourceTree = "<group>"; };
-		9523DDAE2FBC23DD00E24324 /* SubscriptionsAPI.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SubscriptionsAPI.swift; sourceTree = "<group>"; };
 		9539C4212F93FC9D003A105C /* AnalyticsViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AnalyticsViewModel.swift; sourceTree = "<group>"; };
 		9539C4232F93FCB9003A105C /* AnalyticsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AnalyticsView.swift; sourceTree = "<group>"; };
 		953C14A02F056E61003998D2 /* Base */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = Base; path = Base.lproj/Localizable.strings; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.plist; };
@@ -109,8 +82,6 @@
 		953C14A52F056EDD003998D2 /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/Localizable.strings; sourceTree = "<group>"; };
 		9557F9782F810AB10086715E /* Settings.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Settings.swift; sourceTree = "<group>"; };
 		95892D352F95F07500A30CA9 /* Color+Brand.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Color+Brand.swift"; sourceTree = "<group>"; };
-		95930B9C2FC99B7D00442F0F /* NetworkMonitor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NetworkMonitor.swift; sourceTree = "<group>"; };
-		95930B9E2FC99B7E00442F0F /* OfflineBanner.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OfflineBanner.swift; sourceTree = "<group>"; };
 		95A86BCF2F82B8BD009B94CF /* AppSchema.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppSchema.swift; sourceTree = "<group>"; };
 		95A86BD12F82BBA2009B94CF /* LanguageBundle.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LanguageBundle.swift; sourceTree = "<group>"; };
 		95A86BD32F82BDF8009B94CF /* CSVExporter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CSVExporter.swift; sourceTree = "<group>"; };
@@ -121,17 +92,14 @@
 		95AD90852F8252A50064CD19 /* SubscriptionsViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SubscriptionsViewModel.swift; sourceTree = "<group>"; };
 		95AD90872F8252CA0064CD19 /* SubscriptionsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SubscriptionsView.swift; sourceTree = "<group>"; };
 		95CCEE172FC9886E00694936 /* AnalyticsViewModelTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AnalyticsViewModelTests.swift; sourceTree = "<group>"; };
-		95D967F72F04193300079C66 /* NotificationName+Unauthorized.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "NotificationName+Unauthorized.swift"; sourceTree = "<group>"; };
 		95D967F92F04193400079C66 /* HomeTabView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomeTabView.swift; sourceTree = "<group>"; };
 		95D967FB2F04193500079C66 /* LandingCard.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LandingCard.swift; sourceTree = "<group>"; };
 		95D967FD2F04193500079C66 /* Color+TertiaryLabel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Color+TertiaryLabel.swift"; sourceTree = "<group>"; };
-		95D968012F041B8500079C66 /* AuthViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AuthViewModel.swift; sourceTree = "<group>"; };
 		95E87C1E2F9493A600E238D5 /* CSVImporter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CSVImporter.swift; sourceTree = "<group>"; };
 		95E87C202F94A27D00E238D5 /* SampleDataService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SampleDataService.swift; sourceTree = "<group>"; };
 		95E87C222F94A28C00E238D5 /* OnboardingView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OnboardingView.swift; sourceTree = "<group>"; };
 		B26A38B2C0B92497C74625F2 /* SubscriptionViewModelTests.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = SubscriptionViewModelTests.swift; sourceTree = "<group>"; };
 		BC60E8CE818846C2907E2ED6 /* PrivacyInfo.xcprivacy */ = {isa = PBXFileReference; lastKnownFileType = text.xml; path = PrivacyInfo.xcprivacy; sourceTree = "<group>"; };
-		C37B7EDAF8F936E98437A1F3 /* APIError.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = APIError.swift; sourceTree = "<group>"; };
 		D18ED4677AC6505B776798E6 /* MainTabView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainTabView.swift; sourceTree = "<group>"; };
 		FD3DA74885FAB544805FB0DE /* InvestPortfolioTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = InvestPortfolioTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
@@ -155,19 +123,6 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
-		5A11619E4267E97BEF78CC37 /* APIClient */ = {
-			isa = PBXGroup;
-			children = (
-				C37B7EDAF8F936E98437A1F3 /* APIError.swift */,
-				9523DD992FBB503900E24324 /* TokenStorage.swift */,
-				9523DD9B2FBB506800E24324 /* RentivoAPIClient.swift */,
-				9523DD9D2FBB508300E24324 /* AuthAPI.swift */,
-				9523DDA82FBB856C00E24324 /* DepositsAPI.swift */,
-				9523DDAE2FBC23DD00E24324 /* SubscriptionsAPI.swift */,
-			);
-			path = APIClient;
-			sourceTree = "<group>";
-		};
 		62D5DB583295B510E944A5CD /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
@@ -182,7 +137,6 @@
 				3D043D3718FB956DCC29034F /* SubscriptionRepositoryTests.swift */,
 				80D08C636718C70D9EAA979A /* SubscriptionServiceTests.swift */,
 				B26A38B2C0B92497C74625F2 /* SubscriptionViewModelTests.swift */,
-				9523DDA42FBB513200E24324 /* TokenStorageTests.swift */,
 				9523DDAA2FBB85F400E24324 /* DepositsViewModelTests.swift */,
 				95CCEE172FC9886E00694936 /* AnalyticsViewModelTests.swift */,
 			);
@@ -194,15 +148,6 @@
 			children = (
 			);
 			path = App;
-			sourceTree = "<group>";
-		};
-		9523DD9F2FBB50C400E24324 /* Auth */ = {
-			isa = PBXGroup;
-			children = (
-				9523DDA02FBB50C400E24324 /* LoginView.swift */,
-				9523DDA22FBB50CD00E24324 /* RegisterView.swift */,
-			);
-			path = Auth;
 			sourceTree = "<group>";
 		};
 		953C14A42F056E61003998D2 /* Resources */ = {
@@ -217,7 +162,6 @@
 			isa = PBXGroup;
 			children = (
 				950800042F0406560041AD54 /* DepositsViewModel.swift */,
-				95D968012F041B8500079C66 /* AuthViewModel.swift */,
 				95AD90852F8252A50064CD19 /* SubscriptionsViewModel.swift */,
 				9539C4212F93FC9D003A105C /* AnalyticsViewModel.swift */,
 			);
@@ -243,7 +187,6 @@
 				95A86BD32F82BDF8009B94CF /* CSVExporter.swift */,
 				95E87C1E2F9493A600E238D5 /* CSVImporter.swift */,
 				95E87C202F94A27D00E238D5 /* SampleDataService.swift */,
-				95930B9C2FC99B7D00442F0F /* NetworkMonitor.swift */,
 			);
 			path = Service;
 			sourceTree = "<group>";
@@ -259,9 +202,6 @@
 				95AD907F2F82527B0064CD19 /* Subscription.swift */,
 				95AD90812F8252890064CD19 /* SubscriptionsRepository.swift */,
 				95A86BCF2F82B8BD009B94CF /* AppSchema.swift */,
-				9523DD972FBB502000E24324 /* AuthToken.swift */,
-				9523DDA62FBB855900E24324 /* DepositResponse.swift */,
-				9523DDAC2FBC23DD00E24324 /* SubscriptionResponse.swift */,
 			);
 			path = Model;
 			sourceTree = "<group>";
@@ -281,7 +221,6 @@
 				95151F8C2EFFC86800285671 /* Assets.xcassets */,
 				5E8A6769F38550C7E7261987 /* InvestPortfolioApp.swift */,
 				BC60E8CE818846C2907E2ED6 /* PrivacyInfo.xcprivacy */,
-				5A11619E4267E97BEF78CC37 /* APIClient */,
 				C6CD1A224B518FD6F436BF8F /* Model */,
 				C60896E4F8DFA38C232D7907 /* Service */,
 				95D968032F041B8500079C66 /* ViewModel */,
@@ -300,7 +239,6 @@
 				D18ED4677AC6505B776798E6 /* MainTabView.swift */,
 				950800022F04064E0041AD54 /* DepositsView.swift */,
 				950800142F040E5A0041AD54 /* SettingsView.swift */,
-				95D967F72F04193300079C66 /* NotificationName+Unauthorized.swift */,
 				95D967F92F04193400079C66 /* HomeTabView.swift */,
 				95D967FB2F04193500079C66 /* LandingCard.swift */,
 				95D967FD2F04193500079C66 /* Color+TertiaryLabel.swift */,
@@ -308,8 +246,6 @@
 				9539C4232F93FCB9003A105C /* AnalyticsView.swift */,
 				95E87C222F94A28C00E238D5 /* OnboardingView.swift */,
 				95892D352F95F07500A30CA9 /* Color+Brand.swift */,
-				9523DD9F2FBB50C400E24324 /* Auth */,
-				95930B9E2FC99B7E00442F0F /* OfflineBanner.swift */,
 			);
 			path = View;
 			sourceTree = "<group>";
@@ -418,28 +354,18 @@
 				95A86BD02F82B8BD009B94CF /* AppSchema.swift in Sources */,
 				9539C4242F93FCB9003A105C /* AnalyticsView.swift in Sources */,
 				F8045D927570703468F14EEE /* InvestPortfolioApp.swift in Sources */,
-				95930B9F2FC99B7E00442F0F /* OfflineBanner.swift in Sources */,
 				95AD90882F8252CA0064CD19 /* SubscriptionsView.swift in Sources */,
-				9523DDA12FBB50C400E24324 /* LoginView.swift in Sources */,
 				950800032F04064E0041AD54 /* DepositsView.swift in Sources */,
-				9523DDA72FBB855900E24324 /* DepositResponse.swift in Sources */,
-				9380DD9F1204B8281856CB04 /* APIError.swift in Sources */,
 				950800132F040B6C0041AD54 /* RootView.swift in Sources */,
 				95D967FC2F04193500079C66 /* LandingCard.swift in Sources */,
 				95E87C212F94A27D00E238D5 /* SampleDataService.swift in Sources */,
-				9523DD9E2FBB508300E24324 /* AuthAPI.swift in Sources */,
 				9539C4222F93FC9D003A105C /* AnalyticsViewModel.swift in Sources */,
 				95AD90842F8252960064CD19 /* SubscriptionsService.swift in Sources */,
 				950800112F0409A60041AD54 /* DepositsService.swift in Sources */,
 				95AD907E2F8252720064CD19 /* SubscriptionBillingCycle.swift in Sources */,
-				9523DD982FBB502000E24324 /* AuthToken.swift in Sources */,
-				9523DD9A2FBB503900E24324 /* TokenStorage.swift in Sources */,
 				95AD90802F82527B0064CD19 /* Subscription.swift in Sources */,
 				95D967FA2F04193400079C66 /* HomeTabView.swift in Sources */,
-				95930B9D2FC99B7D00442F0F /* NetworkMonitor.swift in Sources */,
-				95D967F82F04193300079C66 /* NotificationName+Unauthorized.swift in Sources */,
 				950800052F0406560041AD54 /* DepositsViewModel.swift in Sources */,
-				9523DD9C2FBB506800E24324 /* RentivoAPIClient.swift in Sources */,
 				95AD90822F8252890064CD19 /* SubscriptionsRepository.swift in Sources */,
 				95892D362F95F07500A30CA9 /* Color+Brand.swift in Sources */,
 				9557F9792F810AB10086715E /* Settings.swift in Sources */,
@@ -448,14 +374,9 @@
 				95A86BD42F82BDF8009B94CF /* CSVExporter.swift in Sources */,
 				1A283CB0A1273797A2EDF575 /* MainTabView.swift in Sources */,
 				95E87C1F2F9493A600E238D5 /* CSVImporter.swift in Sources */,
-				9523DDA32FBB50CD00E24324 /* RegisterView.swift in Sources */,
-				9523DDAD2FBC23DD00E24324 /* SubscriptionResponse.swift in Sources */,
-				9523DDA92FBB856C00E24324 /* DepositsAPI.swift in Sources */,
 				9508000D2F0406770041AD54 /* DepositsRepository.swift in Sources */,
 				95D967FE2F04193500079C66 /* Color+TertiaryLabel.swift in Sources */,
 				95AD90862F8252A50064CD19 /* SubscriptionsViewModel.swift in Sources */,
-				9523DDAF2FBC23DD00E24324 /* SubscriptionsAPI.swift in Sources */,
-				95D968042F041B8500079C66 /* AuthViewModel.swift in Sources */,
 				95E87C232F94A28C00E238D5 /* OnboardingView.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -469,7 +390,6 @@
 				9523DDAB2FBB85F400E24324 /* DepositsViewModelTests.swift in Sources */,
 				518517179F516B8CCFD2E88F /* SubscriptionServiceTests.swift in Sources */,
 				EC6792D387AAEE27DD44A4FF /* SubscriptionViewModelTests.swift in Sources */,
-				9523DDA52FBB513200E24324 /* TokenStorageTests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
