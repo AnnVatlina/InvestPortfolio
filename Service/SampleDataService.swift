@@ -3,7 +3,6 @@
 //  InvestPortfolio
 //
 //  Generates realistic sample deposits and subscriptions for onboarding demo.
-//  Creates records on the server first, then caches the responses locally.
 //
 
 import Foundation
@@ -13,36 +12,13 @@ enum SampleDataService {
     // MARK: - Public
 
     static func load(into container: DIContainer) async throws {
-        let depositsAPI = container.makeDepositsAPI()
-        let subscriptionsAPI = container.makeSubscriptionsAPI()
         let depositsService = container.makeDepositsService()
         let subscriptionsService = container.makeSubscriptionsService()
-
         for d in sampleDeposits {
-            let body = DepositCreate(
-                title: d.title, bankName: d.bankName, amount: d.amount,
-                currency: d.currency, openDate: d.openDate, closeDate: d.closeDate,
-                annualInterestRate: d.annualInterestRate
-            )
-            let dto = try await depositsAPI.createDeposit(body)
-            try await depositsService.upsert(
-                serverId: dto.id, title: dto.title, bankName: dto.bankName,
-                amount: dto.amountDouble, currency: dto.depositCurrency,
-                openDate: dto.openDate, closeDate: dto.closeDate,
-                annualInterestRate: dto.annualRateDouble, createdAt: dto.createdAt
-            )
+            try await depositsService.add(d)
         }
-
         for s in sampleSubscriptions {
-            let body = SubscriptionCreate(from: s)
-            let dto = try await subscriptionsAPI.createSubscription(body)
-            try await subscriptionsService.upsert(
-                serverId: dto.id, title: dto.title, amount: dto.amountDouble,
-                currency: dto.depositCurrency, billingCycle: dto.subscriptionBillingCycle,
-                startDate: dto.startDate, endDate: dto.endDate,
-                category: dto.category, iconName: dto.iconName,
-                isActive: dto.isActive, createdAt: dto.createdAt
-            )
+            try await subscriptionsService.add(s)
         }
     }
 

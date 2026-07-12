@@ -23,8 +23,6 @@ struct MonthlyAnalyticsPoint: Identifiable {
 
     private let depositsService: any DepositsService
     private let subscriptionsService: any SubscriptionsService
-    private let depositsAPI: any DepositsAPIProtocol
-    private let subscriptionsAPI: any SubscriptionsAPIProtocol
     private let calendar: Calendar = {
         var cal = Calendar(identifier: .gregorian)
         cal.timeZone = TimeZone.current
@@ -33,79 +31,24 @@ struct MonthlyAnalyticsPoint: Identifiable {
 
     init(
         depositsService: any DepositsService,
-        subscriptionsService: any SubscriptionsService,
-        depositsAPI: any DepositsAPIProtocol = DepositsAPI(),
-        subscriptionsAPI: any SubscriptionsAPIProtocol = SubscriptionsAPI()
+        subscriptionsService: any SubscriptionsService
     ) {
         self.depositsService = depositsService
         self.subscriptionsService = subscriptionsService
-        self.depositsAPI = depositsAPI
-        self.subscriptionsAPI = subscriptionsAPI
         self.selectedYear = Calendar.current.component(.year, from: Date())
     }
 
-    // MARK: - Load (cache-first, then sync from API)
+    // MARK: - Load
 
     func load() async {
         isLoading = true
         errorMessage = nil
         defer { isLoading = false }
-
-        // 1. Show cached data immediately
-        if let cached = try? await depositsService.fetchAll() { deposits = cached }
-        if let cached = try? await subscriptionsService.fetchAll() { subscriptions = cached }
-
-        // 2. Sync both from API concurrently, then remove stale entries
         do {
-            async let depsRemote = depositsAPI.getDeposits()
-            async let subsRemote = subscriptionsAPI.getSubscriptions()
-            let (depsResult, subsResult) = try await (depsRemote, subsRemote)
-
-            for dto in depsResult {
-                try await depositsService.upsert(
-                    serverId: dto.id,
-                    title: dto.title,
-                    bankName: dto.bankName,
-                    amount: dto.amountDouble,
-                    currency: dto.depositCurrency,
-                    openDate: dto.openDate,
-                    closeDate: dto.closeDate,
-                    annualInterestRate: dto.annualRateDouble,
-                    createdAt: dto.createdAt
-                )
-            }
-            let depRemoteIds = Set(depsResult.map(\.id))
-            let allLocalDeps = try await depositsService.fetchAll()
-            for staleId in allLocalDeps.compactMap(\.serverId) where !depRemoteIds.contains(staleId) {
-                try await depositsService.deleteByServerId(staleId)
-            }
-
-            for dto in subsResult {
-                try await subscriptionsService.upsert(
-                    serverId: dto.id,
-                    title: dto.title,
-                    amount: dto.amountDouble,
-                    currency: dto.depositCurrency,
-                    billingCycle: dto.subscriptionBillingCycle,
-                    startDate: dto.startDate,
-                    endDate: dto.endDate,
-                    category: dto.category,
-                    iconName: dto.iconName,
-                    isActive: dto.isActive,
-                    createdAt: dto.createdAt
-                )
-            }
-            let subRemoteIds = Set(subsResult.map(\.id))
-            let allLocalSubs = try await subscriptionsService.fetchAll()
-            for staleId in allLocalSubs.compactMap(\.serverId) where !subRemoteIds.contains(staleId) {
-                try await subscriptionsService.deleteByServerId(staleId)
-            }
-
             async let deps = depositsService.fetchAll()
             async let subs = subscriptionsService.fetchAll()
             (deposits, subscriptions) = try await (deps, subs)
         } catch {
-            // Keep cached data visible; only surface error if nothing to show
             if deposits.isEmpty && subscriptions.isEmpty {
                 errorMessage = error.localizedDescription
             }
@@ -143,7 +86,7 @@ struct MonthlyAnalyticsPoint: Identifiable {
         _allPoints(year: selectedYear).filter { $0.currency == currency }
     }
 
-    // MARK: - Year totals (full year, including future months as projection)
+    // MARK: - Year totals
 
     func totalIncome(currency: DepositCurrency) -> Double {
         monthlyPoints(currency: currency).reduce(0) { $0 + $1.income }
@@ -157,14 +100,12 @@ struct MonthlyAnalyticsPoint: Identifiable {
         totalIncome(currency: currency) - totalExpenses(currency: currency)
     }
 
-    // MARK: - To date (actual amounts from Jan 1 of selectedYear up to today)
+    // MARK: - To date
 
-    /// True if selectedYear is current or past — "to date" values are meaningful
     var isPastOrCurrentYear: Bool {
         selectedYear <= calendar.component(.year, from: Date())
     }
 
-    /// Actual deposit income earned from Jan 1 of selectedYear up to today
     func totalEarnedToDate(currency: DepositCurrency) -> Double {
         guard isPastOrCurrentYear else { return 0 }
         let today = Date()
@@ -180,7 +121,6 @@ struct MonthlyAnalyticsPoint: Identifiable {
             }
     }
 
-    /// Actual subscription payments made from Jan 1 of selectedYear up to today
     func totalPaidToDate(currency: DepositCurrency) -> Double {
         guard isPastOrCurrentYear else { return 0 }
         let today = Date()
@@ -215,7 +155,6 @@ struct MonthlyAnalyticsPoint: Identifiable {
                       let dayBefore = calendar.date(byAdding: .day, value: -1, to: monthStart) else { continue }
                 let monthEnd = calendar.date(byAdding: .day, value: -1, to: nextMonth) ?? monthStart
 
-                // Deposit income earned within this calendar month
                 let income = deposits
                     .filter { $0.currency == currency }
                     .reduce(0.0) { sum, dep in
@@ -224,7 +163,6 @@ struct MonthlyAnalyticsPoint: Identifiable {
                         return sum + max(0, atEnd - atStart)
                     }
 
-                // Subscription payments falling within [monthStart, nextMonth)
                 let expense = subscriptions
                     .filter { $0.currency == currency }
                     .reduce(0.0) { sum, sub in

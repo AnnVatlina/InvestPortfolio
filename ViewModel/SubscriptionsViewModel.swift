@@ -37,11 +37,9 @@ final class SubscriptionsViewModel: ObservableObject {
     @Published var currentPage: Int = 1
 
     private let service: any SubscriptionsService
-    private let api: any SubscriptionsAPIProtocol
 
-    init(service: any SubscriptionsService, api: any SubscriptionsAPIProtocol = SubscriptionsAPI()) {
+    init(service: any SubscriptionsService) {
         self.service = service
-        self.api = api
     }
 
     // MARK: - Filter & pagination computed
@@ -51,10 +49,8 @@ final class SubscriptionsViewModel: ObservableObject {
         let now = Date()
         switch statusFilter {
         case .all:
-            // Reverse chronological — most recently added first
             return subscriptions.sorted { $0.createdAt > $1.createdAt }
         case .active:
-            // Keep the smart sort (by next payment date) applied in load()
             return subscriptions.filter { $0.isActive }
         case .cancelled:
             return subscriptions
@@ -99,12 +95,11 @@ final class SubscriptionsViewModel: ObservableObject {
 
     struct MonthlyPaymentPoint: Identifiable {
         let id = UUID()
-        let month: Date       // first day of the month
+        let month: Date
         let currency: String
         let total: Double
     }
 
-    /// All unique years covered by subscriptions (open → current year).
     var yearRange: ClosedRange<Int> {
         let cal = Calendar.current
         let currentYear = cal.component(.year, from: Date())
@@ -113,18 +108,14 @@ final class SubscriptionsViewModel: ObservableObject {
         return minYear...currentYear
     }
 
-    /// Actual payment amounts per month for a given year (not normalized monthly cost).
-    /// One-time purchases appear in the month of their startDate.
     func monthlyPayments(year: Int) -> [MonthlyPaymentPoint] {
         let cal = Calendar.current
         guard let yearStart = cal.date(from: DateComponents(year: year, month: 1, day: 1)),
               let yearEnd   = cal.date(from: DateComponents(year: year + 1, month: 1, day: 1))
         else { return [] }
 
-        // Accumulate: [monthStart: [currency: total]]
         var acc: [Date: [String: Double]] = [:]
 
-        // Include active subscriptions + cancelled ones that have an explicit end date recorded
         for sub in subscriptions where sub.isActive || sub.endDate != nil {
             let dates = paymentDates(for: sub, from: yearStart, to: yearEnd, calendar: cal)
             for date in dates {
@@ -142,7 +133,6 @@ final class SubscriptionsViewModel: ObservableObject {
         return points.sorted { $0.month < $1.month }
     }
 
-    /// Monthly payment totals per month (sum across all currencies).
     func monthlyTotals(year: Int) -> [(month: Date, total: Double)] {
         let points = monthlyPayments(year: year)
         let grouped = Dictionary(grouping: points) { $0.month }
@@ -151,43 +141,15 @@ final class SubscriptionsViewModel: ObservableObject {
         }.sorted { $0.month < $1.month }
     }
 
-    // MARK: - Load (cache-first, then sync from API)
+    // MARK: - Load
 
     func load() async {
         isLoading = true
         errorMessage = nil
         defer { isLoading = false }
-
-        // 1. Show cached data immediately
-        if let cached = try? await service.fetchAll() {
-            subscriptions = applySort(cached)
-        }
-
-        // 2. Fetch from API, upsert into cache, remove stale entries, reload
         do {
-            let remoteList = try await api.getSubscriptions()
-            for dto in remoteList {
-                try await service.upsert(
-                    serverId: dto.id,
-                    title: dto.title,
-                    amount: dto.amountDouble,
-                    currency: dto.depositCurrency,
-                    billingCycle: dto.subscriptionBillingCycle,
-                    startDate: dto.startDate,
-                    endDate: dto.endDate,
-                    category: dto.category,
-                    iconName: dto.iconName,
-                    isActive: dto.isActive,
-                    createdAt: dto.createdAt
-                )
-            }
-            let remoteIds = Set(remoteList.map(\.id))
-            let allLocal = try await service.fetchAll()
-            for staleId in allLocal.compactMap(\.serverId) where !remoteIds.contains(staleId) {
-                try await service.deleteByServerId(staleId)
-            }
-            let updated = try await service.fetchAll()
-            subscriptions = applySort(updated)
+            let all = try await service.fetchAll()
+            subscriptions = applySort(all)
             rescheduleAllNotifications()
         } catch {
             if subscriptions.isEmpty {
@@ -212,33 +174,21 @@ final class SubscriptionsViewModel: ObservableObject {
             return
         }
         do {
-            let body = SubscriptionCreate(
+            let sub = Subscription(
                 title: title.trimmingCharacters(in: .whitespacesAndNewlines),
                 amount: amount,
                 currency: currency,
                 billingCycle: billingCycle,
                 startDate: startDate,
                 category: emptyToNil(category),
-                iconName: emptyToNil(iconName)
+                iconName: emptyToNil(iconName),
+                isActive: true
             )
-            let response = try await api.createSubscription(body)
-            try await service.upsert(
-                serverId: response.id,
-                title: response.title,
-                amount: response.amountDouble,
-                currency: response.depositCurrency,
-                billingCycle: response.subscriptionBillingCycle,
-                startDate: response.startDate,
-                endDate: response.endDate,
-                category: response.category,
-                iconName: response.iconName,
-                isActive: response.isActive,
-                createdAt: response.createdAt
-            )
+            try await service.add(sub)
             await load()
             if billingCycle.isRecurring,
-               let sub = subscriptions.first(where: { $0.serverId == response.id }) {
-                scheduleNotifications(for: sub)
+               let added = subscriptions.first(where: { $0.id == sub.id }) {
+                scheduleNotifications(for: added)
             }
         } catch {
             operationError = error.localizedDescription
@@ -248,12 +198,7 @@ final class SubscriptionsViewModel: ObservableObject {
     func deleteSubscription(_ subscription: Subscription) async {
         cancelNotifications(for: subscription)
         do {
-            if let serverId = subscription.serverId {
-                try await api.deleteSubscription(id: serverId)
-                try await service.deleteByServerId(serverId)
-            } else {
-                try await service.delete(id: subscription.id)
-            }
+            try await service.delete(id: subscription.id)
             await load()
         } catch {
             operationError = error.localizedDescription
@@ -272,10 +217,8 @@ final class SubscriptionsViewModel: ObservableObject {
         isActive: Bool,
         endDate: Date?
     ) async {
-        guard let subscription = subscriptions.first(where: { $0.id == id }),
-              let serverId = subscription.serverId else {
-            // Fallback: no server ID, update locally only
-            try? await service.update(
+        do {
+            try await service.update(
                 id: id,
                 title: title.trimmingCharacters(in: .whitespacesAndNewlines),
                 amount: amount,
@@ -286,35 +229,6 @@ final class SubscriptionsViewModel: ObservableObject {
                 iconName: emptyToNil(iconName),
                 isActive: isActive,
                 endDate: isActive ? nil : endDate
-            )
-            await load()
-            return
-        }
-        do {
-            let body = SubscriptionUpdate(
-                title: title.trimmingCharacters(in: .whitespacesAndNewlines),
-                amount: amount,
-                currency: currency,
-                billingCycle: billingCycle,
-                startDate: startDate,
-                endDate: isActive ? nil : endDate,
-                category: emptyToNil(category),
-                iconName: emptyToNil(iconName),
-                isActive: isActive
-            )
-            let response = try await api.updateSubscription(id: serverId, body)
-            try await service.upsert(
-                serverId: response.id,
-                title: response.title,
-                amount: response.amountDouble,
-                currency: response.depositCurrency,
-                billingCycle: response.subscriptionBillingCycle,
-                startDate: response.startDate,
-                endDate: response.endDate,
-                category: response.category,
-                iconName: response.iconName,
-                isActive: response.isActive,
-                createdAt: response.createdAt
             )
             await load()
             if let updated = subscriptions.first(where: { $0.id == id }) {
@@ -351,7 +265,6 @@ final class SubscriptionsViewModel: ObservableObject {
             .sorted { $0.rawValue < $1.rawValue }
     }
 
-    /// Recurring subscriptions with nextPaymentDate within the next N days.
     func upcoming(withinDays days: Int = 7) -> [Subscription] {
         let now = Calendar.current.startOfDay(for: Date())
         guard let limit = Calendar.current.date(byAdding: .day, value: days, to: now) else { return [] }
@@ -360,7 +273,6 @@ final class SubscriptionsViewModel: ObservableObject {
             if sub.billingCycle.isRecurring {
                 return sub.nextPaymentDate >= now && sub.nextPaymentDate <= limit
             } else {
-                // One-time: show only if purchase date is still in the future
                 return sub.startDate >= now && sub.startDate <= limit
             }
         }
@@ -369,9 +281,6 @@ final class SubscriptionsViewModel: ObservableObject {
 
     // MARK: - Notifications
 
-    /// Cancels all pending subscription notifications and re-schedules them
-    /// for the next 12 months. Called after every load() so notifications
-    /// survive app reinstalls and remain accurate after server sync.
     func rescheduleAllNotifications() {
         let cal = Calendar.current
         let now = Date()
@@ -480,18 +389,13 @@ final class SubscriptionsViewModel: ObservableObject {
 
     // MARK: - Private helpers
 
-    /// All payment dates for a subscription that fall within [from, to).
-    /// For cancelled subscriptions with `endDate`, payments are capped at the end date.
     private func paymentDates(for sub: Subscription, from: Date, to: Date, calendar: Calendar) -> [Date] {
-        // Cap the window at endDate for cancelled subscriptions
         let effectiveTo = sub.endDate.map { min($0, to) } ?? to
         if !sub.billingCycle.isRecurring {
-            // One-time: appears only in the year it was purchased
             return (sub.startDate >= from && sub.startDate < effectiveTo) ? [sub.startDate] : []
         }
         var dates: [Date] = []
         var current = sub.startDate
-        // Fast-forward to within range
         while current < from {
             current = Subscription.advance(current, by: sub.billingCycle, calendar: calendar)
         }

@@ -266,7 +266,6 @@ struct DataSettingsView: View {
             let url = try result.get()
             let csv = try readCSV(from: url)
             let parsed = CSVImporter.parseDeposits(csv)
-            let api = container.makeDepositsAPI()
             let service = container.makeDepositsService()
             let existingIDs = Set(try await service.fetchAll().map { $0.id })
             let toAdd = parsed.items.filter { !existingIDs.contains($0.id) }
@@ -274,27 +273,7 @@ struct DataSettingsView: View {
             var failed = parsed.failed
             for d in toAdd {
                 do {
-                    let body = DepositCreate(
-                        title: d.title,
-                        bankName: d.bankName,
-                        amount: d.amount,
-                        currency: d.currency,
-                        openDate: d.openDate,
-                        closeDate: d.closeDate,
-                        annualInterestRate: d.annualInterestRate
-                    )
-                    let dto = try await api.createDeposit(body)
-                    try await service.upsert(
-                        serverId: dto.id,
-                        title: dto.title,
-                        bankName: dto.bankName,
-                        amount: dto.amountDouble,
-                        currency: dto.depositCurrency,
-                        openDate: dto.openDate,
-                        closeDate: dto.closeDate,
-                        annualInterestRate: dto.annualRateDouble,
-                        createdAt: dto.createdAt
-                    )
+                    try await service.add(d)
                     imported += 1
                 } catch {
                     failed += 1
@@ -313,7 +292,6 @@ struct DataSettingsView: View {
             let url = try result.get()
             let csv = try readCSV(from: url)
             let parsed = CSVImporter.parseSubscriptions(csv)
-            let api = container.makeSubscriptionsAPI()
             let service = container.makeSubscriptionsService()
             let existingIDs = Set(try await service.fetchAll().map { $0.id })
             let toAdd = parsed.items.filter { !existingIDs.contains($0.id) }
@@ -321,20 +299,7 @@ struct DataSettingsView: View {
             var failed = parsed.failed
             for s in toAdd {
                 do {
-                    let dto = try await api.createSubscription(SubscriptionCreate(from: s))
-                    try await service.upsert(
-                        serverId: dto.id,
-                        title: dto.title,
-                        amount: dto.amountDouble,
-                        currency: dto.depositCurrency,
-                        billingCycle: dto.subscriptionBillingCycle,
-                        startDate: dto.startDate,
-                        endDate: dto.endDate,
-                        category: dto.category,
-                        iconName: dto.iconName,
-                        isActive: dto.isActive,
-                        createdAt: dto.createdAt
-                    )
+                    try await service.add(s)
                     imported += 1
                 } catch {
                     failed += 1

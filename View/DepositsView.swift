@@ -16,7 +16,6 @@ struct DepositsView: View {
     }
 
     @Environment(\.locale) private var locale
-    @EnvironmentObject private var networkMonitor: NetworkMonitor
     @State private var showAddSheet = false
     @State private var depositToEdit: Deposit? = nil
     @State private var depositToDelete: Deposit? = nil
@@ -34,13 +33,6 @@ struct DepositsView: View {
                 depositsList
             }
         }
-        .safeAreaInset(edge: .top, spacing: 0) {
-            if !networkMonitor.isConnected {
-                OfflineBanner()
-                    .transition(.move(edge: .top).combined(with: .opacity))
-            }
-        }
-        .animation(.easeInOut(duration: 0.25), value: networkMonitor.isConnected)
         .navigationTitle("deposits.title")
         .toolbar {
             ToolbarItem(placement: .primaryAction) {
