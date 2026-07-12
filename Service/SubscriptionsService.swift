@@ -31,21 +31,6 @@ protocol SubscriptionsService: Sendable {
     func totalMonthlyCost(in currency: DepositCurrency, subscriptions: [Subscription]) -> Double
     /// Total annual cost across active subscriptions in given currency
     func totalAnnualCost(in currency: DepositCurrency, subscriptions: [Subscription]) -> Double
-
-    func upsert(
-        serverId: UUID,
-        title: String,
-        amount: Double,
-        currency: DepositCurrency,
-        billingCycle: SubscriptionBillingCycle,
-        startDate: Date,
-        endDate: Date?,
-        category: String?,
-        iconName: String?,
-        isActive: Bool,
-        createdAt: Date
-    ) async throws
-    func deleteByServerId(_ serverId: UUID) async throws
 }
 
 // MARK: - Default implementation
@@ -122,35 +107,4 @@ final class DefaultSubscriptionsService: SubscriptionsService {
             .reduce(0.0) { $0 + annualCost(for: $1) }
     }
 
-    func upsert(
-        serverId: UUID,
-        title: String,
-        amount: Double,
-        currency: DepositCurrency,
-        billingCycle: SubscriptionBillingCycle,
-        startDate: Date,
-        endDate: Date?,
-        category: String?,
-        iconName: String?,
-        isActive: Bool,
-        createdAt: Date
-    ) async throws {
-        try await repository.upsert(
-            serverId: serverId,
-            title: title,
-            amount: amount,
-            currency: currency,
-            billingCycle: billingCycle,
-            startDate: startDate,
-            endDate: endDate,
-            category: category,
-            iconName: iconName,
-            isActive: isActive,
-            createdAt: createdAt
-        )
-    }
-
-    func deleteByServerId(_ serverId: UUID) async throws {
-        try await repository.deleteByServerId(serverId)
-    }
 }

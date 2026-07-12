@@ -12,7 +12,6 @@ import SwiftData
 @Model
 final class Subscription {
     var id: UUID = UUID()
-    var serverId: UUID?
     var title: String = ""
     var amount: Double = 0.0
     // Stored as String to avoid SwiftData lazy-load cast failure with custom enums (iOS 26)

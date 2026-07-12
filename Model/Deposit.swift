@@ -10,8 +10,6 @@ import SwiftData
 @Model
 final class Deposit {
     var id: UUID
-    /// UUID from the Rentivo backend — used to match local cache records to API records.
-    var serverId: UUID?
     var title: String
     var bankName: String?
     var amount: Double
@@ -31,7 +29,6 @@ final class Deposit {
 
     init(
         id: UUID = UUID(),
-        serverId: UUID? = nil,
         title: String,
         bankName: String? = nil,
         amount: Double,
@@ -42,7 +39,6 @@ final class Deposit {
         annualInterestRate: Double
     ) {
         self.id = id
-        self.serverId = serverId
         self.title = title
         self.bankName = bankName
         self.amount = amount
