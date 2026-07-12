@@ -5,7 +5,7 @@
 //  Central URLSession client for the Rentivo backend.
 //  - Adds Bearer token to every authenticated request
 //  - On 401: calls POST /auth/refresh, retries once
-//  - On refresh failure: clears tokens, posts .unauthorized notification
+//  - On refresh failure: clears tokens
 //
 
 import Foundation
@@ -121,9 +121,6 @@ final class RentivoAPIClient: @unchecked Sendable {
 
     private func signOut() {
         tokenStorage.clearTokens()
-        Task { @MainActor in
-            NotificationCenter.default.post(name: .unauthorized, object: nil)
-        }
     }
 
     private func buildRequest(method: String, path: String, bodyData: Data?, bearer: String?) -> URLRequest {

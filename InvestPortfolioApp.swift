@@ -11,7 +11,6 @@ import SwiftData
 struct InvestPortfolioApp: App {
 
     @StateObject private var container: DIContainer
-    @StateObject private var authVM: AuthViewModel
     @StateObject private var networkMonitor = NetworkMonitor()
     @AppStorage("App_LocaleIdentifier") private var localeIdentifier: String = Locale.current.identifier
 
@@ -45,24 +44,16 @@ struct InvestPortfolioApp: App {
             }
         }
         _container = StateObject(wrappedValue: DIContainer(modelContainer: modelContainer))
-        _authVM = StateObject(wrappedValue: AuthViewModel())
     }
 
     var body: some Scene {
         WindowGroup {
-            Group {
-                if authVM.isAuthorized {
-                    RootView()
-                } else {
-                    LoginView()
-                }
-            }
-            .id(localeIdentifier)           // rebuild full view tree on language change
-            .environmentObject(container)
-            .environmentObject(authVM)
-            .environmentObject(networkMonitor)
-            .tint(.brand)
-            .environment(\.locale, Locale(identifier: localeIdentifier))
+            RootView()
+                .id(localeIdentifier)           // rebuild full view tree on language change
+                .environmentObject(container)
+                .environmentObject(networkMonitor)
+                .tint(.brand)
+                .environment(\.locale, Locale(identifier: localeIdentifier))
         }
         // Передаём контейнер в среду SwiftUI (для @Query и @Environment(\.modelContext))
         .modelContainer(container.modelContainer)
