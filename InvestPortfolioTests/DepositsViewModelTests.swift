@@ -2,223 +2,140 @@
 //  DepositsViewModelTests.swift
 //  InvestPortfolioTests
 //
-//  Tests for DepositsViewModel using protocol-based mocks.
-//  Verifies API-first cache upsert behaviour.
+//  Tests for DepositsViewModel — local SwiftData-backed behaviour.
 //
 
 import Testing
 import Foundation
 @testable import InvestPortfolio
 
-// MARK: - Mock API
-
-final class MockDepositsAPI: DepositsAPIProtocol, @unchecked Sendable {
-    var stubbedDeposits: [DepositResponse] = []
-    var stubbedError: Error? = nil
-
-    var createCalled = false
-    var updateCalled = false
-    var deleteCalled = false
-    var lastDeletedId: UUID? = nil
-
-    func getDeposits() async throws -> [DepositResponse] {
-        if let error = stubbedError { throw error }
-        return stubbedDeposits
-    }
-
-    func createDeposit(_ body: DepositCreate) async throws -> DepositResponse {
-        if let error = stubbedError { throw error }
-        createCalled = true
-        return stubbedDeposits.first ?? makeResponse()
-    }
-
-    func updateDeposit(id: UUID, _ body: DepositUpdate) async throws -> DepositResponse {
-        if let error = stubbedError { throw error }
-        updateCalled = true
-        return stubbedDeposits.first ?? makeResponse()
-    }
-
-    func deleteDeposit(id: UUID) async throws {
-        if let error = stubbedError { throw error }
-        deleteCalled = true
-        lastDeletedId = id
-    }
-
-    private func makeResponse() -> DepositResponse {
-        stubbedDeposits.first ?? DepositResponse(
-            id: UUID(), title: "Test", bankName: nil,
-            amount: "1000", currency: "RUB",
-            openDate: Date(), closeDate: nil,
-            annualRate: "5.0", interestType: nil,
-            compoundFrequency: nil, incomeToDate: nil,
-            daysElapsed: nil, createdAt: Date()
-        )
-    }
-}
-
 // MARK: - Helpers
 
-private func makeResponse(
-    id: UUID = UUID(),
-    title: String = "Deposit",
-    bankName: String? = nil,
-    amount: String = "100000",
-    currency: String = "RUB",
-    annualRate: String = "10.0"
-) -> DepositResponse {
-    DepositResponse(
-        id: id, title: title, bankName: bankName,
-        amount: amount, currency: currency,
-        openDate: Date(), closeDate: nil,
-        annualRate: annualRate, interestType: nil,
-        compoundFrequency: nil, incomeToDate: nil,
-        daysElapsed: nil, createdAt: Date()
-    )
+@MainActor
+private func makeVM(with deposits: [Deposit] = []) async -> DepositsViewModel {
+    let repo = InMemoryDepositsRepository()
+    for d in deposits { try? await repo.add(d) }
+    let vm = DepositsViewModel(service: DefaultDepositsService(repository: repo))
+    await vm.load()
+    return vm
 }
 
-@MainActor
-private func makeVM(api: MockDepositsAPI) -> DepositsViewModel {
-    DepositsViewModel(
-        service: DefaultDepositsService(
-            repository: InMemoryDepositsRepository()
-        ),
-        api: api
-    )
+private func dep(
+    title: String = "Deposit",
+    bankName: String? = nil,
+    amount: Double = 100_000,
+    currency: DepositCurrency = .RUB,
+    openDate: Date = Date(),
+    closeDate: Date? = nil,
+    rate: Double = 10.0
+) -> Deposit {
+    Deposit(title: title, bankName: bankName, amount: amount, currency: currency,
+            openDate: openDate, closeDate: closeDate, annualInterestRate: rate)
 }
 
 // MARK: - Suite
 
-@Suite("DepositsViewModel — API-first cache")
+@Suite("DepositsViewModel — local CRUD")
 @MainActor
 struct DepositsViewModelTests {
 
     // MARK: load
 
-    @Test("API returns deposits → cache is populated")
-    func loadPopulatesCache() async throws {
-        let api = MockDepositsAPI()
-        api.stubbedDeposits = [makeResponse(title: "Сбербанк")]
-        let vm = makeVM(api: api)
-
-        await vm.load()
-
-        #expect(vm.deposits.count == 1)
-        #expect(vm.deposits[0].title == "Сбербанк")
+    @Test("Load from empty service → deposits is empty")
+    func loadEmpty() async {
+        let vm = await makeVM()
+        #expect(vm.deposits.isEmpty)
         #expect(vm.errorMessage == nil)
     }
 
-    @Test("API returns multiple deposits → all cached")
-    func loadCachesAll() async throws {
-        let api = MockDepositsAPI()
-        api.stubbedDeposits = [makeResponse(title: "A"), makeResponse(title: "B")]
-        let vm = makeVM(api: api)
-
-        await vm.load()
-
+    @Test("Load with pre-seeded deposits → list populated")
+    func loadPopulates() async {
+        let vm = await makeVM(with: [dep(title: "Сбербанк"), dep(title: "ВТБ")])
         #expect(vm.deposits.count == 2)
+        #expect(vm.errorMessage == nil)
     }
 
-    @Test("API error → existing cache preserved, error shown if cache empty")
-    func apiErrorPreservesCache() async throws {
-        let api = MockDepositsAPI()
-        api.stubbedDeposits = [makeResponse(title: "Cached")]
-        let vm = makeVM(api: api)
-        // Prime the cache
-        await vm.load()
-        #expect(vm.deposits.count == 1)
+    // MARK: add
 
-        // Now simulate error
-        api.stubbedError = APIError.networkOffline
-        await vm.load()
-
-        // Cache still visible, no crash
-        #expect(vm.deposits.count == 1)
-    }
-
-    @Test("Upsert: same serverId → updates existing record not duplicates")
-    func upsertUpdatesSameRecord() async throws {
-        let serverId = UUID()
-        let api = MockDepositsAPI()
-        api.stubbedDeposits = [makeResponse(id: serverId, title: "Original")]
-        let vm = makeVM(api: api)
-        await vm.load()
-        #expect(vm.deposits.count == 1)
-
-        // Update with same serverId
-        api.stubbedDeposits = [makeResponse(id: serverId, title: "Updated")]
-        await vm.load()
-
-        #expect(vm.deposits.count == 1)
-        #expect(vm.deposits[0].title == "Updated")
-    }
-
-    // MARK: create
-
-    @Test("Create deposit calls API then upserts into cache")
-    func createCallsAPIAndUpdatesCache() async throws {
-        let serverId = UUID()
-        let api = MockDepositsAPI()
-        api.stubbedDeposits = [makeResponse(id: serverId, title: "New")]
-        let vm = makeVM(api: api)
-
+    @Test("Add valid deposit → appears in list")
+    func addAppearsInList() async {
+        let vm = await makeVM()
         await vm.addDeposit(
-            title: "New", bankName: "", amount: 100_000,
-            currency: .RUB, openDate: Date(), closeDate: nil,
-            annualInterestRate: 10
+            title: "Накопительный", bankName: "", amount: 200_000,
+            currency: .RUB, openDate: Date(), closeDate: nil, annualInterestRate: 12.5
         )
-
-        #expect(api.createCalled)
-        #expect(vm.deposits.isEmpty == false)
+        #expect(vm.deposits.count == 1)
+        #expect(vm.deposits[0].title == "Накопительный")
+        #expect(vm.operationError == nil)
     }
 
-    @Test("Create with empty title → shows error, API not called")
-    func createEmptyTitleShowsError() async throws {
-        let api = MockDepositsAPI()
-        let vm = makeVM(api: api)
-
+    @Test("Add with empty title → errorMessage set, list unchanged")
+    func addEmptyTitleSetsError() async {
+        let vm = await makeVM()
         await vm.addDeposit(
-            title: "  ", bankName: "", amount: 100,
-            currency: .RUB, openDate: Date(), closeDate: nil,
-            annualInterestRate: 5
+            title: "   ", bankName: "", amount: 100,
+            currency: .RUB, openDate: Date(), closeDate: nil, annualInterestRate: 5
         )
-
-        #expect(!api.createCalled)
+        #expect(vm.deposits.isEmpty)
         #expect(vm.errorMessage != nil)
     }
 
     // MARK: delete
 
-    @Test("Delete deposit calls API then removes from cache")
-    func deleteCallsAPIAndRemovesFromCache() async throws {
-        let serverId = UUID()
-        let api = MockDepositsAPI()
-        api.stubbedDeposits = [makeResponse(id: serverId, title: "ToDelete")]
-        let vm = makeVM(api: api)
-        await vm.load()
+    @Test("Delete deposit → removed from list")
+    func deleteRemoves() async {
+        let vm = await makeVM(with: [dep(title: "ToDelete")])
         #expect(vm.deposits.count == 1)
-
-        let deposit = vm.deposits[0]
-        // Clear remote list so reload returns empty
-        api.stubbedDeposits = []
-        await vm.deleteDeposit(deposit)
-
-        #expect(api.deleteCalled)
-        #expect(api.lastDeletedId == serverId)
+        await vm.deleteDeposit(vm.deposits[0])
         #expect(vm.deposits.isEmpty)
+        #expect(vm.operationError == nil)
     }
 
-    @Test("Delete API error → cache preserved, operationError shown")
-    func deleteAPIErrorPreservesCache() async throws {
-        let serverId = UUID()
-        let api = MockDepositsAPI()
-        api.stubbedDeposits = [makeResponse(id: serverId, title: "Keep")]
-        let vm = makeVM(api: api)
-        await vm.load()
+    @Test("Delete one of two → other remains")
+    func deleteOneOfTwo() async {
+        let d1 = dep(title: "Keep",   openDate: Date(timeIntervalSinceNow: -200))
+        let d2 = dep(title: "Remove", openDate: Date(timeIntervalSinceNow: -100))
+        let vm = await makeVM(with: [d1, d2])
+        let toDelete = vm.deposits.first(where: { $0.title == "Remove" })!
+        await vm.deleteDeposit(toDelete)
+        #expect(vm.deposits.count == 1)
+        #expect(vm.deposits[0].title == "Keep")
+    }
 
-        api.stubbedError = APIError.networkOffline
-        let deposit = vm.deposits[0]
-        await vm.deleteDeposit(deposit)
+    // MARK: update
 
-        #expect(vm.operationError != nil)
+    @Test("Update deposit → title changes in list")
+    func updateChangesTitle() async {
+        let vm = await makeVM(with: [dep(title: "Old")])
+        let id = vm.deposits[0].id
+        await vm.updateDeposit(
+            id: id, title: "New", bankName: "",
+            amount: 100_000, currency: .RUB,
+            openDate: Date(), closeDate: nil, annualInterestRate: 10
+        )
+        #expect(vm.deposits[0].title == "New")
+    }
+
+    @Test("Update with empty title → errorMessage set, title unchanged")
+    func updateEmptyTitleSetsError() async {
+        let vm = await makeVM(with: [dep(title: "Original")])
+        let id = vm.deposits[0].id
+        await vm.updateDeposit(
+            id: id, title: "  ", bankName: "",
+            amount: 100_000, currency: .RUB,
+            openDate: Date(), closeDate: nil, annualInterestRate: 10
+        )
+        #expect(vm.errorMessage != nil)
+        #expect(vm.deposits[0].title == "Original")
+    }
+
+    // MARK: income summary
+
+    @Test("incomeSummary for active deposit with positive rate → incomeToDate > 0")
+    func incomeSummaryPositive() async {
+        let openDate = Calendar.current.date(byAdding: .day, value: -30, to: Date())!
+        let vm = await makeVM(with: [dep(amount: 100_000, openDate: openDate, rate: 12.0)])
+        let summary = vm.incomeSummary(for: vm.deposits[0])
+        #expect(summary.incomeToDate > 0)
     }
 }

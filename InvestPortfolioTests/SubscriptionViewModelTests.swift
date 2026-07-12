@@ -2,82 +2,14 @@
 //  SubscriptionViewModelTests.swift
 //  InvestPortfolioTests
 //
-//  Tests for SubscriptionsViewModel.
-//  CRUD tests use MockSubscriptionsAPI (API-first behaviour).
-//  Filter / pagination / upcoming / monthly tests pre-populate the cache via
-//  InMemorySubscriptionsRepository and pass an empty mock so load() does not
-//  touch the network — those tests remain purely local.
+//  Tests for SubscriptionsViewModel — local behaviour.
+//  CRUD tests verify add/delete/update against InMemorySubscriptionsRepository.
+//  Filter / pagination / upcoming / monthly tests pre-populate the cache directly.
 //
 
 import Testing
 import Foundation
 @testable import InvestPortfolio
-
-// MARK: - Mock API (internal — reused in AnalyticsViewModelTests)
-
-final class MockSubscriptionsAPI: SubscriptionsAPIProtocol, @unchecked Sendable {
-    var stubbedSubscriptions: [SubscriptionResponse] = []
-    var stubbedError: Error? = nil
-
-    var createCalled = false
-    var updateCalled = false
-    var deleteCalled = false
-    var lastDeletedId: UUID? = nil
-
-    func getSubscriptions() async throws -> [SubscriptionResponse] {
-        if let error = stubbedError { throw error }
-        return stubbedSubscriptions
-    }
-
-    func createSubscription(_ body: SubscriptionCreate) async throws -> SubscriptionResponse {
-        if let error = stubbedError { throw error }
-        createCalled = true
-        return stubbedSubscriptions.first ?? SubscriptionResponse(
-            id: UUID(), title: body.title, amount: body.amount,
-            currency: body.currency, billingCycle: body.billingCycle,
-            startDate: Date(), endDate: nil,
-            category: nil, iconName: nil, isActive: true, createdAt: Date()
-        )
-    }
-
-    func updateSubscription(id: UUID, _ body: SubscriptionUpdate) async throws -> SubscriptionResponse {
-        if let error = stubbedError { throw error }
-        updateCalled = true
-        return stubbedSubscriptions.first ?? SubscriptionResponse(
-            id: id, title: body.title, amount: body.amount,
-            currency: body.currency, billingCycle: body.billingCycle,
-            startDate: Date(), endDate: body.endDate.flatMap { _ in Date() },
-            category: nil, iconName: nil, isActive: body.isActive, createdAt: Date()
-        )
-    }
-
-    func deleteSubscription(id: UUID) async throws {
-        if let error = stubbedError { throw error }
-        deleteCalled = true
-        lastDeletedId = id
-        stubbedSubscriptions.removeAll { $0.id == id }
-    }
-}
-
-// MARK: - Response helper (internal — reused in AnalyticsViewModelTests)
-
-func makeSubResponse(
-    id: UUID = UUID(),
-    title: String = "Sub",
-    amount: String = "10.0",
-    currency: String = "USD",
-    billingCycle: String = "monthly",
-    startDate: Date = Date(),
-    isActive: Bool = true
-) -> SubscriptionResponse {
-    SubscriptionResponse(
-        id: id, title: title, amount: amount,
-        currency: currency, billingCycle: billingCycle,
-        startDate: startDate, endDate: nil,
-        category: nil, iconName: nil,
-        isActive: isActive, createdAt: Date()
-    )
-}
 
 // MARK: - Local Subscription factory
 
@@ -107,160 +39,77 @@ private func makeService(with subs: [Subscription] = []) async -> DefaultSubscri
 }
 
 @MainActor
-private func makeVM(
-    with subs: [Subscription] = [],
-    api: MockSubscriptionsAPI = MockSubscriptionsAPI()
-) async -> SubscriptionsViewModel {
+private func makeVM(with subs: [Subscription] = []) async -> SubscriptionsViewModel {
     let service = await makeService(with: subs)
-    let vm = SubscriptionsViewModel(service: service, api: api)
+    let vm = SubscriptionsViewModel(service: service)
     await vm.load()
     return vm
 }
 
-// MARK: - CRUD (API-first)
+// MARK: - CRUD (local)
 
-@Suite("SubscriptionsViewModel — CRUD (API-first)")
+@Suite("SubscriptionsViewModel — CRUD (local)")
 @MainActor
 struct SubscriptionsViewModelCRUDTests {
 
-    @Test("Load: API deposits populate subscriptions list")
-    func loadPopulatesFromAPI() async {
-        let api = MockSubscriptionsAPI()
-        api.stubbedSubscriptions = [makeSubResponse(title: "Netflix"), makeSubResponse(title: "Spotify")]
-        let vm = await makeVM(api: api)
-        #expect(vm.subscriptions.count == 2)
-    }
-
-    @Test("Load: API error with empty cache shows errorMessage")
-    func loadAPIErrorEmptyCacheShowsError() async {
-        let api = MockSubscriptionsAPI()
-        api.stubbedError = APIError.networkOffline
-        let vm = await makeVM(api: api)
-        #expect(vm.errorMessage != nil)
-    }
-
-    @Test("Load: API error with cached data preserves cache, no error shown")
-    func loadAPIErrorPreservesCache() async {
-        let api = MockSubscriptionsAPI()
-        api.stubbedSubscriptions = [makeSubResponse(title: "Cached")]
-        let vm = await makeVM(api: api)
-        #expect(vm.subscriptions.count == 1)
-
-        api.stubbedError = APIError.networkOffline
-        api.stubbedSubscriptions = []
-        await vm.load()
-
-        #expect(vm.subscriptions.count == 1)
+    @Test("Load from empty service → empty list")
+    func loadEmpty() async {
+        let vm = await makeVM()
+        #expect(vm.subscriptions.isEmpty)
         #expect(vm.errorMessage == nil)
     }
 
-    @Test("Load: same serverId → no duplicates on repeated sync")
-    func loadUpsertDeduplicates() async {
-        let id = UUID()
-        let api = MockSubscriptionsAPI()
-        api.stubbedSubscriptions = [makeSubResponse(id: id, title: "Original")]
-        let vm = await makeVM(api: api)
-        #expect(vm.subscriptions.count == 1)
-
-        api.stubbedSubscriptions = [makeSubResponse(id: id, title: "Updated")]
-        await vm.load()
-
-        #expect(vm.subscriptions.count == 1)
-        #expect(vm.subscriptions[0].title == "Updated")
+    @Test("Load with pre-seeded subscriptions → list populated")
+    func loadPopulates() async {
+        let vm = await makeVM(with: [sub(title: "Netflix"), sub(title: "Spotify")])
+        #expect(vm.subscriptions.count == 2)
     }
 
-    @Test("Add: calls API, response upserted and visible in list")
-    func addCallsAPIAndAppearsInList() async {
-        let api = MockSubscriptionsAPI()
-        api.stubbedSubscriptions = [makeSubResponse(title: "iCloud")]
-        let service = await makeService()
-        let vm = SubscriptionsViewModel(service: service, api: api)
-
+    @Test("Add subscription → appears in list")
+    func addAppearsInList() async {
+        let vm = await makeVM()
         await vm.addSubscription(
             title: "iCloud", amount: 0.99, currency: .USD,
             billingCycle: .monthly, startDate: Date(),
             category: nil, iconName: nil
         )
-
-        #expect(api.createCalled)
         #expect(vm.subscriptions.isEmpty == false)
         #expect(vm.subscriptions[0].title == "iCloud")
+        #expect(vm.operationError == nil)
     }
 
-    @Test("Add: empty title sets operationError, API not called")
+    @Test("Add with empty title → operationError set, list unchanged")
     func addEmptyTitleSetsOperationError() async {
-        let api = MockSubscriptionsAPI()
-        let vm = await makeVM(api: api)
-
+        let vm = await makeVM()
         await vm.addSubscription(
             title: "   ", amount: 10, currency: .USD,
             billingCycle: .monthly, startDate: Date(),
             category: nil, iconName: nil
         )
-
-        #expect(!api.createCalled)
+        #expect(vm.subscriptions.isEmpty)
         #expect(vm.operationError != nil)
     }
 
-    @Test("Add: API error sets operationError")
-    func addAPIErrorSetsOperationError() async {
-        let api = MockSubscriptionsAPI()
-        api.stubbedError = APIError.networkOffline
-        let service = await makeService()
-        let vm = SubscriptionsViewModel(service: service, api: api)
-
-        await vm.addSubscription(
-            title: "Netflix", amount: 15.99, currency: .USD,
-            billingCycle: .monthly, startDate: Date(),
-            category: nil, iconName: nil
-        )
-
-        #expect(vm.operationError != nil)
+    @Test("Delete subscription → removed from list")
+    func deleteRemoves() async {
+        let vm = await makeVM(with: [sub(title: "ToDelete")])
+        await vm.deleteSubscription(vm.subscriptions[0])
         #expect(vm.subscriptions.isEmpty)
     }
 
-    @Test("Delete: subscription with serverId calls API delete")
-    func deleteWithServerIdCallsAPI() async {
-        let serverId = UUID()
-        let api = MockSubscriptionsAPI()
-        api.stubbedSubscriptions = [makeSubResponse(id: serverId, title: "ToDelete")]
-        let service = await makeService()
-        let vm = SubscriptionsViewModel(service: service, api: api)
-        await vm.load()
+    @Test("Delete one of two → other remains")
+    func deleteOneOfTwo() async {
+        let s1 = sub(title: "Keep",   createdAt: Date(timeIntervalSinceNow: -200))
+        let s2 = sub(title: "Remove", createdAt: Date(timeIntervalSinceNow: -100))
+        let vm = await makeVM(with: [s1, s2])
+        let toDelete = vm.subscriptions.first(where: { $0.title == "Remove" })!
+        await vm.deleteSubscription(toDelete)
         #expect(vm.subscriptions.count == 1)
-
-        api.stubbedSubscriptions = []
-        await vm.deleteSubscription(vm.subscriptions[0])
-
-        #expect(api.deleteCalled)
-        #expect(api.lastDeletedId == serverId)
-        #expect(vm.subscriptions.isEmpty)
+        #expect(vm.subscriptions[0].title == "Keep")
     }
 
-    @Test("Delete: local-only subscription (no serverId) removed from cache")
-    func deleteLocalSubRemovesFromCache() async {
-        let vm = await makeVM(with: [sub(title: "Local")])
-        await vm.deleteSubscription(vm.subscriptions[0])
-        #expect(vm.subscriptions.isEmpty)
-    }
-
-    @Test("Delete: API error sets operationError, cache preserved")
-    func deleteAPIErrorPreservesCache() async {
-        let serverId = UUID()
-        let api = MockSubscriptionsAPI()
-        api.stubbedSubscriptions = [makeSubResponse(id: serverId, title: "Keep")]
-        let service = await makeService()
-        let vm = SubscriptionsViewModel(service: service, api: api)
-        await vm.load()
-
-        api.stubbedError = APIError.networkOffline
-        await vm.deleteSubscription(vm.subscriptions[0])
-
-        #expect(vm.operationError != nil)
-    }
-
-    @Test("Update: local-only subscription (no serverId) updated in cache")
-    func updateLocalSubChangesTitle() async {
+    @Test("Update local subscription → title changes")
+    func updateChangesTitle() async {
         let vm = await makeVM(with: [sub(title: "Old")])
         let id = vm.subscriptions[0].id
         await vm.updateSubscription(
@@ -271,21 +120,20 @@ struct SubscriptionsViewModelCRUDTests {
         #expect(vm.subscriptions[0].title == "New")
     }
 
-    @Test("Update: isActive=false preserves endDate")
+    @Test("Update with isActive=false stores endDate")
     func updateWithIsActiveFalsePreservesEndDate() async {
         let vm = await makeVM(with: [sub(title: "Cancel Me")])
         let id = vm.subscriptions[0].id
-        let endDate = Date()
         await vm.updateSubscription(
             id: id, title: "Cancel Me", amount: 10, currency: .USD,
             billingCycle: .monthly, startDate: Date(),
-            category: nil, iconName: nil, isActive: false, endDate: endDate
+            category: nil, iconName: nil, isActive: false, endDate: Date()
         )
         #expect(vm.subscriptions[0].isActive == false)
         #expect(vm.subscriptions[0].endDate != nil)
     }
 
-    @Test("Update: isActive=true clears endDate")
+    @Test("Update with isActive=true clears endDate")
     func updateWithIsActiveTrueClearsEndDate() async {
         let vm = await makeVM(with: [sub(title: "Reactivate", isActive: false, endDate: Date())])
         let id = vm.subscriptions[0].id
