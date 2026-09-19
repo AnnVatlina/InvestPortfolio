@@ -155,6 +155,11 @@ private struct DepositRow: View {
     let deposit: Deposit
     let summary: DepositIncomeSummary
 
+    // Date.formatted(date:time:) ignores the SwiftUI environment locale and follows the
+    // device's system language instead — reading it explicitly keeps dates in sync with
+    // the in-app language switch (Settings), not just everything else on screen.
+    @Environment(\.locale) private var locale
+
     private var isClosed: Bool {
         guard let closeDate = deposit.closeDate else { return false }
         return closeDate <= Date()
@@ -198,14 +203,14 @@ private struct DepositRow: View {
                     .fontWeight(.medium)
                 Spacer()
                 HStack(spacing: 6) {
-                    Text(deposit.openDate.formatted(date: .abbreviated, time: .omitted))
+                    Text(deposit.openDate.formatted(Date.FormatStyle(date: .abbreviated, time: .omitted).locale(locale)))
                         .font(.caption)
                         .foregroundColor(.secondary)
                     if let close = deposit.closeDate {
                         Image(systemName: "arrow.right")
                             .font(.caption2)
                             .foregroundColor(.secondary)
-                        Text(close.formatted(date: .abbreviated, time: .omitted))
+                        Text(close.formatted(Date.FormatStyle(date: .abbreviated, time: .omitted).locale(locale)))
                             .font(.caption)
                             .foregroundColor(isClosed ? .secondary : .orange)
                     }

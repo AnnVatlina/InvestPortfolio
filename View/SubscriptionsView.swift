@@ -264,7 +264,7 @@ struct SubscriptionsView: View {
             SubscriptionIcon(name: sub.iconName ?? "repeat.circle.fill", size: 32)
             VStack(alignment: .leading, spacing: 2) {
                 Text(sub.title).font(.subheadline).fontWeight(.medium)
-                Text(payDate.formatted(date: .abbreviated, time: .omitted))
+                Text(payDate.formatted(Date.FormatStyle(date: .abbreviated, time: .omitted).locale(locale)))
                     .font(.caption).foregroundColor(.orange)
             }
             Spacer()
@@ -306,6 +306,11 @@ struct SubscriptionsView: View {
 private struct SubscriptionRow: View {
     let subscription: Subscription
     let monthlyCost: Double
+
+    // Date.formatted(date:time:) ignores the SwiftUI environment locale and follows the
+    // device's system language instead — reading it explicitly keeps dates in sync with
+    // the in-app language switch (Settings), not just everything else on screen.
+    @Environment(\.locale) private var locale
 
     private var isOneTime: Bool { !subscription.billingCycle.isRecurring }
     private var isPurchased: Bool { isOneTime && subscription.startDate <= Date() }
@@ -349,7 +354,7 @@ private struct SubscriptionRow: View {
                             Text(isPurchased
                                  ? String(localized: "subscriptions.oneTime.purchased")
                                  : String(localized: "subscriptions.oneTime.scheduledFor")
-                                     + " " + subscription.startDate.formatted(date: .abbreviated, time: .omitted))
+                                     + " " + subscription.startDate.formatted(Date.FormatStyle(date: .abbreviated, time: .omitted).locale(locale)))
                                 .font(.caption)
                                 .foregroundColor(isPurchased ? .secondary : .orange)
                         }
@@ -359,7 +364,7 @@ private struct SubscriptionRow: View {
                             Image(systemName: "calendar.badge.clock")
                                 .font(.caption2).foregroundColor(.orange)
                             Text(String(localized: "subscriptions.nextPayment")
-                                 + ": " + subscription.nextPaymentDate.formatted(date: .abbreviated, time: .omitted))
+                                 + ": " + subscription.nextPaymentDate.formatted(Date.FormatStyle(date: .abbreviated, time: .omitted).locale(locale)))
                                 .font(.caption).foregroundColor(.orange)
                             if subscription.billingCycle != .monthly {
                                 Spacer()
@@ -375,7 +380,7 @@ private struct SubscriptionRow: View {
                         Image(systemName: "xmark.circle")
                             .font(.caption2).foregroundColor(.secondary)
                         Text(String(format: String(localized: "subscriptions.cancelled.on.format"),
-                                    end.formatted(date: .abbreviated, time: .omitted)))
+                                    end.formatted(Date.FormatStyle(date: .abbreviated, time: .omitted).locale(locale))))
                             .font(.caption).foregroundColor(.secondary)
                     }
                 }
