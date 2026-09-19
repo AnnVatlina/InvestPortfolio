@@ -34,6 +34,8 @@
 		95AD90862F8252A50064CD19 /* SubscriptionsViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 95AD90852F8252A50064CD19 /* SubscriptionsViewModel.swift */; };
 		95AD90882F8252CA0064CD19 /* SubscriptionsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 95AD90872F8252CA0064CD19 /* SubscriptionsView.swift */; };
 		95CCEE182FC9886E00694936 /* AnalyticsViewModelTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 95CCEE172FC9886E00694936 /* AnalyticsViewModelTests.swift */; };
+		95DA000C2FD0000100000001 /* CSVImporterTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 95DA000B2FD0000100000001 /* CSVImporterTests.swift */; };
+		95DA000A2FD0000100000001 /* CSVExporterTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 95DA00092FD0000100000001 /* CSVExporterTests.swift */; };
 		95DA00082FD0000100000001 /* DashboardViewModelTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 95DA00072FD0000100000001 /* DashboardViewModelTests.swift */; };
 		95DA00062FD0000100000001 /* CurrencyConverterTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 95DA00052FD0000100000001 /* CurrencyConverterTests.swift */; };
 		95DA00042FD0000100000001 /* DashboardViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 95DA00032FD0000100000001 /* DashboardViewModel.swift */; };
@@ -96,6 +98,8 @@
 		95AD90852F8252A50064CD19 /* SubscriptionsViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SubscriptionsViewModel.swift; sourceTree = "<group>"; };
 		95AD90872F8252CA0064CD19 /* SubscriptionsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SubscriptionsView.swift; sourceTree = "<group>"; };
 		95CCEE172FC9886E00694936 /* AnalyticsViewModelTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AnalyticsViewModelTests.swift; sourceTree = "<group>"; };
+		95DA000B2FD0000100000001 /* CSVImporterTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CSVImporterTests.swift; sourceTree = "<group>"; };
+		95DA00092FD0000100000001 /* CSVExporterTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CSVExporterTests.swift; sourceTree = "<group>"; };
 		95DA00072FD0000100000001 /* DashboardViewModelTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DashboardViewModelTests.swift; sourceTree = "<group>"; };
 		95DA00052FD0000100000001 /* CurrencyConverterTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CurrencyConverterTests.swift; sourceTree = "<group>"; };
 		95DA00032FD0000100000001 /* DashboardViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DashboardViewModel.swift; sourceTree = "<group>"; };
@@ -147,6 +151,8 @@
 				B26A38B2C0B92497C74625F2 /* SubscriptionViewModelTests.swift */,
 				9523DDAA2FBB85F400E24324 /* DepositsViewModelTests.swift */,
 				95CCEE172FC9886E00694936 /* AnalyticsViewModelTests.swift */,
+				95DA000B2FD0000100000001 /* CSVImporterTests.swift */,
+				95DA00092FD0000100000001 /* CSVExporterTests.swift */,
 				95DA00072FD0000100000001 /* DashboardViewModelTests.swift */,
 				95DA00052FD0000100000001 /* CurrencyConverterTests.swift */,
 			);
@@ -401,6 +407,8 @@
 			files = (
 				42FE55B393A3181535CBC9F8 /* SubscriptionRepositoryTests.swift in Sources */,
 				95CCEE182FC9886E00694936 /* AnalyticsViewModelTests.swift in Sources */,
+				95DA000C2FD0000100000001 /* CSVImporterTests.swift in Sources */,
+				95DA000A2FD0000100000001 /* CSVExporterTests.swift in Sources */,
 				95DA00082FD0000100000001 /* DashboardViewModelTests.swift in Sources */,
 				95DA00062FD0000100000001 /* CurrencyConverterTests.swift in Sources */,
 				9523DDAB2FBB85F400E24324 /* DepositsViewModelTests.swift in Sources */,
