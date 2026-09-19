@@ -174,3 +174,71 @@ struct AnalyticsViewModelComputationTests {
         #expect(vm.netBalance(currency: .RUB) == income - expenses)
     }
 }
+
+// MARK: - By month
+
+@Suite("AnalyticsViewModel — by month")
+@MainActor
+struct AnalyticsViewModelByMonthTests {
+
+    @Test("Monthly subscription charge only counts in the month it's due")
+    func expenseOnlyInDueMonth() async {
+        let year = Calendar.current.component(.year, from: Date())
+        let startDate = date(year: year, month: 3)
+        let vm = await makeVM(subscriptions: [sub(amount: 9.99, currency: .USD, cycle: .yearly, startDate: startDate)])
+        vm.selectedYear = year
+        await vm.load()
+
+        vm.selectedMonth = 3
+        #expect(abs(vm.monthExpense(currency: .USD) - 9.99) < 0.001)
+
+        vm.selectedMonth = 4
+        #expect(vm.monthExpense(currency: .USD) == 0)
+    }
+
+    @Test("Deposit income for a month equals that month's slice, not the whole year")
+    func incomeIsSlicedByMonth() async {
+        let year = Calendar.current.component(.year, from: Date())
+        let openDate = date(year: year, month: 1)
+        let vm = await makeVM(deposits: [dep(amount: 100_000, currency: .RUB, annualRate: 12.0, openDate: openDate)])
+        vm.selectedYear = year
+        await vm.load()
+
+        vm.selectedMonth = 1
+        let januaryIncome = vm.monthIncome(currency: .RUB)
+        let yearIncome = vm.totalIncome(currency: .RUB)
+        #expect(januaryIncome > 0)
+        #expect(januaryIncome < yearIncome)
+    }
+
+    @Test("monthNet equals monthIncome minus monthExpense")
+    func monthNetIsIncomeMinusExpense() async {
+        let year = Calendar.current.component(.year, from: Date())
+        let openDate = date(year: year, month: 1)
+        let vm = await makeVM(
+            deposits: [dep(amount: 100_000, currency: .RUB, annualRate: 10.0, openDate: openDate)],
+            subscriptions: [sub(amount: 500, currency: .RUB, cycle: .monthly, startDate: openDate)]
+        )
+        vm.selectedYear = year
+        vm.selectedMonth = 6
+        await vm.load()
+        let income = vm.monthIncome(currency: .RUB)
+        let expense = vm.monthExpense(currency: .RUB)
+        #expect(vm.monthNet(currency: .RUB) == income - expense)
+    }
+
+    @Test("Month with no data returns zero for income, expense and net")
+    func emptyMonthReturnsZero() async {
+        let vm = await makeVM()
+        vm.selectedMonth = 5
+        #expect(vm.monthIncome(currency: .USD) == 0)
+        #expect(vm.monthExpense(currency: .USD) == 0)
+        #expect(vm.monthNet(currency: .USD) == 0)
+    }
+
+    @Test("selectedMonth defaults to the current calendar month")
+    func defaultsToCurrentMonth() async {
+        let vm = await makeVM()
+        #expect(vm.selectedMonth == Calendar.current.component(.month, from: Date()))
+    }
+}

@@ -67,8 +67,6 @@
 "subscriptions.monthly.cost.format" = "≈ %.2f %@/mo";
 "subscriptions.nextPayment" = "Next payment";
 "subscriptions.section.upcoming" = "Upcoming (7 days)";
-"subscriptions.section.summary" = "Monthly total";
-"subscriptions.summary.monthly" = "Per month";
 "subscriptions.field.icon" = "Icon";
 "subscriptions.field.name" = "Name";
 "subscriptions.field.category" = "Category (optional)";
@@ -122,6 +120,8 @@
 "analytics.todate.subtitle" = "Actual amounts from Jan 1 to today";
 "analytics.year.title" = "Full year";
 "analytics.year.subtitle" = "Includes forecast for remaining months";
+"analytics.month.title" = "By Month";
+"analytics.month.subtitle" = "Income and expenses for the selected month";
 "analytics.chart.title" = "Income vs Expenses";
 "analytics.chart.empty" = "No data for this year";
 "analytics.legend.income" = "Income";

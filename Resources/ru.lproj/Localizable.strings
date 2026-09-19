@@ -67,8 +67,6 @@
 "subscriptions.monthly.cost.format" = "≈ %.2f %@/мес";
 "subscriptions.nextPayment" = "Следующий платёж";
 "subscriptions.section.upcoming" = "Ближайшие (7 дней)";
-"subscriptions.section.summary" = "Итого в месяц";
-"subscriptions.summary.monthly" = "В месяц";
 "subscriptions.field.icon" = "Иконка";
 "subscriptions.field.name" = "Название";
 "subscriptions.field.category" = "Категория (необязательно)";
@@ -122,6 +120,8 @@
 "analytics.todate.subtitle" = "Реальные суммы с 1 января по сегодня";
 "analytics.year.title" = "За год";
 "analytics.year.subtitle" = "Включает прогноз на оставшиеся месяцы";
+"analytics.month.title" = "За месяц";
+"analytics.month.subtitle" = "Доходы и расходы за выбранный месяц";
 "analytics.chart.title" = "Доходы и расходы";
 "analytics.chart.empty" = "Нет данных за этот год";
 "analytics.legend.income" = "Доходы";

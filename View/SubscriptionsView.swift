@@ -114,24 +114,6 @@ struct SubscriptionsView: View {
                     }
                 }
 
-                // Monthly cost summary (recurring only, always from active subs)
-                if !vm.activeCurrencies.filter({ vm.totalMonthlyCost(in: $0) > 0 }).isEmpty {
-                    Section(LanguageBundle.string("subscriptions.section.summary")) {
-                        ForEach(vm.activeCurrencies, id: \.self) { currency in
-                            let cost = vm.totalMonthlyCost(in: currency)
-                            if cost > 0 {
-                                HStack {
-                                    Text(LanguageBundle.string("subscriptions.summary.monthly"))
-                                        .foregroundColor(.secondary)
-                                    Spacer()
-                                    Text(String(format: "%.2f %@", cost, currency.rawValue))
-                                        .fontWeight(.semibold)
-                                }
-                            }
-                        }
-                    }
-                }
-
                 // Filtered & paginated section
                 Section {
                     if vm.pagedSubscriptions.isEmpty {

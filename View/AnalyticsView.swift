@@ -49,10 +49,13 @@ struct AnalyticsView: View {
                                 toDateSection(currency: cur)
                             }
 
-                            // Block 2: full year projection
+                            // Block 2: a single selected month
+                            byMonthSection(currency: cur)
+
+                            // Block 3: full year projection
                             yearTotalSection(currency: cur)
 
-                            // Block 3: monthly chart
+                            // Block 4: monthly chart
                             chartSection(currency: cur)
                         }
                     }
@@ -90,6 +93,66 @@ struct AnalyticsView: View {
         .padding(.vertical, 8)
         .background(Color(.secondarySystemGroupedBackground))
         .cornerRadius(12)
+    }
+
+    // MARK: - By month section
+
+    private var monthDate: Date? {
+        Calendar.current.date(from: DateComponents(year: vm.selectedYear, month: vm.selectedMonth, day: 1))
+    }
+
+    private var monthPicker: some View {
+        HStack {
+            Button {
+                if vm.selectedMonth > 1 { vm.selectedMonth -= 1 }
+            } label: {
+                Image(systemName: "chevron.left").font(.subheadline.bold())
+            }
+            .disabled(vm.selectedMonth <= 1)
+
+            Spacer()
+            if let date = monthDate {
+                Text(date, format: .dateTime.month(.wide).year())
+                    .font(.subheadline.bold())
+            }
+            Spacer()
+
+            Button {
+                if vm.selectedMonth < 12 { vm.selectedMonth += 1 }
+            } label: {
+                Image(systemName: "chevron.right").font(.subheadline.bold())
+            }
+            .disabled(vm.selectedMonth >= 12)
+        }
+    }
+
+    private func byMonthSection(currency: DepositCurrency) -> some View {
+        VStack(alignment: .leading, spacing: 10) {
+            sectionHeader(title: "analytics.month.title", subtitle: "analytics.month.subtitle")
+            monthPicker
+
+            HStack(spacing: 12) {
+                summaryCard(
+                    title: "analytics.income",
+                    value: vm.monthIncome(currency: currency),
+                    currency: currency.rawValue,
+                    color: .teal
+                )
+                summaryCard(
+                    title: "analytics.expenses",
+                    value: vm.monthExpense(currency: currency),
+                    currency: currency.rawValue,
+                    color: .orange
+                )
+                let net = vm.monthNet(currency: currency)
+                summaryCard(
+                    title: "analytics.net",
+                    value: net,
+                    currency: currency.rawValue,
+                    color: net >= 0 ? .green : .red
+                )
+            }
+        }
     }
 
     // MARK: - Currency picker

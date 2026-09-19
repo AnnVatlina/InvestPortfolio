@@ -16,6 +16,7 @@ struct MonthlyAnalyticsPoint: Identifiable {
 
 @MainActor final class AnalyticsViewModel: ObservableObject {
     @Published var selectedYear: Int
+    @Published var selectedMonth: Int
     @Published private(set) var deposits: [Deposit] = []
     @Published private(set) var subscriptions: [Subscription] = []
     @Published var isLoading = false
@@ -36,6 +37,7 @@ struct MonthlyAnalyticsPoint: Identifiable {
         self.depositsService = depositsService
         self.subscriptionsService = subscriptionsService
         self.selectedYear = Calendar.current.component(.year, from: Date())
+        self.selectedMonth = Calendar.current.component(.month, from: Date())
     }
 
     // MARK: - Load
@@ -136,6 +138,28 @@ struct MonthlyAnalyticsPoint: Identifiable {
 
     func netToDate(currency: DepositCurrency) -> Double {
         totalEarnedToDate(currency: currency) - totalPaidToDate(currency: currency)
+    }
+
+    // MARK: - By month (selectedMonth within selectedYear)
+
+    /// Deposit interest and subscription charges are already computed per calendar month
+    /// by `_allPoints` — a future month naturally comes out as a projection (same as the
+    /// full-year total already does), a past month as the actual amount for that month.
+
+    func monthIncome(currency: DepositCurrency) -> Double {
+        point(currency: currency, month: selectedMonth)?.income ?? 0
+    }
+
+    func monthExpense(currency: DepositCurrency) -> Double {
+        point(currency: currency, month: selectedMonth)?.expense ?? 0
+    }
+
+    func monthNet(currency: DepositCurrency) -> Double {
+        monthIncome(currency: currency) - monthExpense(currency: currency)
+    }
+
+    private func point(currency: DepositCurrency, month: Int) -> MonthlyAnalyticsPoint? {
+        monthlyPoints(currency: currency).first { calendar.component(.month, from: $0.month) == month }
     }
 
     // MARK: - Private computation
