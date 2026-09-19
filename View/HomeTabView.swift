@@ -1,35 +1,62 @@
 //
 //  HomeTabView.swift
-//  
 //
 //  Created by Anna on 26.12.25.
 //
+//  Dashboard: net worth in the base currency, allocation by currency,
+//  upcoming events, and shortcuts into the other tabs.
+//
 
 import SwiftUI
+import Charts
 
 struct HomeTabView: View {
-    var openDeposits: () -> Void
-    var openSubscriptions: () -> Void
-    var openAnalytics: () -> Void
-    var openSettings: () -> Void
+    private let openDeposits: () -> Void
+    private let openSubscriptions: () -> Void
+    private let openAnalytics: () -> Void
 
-    @EnvironmentObject private var container: DIContainer
-    @AppStorage("Settings_SelectedCurrencies") private var selectedCurrenciesRaw: String = DepositCurrency.defaultSelection
+    @StateObject private var vm: DashboardViewModel
 
-    @State private var depositSums: [(currency: DepositCurrency, amount: Double)] = []
-    @State private var monthlyExpenses: [(currency: DepositCurrency, amount: Double)] = []
-    @State private var isLoaded = false
+    @AppStorage(CurrencySettings.baseCurrencyKey) private var baseCurrencyRaw: String = CurrencySettings.defaultBaseCurrency.rawValue
+    @AppStorage(CurrencySettings.ratesKey) private var ratesJSON: String = CurrencySettings.defaultRatesJSON
 
-    private var selectedCurrencies: [DepositCurrency] {
-        selectedCurrenciesRaw.split(separator: ",")
-            .compactMap { DepositCurrency(rawValue: String($0)) }
+    init(
+        container: DIContainer,
+        openDeposits: @escaping () -> Void,
+        openSubscriptions: @escaping () -> Void,
+        openAnalytics: @escaping () -> Void
+    ) {
+        self.openDeposits = openDeposits
+        self.openSubscriptions = openSubscriptions
+        self.openAnalytics = openAnalytics
+        _vm = StateObject(wrappedValue: DashboardViewModel(
+            depositsService: container.makeDepositsService(),
+            subscriptionsService: container.makeSubscriptionsService()
+        ))
+    }
+
+    private var converter: CurrencyConverter {
+        CurrencySettings.converter(baseRaw: baseCurrencyRaw, ratesJSON: ratesJSON)
     }
 
     var body: some View {
         ScrollView {
             VStack(spacing: 16) {
-                if isLoaded {
-                    summaryCard
+                netWorthCard
+
+                let netWorth = vm.netWorth(using: converter)
+                if !netWorth.missing.isEmpty {
+                    missingRatesBanner(netWorth.missing)
+                }
+
+                let allocation = vm.allocationByCurrency(using: converter)
+                if allocation.count > 1 {
+                    allocationCard(allocation)
+                }
+
+                let events = vm.upcomingEvents()
+                if !events.isEmpty {
+                    upcomingCard(events)
                 }
 
                 LandingCard(
@@ -55,28 +82,34 @@ struct HomeTabView: View {
                     title: "analytics.title",
                     subtitle: "analytics.open"
                 ) { openAnalytics() }
-
-                LandingCard(
-                    icon: "gearshape.fill",
-                    iconColor: .white,
-                    iconBackground: LinearGradient(colors: [Color.blue, Color.cyan], startPoint: .topLeading, endPoint: .bottomTrailing),
-                    title: "settings.title",
-                    subtitle: "about.title"
-                ) { openSettings() }
             }
             .padding(.horizontal, 20)
             .padding(.top, 24)
+            .padding(.bottom, 24)
         }
-        .task { await loadSummary() }
-        .onChange(of: selectedCurrenciesRaw) {
-            Task { await loadSummary() }
+        .toolbar {
+            ToolbarItem(placement: .primaryAction) {
+                NavigationLink {
+                    SettingsView()
+                } label: {
+                    Image(systemName: "gearshape")
+                }
+                .accessibilityLabel(Text("settings.title"))
+            }
         }
+        .task { await vm.load() }
+        .refreshable { await vm.load() }
     }
 
-    // MARK: - Summary Card
+    // MARK: - Net worth
 
-    private var summaryCard: some View {
-        ZStack {
+    private var netWorthCard: some View {
+        let principal = vm.depositsPrincipal(using: converter)
+        let income = vm.depositsAccruedIncome(using: converter)
+        let annualSubs = vm.annualSubscriptionCost(using: converter)
+        let netWorth = vm.netWorth(using: converter)
+
+        return ZStack {
             RoundedRectangle(cornerRadius: 20, style: .continuous)
                 .fill(LinearGradient(
                     colors: [.brand, Color(red: 0.05, green: 0.35, blue: 0.27)],
@@ -84,81 +117,170 @@ struct HomeTabView: View {
                     endPoint: .bottomTrailing
                 ))
 
-            HStack(alignment: .top, spacing: 0) {
-                // Левая колонка: вклады
-                VStack(alignment: .leading, spacing: 6) {
-                    Text("home.summary.deposits")
-                        .font(.caption)
-                        .fontWeight(.semibold)
-                        .textCase(.uppercase)
-                        .opacity(0.75)
-                    if depositSums.isEmpty {
-                        Text("—").font(.subheadline).fontWeight(.semibold)
-                    } else {
-                        ForEach(depositSums, id: \.currency) { item in
-                            Text("\(item.amount, specifier: "%.0f") \(item.currency.rawValue)")
-                                .font(.subheadline).fontWeight(.bold)
-                        }
-                    }
-                }
-                .frame(maxWidth: .infinity, alignment: .leading)
+            VStack(alignment: .leading, spacing: 14) {
+                Text("dashboard.netWorth.title")
+                    .font(.caption)
+                    .fontWeight(.semibold)
+                    .textCase(.uppercase)
+                    .opacity(0.75)
 
-                Rectangle()
-                    .fill(.white.opacity(0.2))
-                    .frame(width: 1)
-                    .padding(.vertical, 4)
-                    .padding(.horizontal, 16)
-
-                // Правая колонка: подписки/мес
-                VStack(alignment: .leading, spacing: 6) {
-                    Text("home.summary.monthly")
-                        .font(.caption)
-                        .fontWeight(.semibold)
-                        .textCase(.uppercase)
-                        .opacity(0.75)
-                    if monthlyExpenses.isEmpty {
-                        Text("—").font(.subheadline).fontWeight(.semibold)
-                    } else {
-                        ForEach(monthlyExpenses, id: \.currency) { item in
-                            Text("−\(item.amount, specifier: "%.0f") \(item.currency.rawValue)")
-                                .font(.subheadline).fontWeight(.bold)
-                        }
-                    }
+                HStack(alignment: .firstTextBaseline, spacing: 6) {
+                    Text(amountText(netWorth.value))
+                        .font(.system(size: 34, weight: .bold, design: .rounded))
+                        .minimumScaleFactor(0.5)
+                        .lineLimit(1)
+                    Text(converter.base.rawValue)
+                        .font(.headline)
+                        .opacity(0.8)
                 }
-                .frame(maxWidth: .infinity, alignment: .leading)
+
+                Divider().overlay(.white.opacity(0.25))
+
+                breakdownRow(title: "dashboard.breakdown.deposits", total: principal, isNegative: false)
+                breakdownRow(title: "dashboard.breakdown.income", total: income, isNegative: false)
+                breakdownRow(title: "dashboard.breakdown.subscriptions", total: annualSubs, isNegative: true)
             }
             .foregroundColor(.white)
             .padding(20)
         }
     }
 
-    // MARK: - Data Loading
+    private func breakdownRow(title: LocalizedStringKey, total: ConvertedTotal, isNegative: Bool) -> some View {
+        HStack {
+            Text(title)
+                .font(.subheadline)
+                .opacity(0.8)
+            Spacer()
+            Text("\(isNegative ? "−" : "")\(amountText(total.value))")
+                .font(.subheadline.weight(.semibold))
+                .monospacedDigit()
+        }
+    }
 
-    private func loadSummary() async {
-        do {
-            let depositsService = container.makeDepositsService()
-            let subsService = container.makeSubscriptionsService()
+    // MARK: - Missing rates
 
-            let allDeposits = try await depositsService.fetchAll()
-            let allSubs = try await subsService.fetchAll()
-
-            let activeDeposits = allDeposits.filter {
-                guard let closeDate = $0.closeDate else { return true }
-                return closeDate > Date()
+    private func missingRatesBanner(_ missing: [DepositCurrency]) -> some View {
+        NavigationLink {
+            CurrenciesSettingsView()
+        } label: {
+            HStack(alignment: .top, spacing: 12) {
+                Image(systemName: "exclamationmark.triangle.fill")
+                    .foregroundStyle(.orange)
+                VStack(alignment: .leading, spacing: 4) {
+                    Text("dashboard.rates.missing.title")
+                        .font(.subheadline.weight(.semibold))
+                        .foregroundStyle(.primary)
+                    Text(String(
+                        format: String(localized: "dashboard.rates.missing.format"),
+                        missing.map(\.rawValue).joined(separator: ", ")
+                    ))
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
+                    .multilineTextAlignment(.leading)
+                }
+                Spacer(minLength: 0)
+                Image(systemName: "chevron.right")
+                    .font(.caption)
+                    .foregroundColor(.tertiaryLabel)
             }
-            let activeSubs = allSubs.filter { $0.isActive }
+            .padding(14)
+            .background(Color(.secondarySystemGroupedBackground))
+            .cornerRadius(14)
+        }
+        .buttonStyle(.plain)
+    }
 
-            depositSums = selectedCurrencies.compactMap { cur in
-                let total = activeDeposits.filter { $0.currency == cur }.reduce(0) { $0 + $1.amount }
-                return total > 0 ? (cur, total) : nil
-            }
+    // MARK: - Allocation
 
-            monthlyExpenses = selectedCurrencies.compactMap { cur in
-                let total = subsService.totalMonthlyCost(in: cur, subscriptions: activeSubs)
-                return total > 0 ? (cur, total) : nil
+    private func allocationCard(_ slices: [AllocationSlice]) -> some View {
+        VStack(alignment: .leading, spacing: 12) {
+            Text("dashboard.allocation.title")
+                .font(.headline)
+
+            Chart(slices) { slice in
+                // Series keys are currency rawValues, never localized strings —
+                // otherwise switching language remaps the color scale.
+                SectorMark(
+                    angle: .value("Share", slice.converted),
+                    innerRadius: .ratio(0.6),
+                    angularInset: 1.5
+                )
+                .cornerRadius(4)
+                .foregroundStyle(by: .value("Currency", slice.currency.rawValue))
             }
-        } catch {}
-        isLoaded = true
+            .chartLegend(.hidden)
+            .frame(height: 180)
+
+            VStack(spacing: 8) {
+                ForEach(slices) { slice in
+                    HStack(spacing: 8) {
+                        RoundedRectangle(cornerRadius: 3)
+                            .fill(color(for: slice.currency, in: slices))
+                            .frame(width: 12, height: 12)
+                        Text(slice.currency.rawValue)
+                            .font(.subheadline)
+                        Spacer()
+                        Text(String(format: "%.0f%%", slice.share * 100))
+                            .font(.subheadline.weight(.semibold))
+                            .monospacedDigit()
+                            .foregroundStyle(.secondary)
+                    }
+                }
+            }
+            .font(.caption)
+        }
+        .padding()
+        .background(Color(.secondarySystemGroupedBackground))
+        .cornerRadius(16)
+    }
+
+    /// Mirrors Swift Charts' default categorical palette so the hand-drawn legend matches the donut.
+    private func color(for currency: DepositCurrency, in slices: [AllocationSlice]) -> Color {
+        let palette: [Color] = [.blue, .green, .orange, .purple, .red, .teal, .pink]
+        guard let index = slices.firstIndex(where: { $0.currency == currency }) else { return .gray }
+        return palette[index % palette.count]
+    }
+
+    // MARK: - Upcoming
+
+    private func upcomingCard(_ events: [DashboardEvent]) -> some View {
+        VStack(alignment: .leading, spacing: 12) {
+            Text("dashboard.upcoming.title")
+                .font(.headline)
+
+            ForEach(events) { event in
+                HStack(spacing: 12) {
+                    Image(systemName: event.kind == .depositClosing ? "banknote.fill" : "repeat.circle.fill")
+                        .foregroundStyle(event.kind == .depositClosing ? Color.brand : Color.orange)
+                        .frame(width: 24)
+
+                    VStack(alignment: .leading, spacing: 2) {
+                        Text(event.title)
+                            .font(.subheadline.weight(.medium))
+                            .lineLimit(1)
+                        Text(event.date, format: .dateTime.day().month(.abbreviated))
+                            .font(.caption)
+                            .foregroundStyle(.secondary)
+                    }
+
+                    Spacer(minLength: 0)
+
+                    Text("\(amountText(event.amount)) \(event.currency.rawValue)")
+                        .font(.subheadline)
+                        .monospacedDigit()
+                        .lineLimit(1)
+                        .minimumScaleFactor(0.7)
+                }
+            }
+        }
+        .padding()
+        .background(Color(.secondarySystemGroupedBackground))
+        .cornerRadius(16)
+    }
+
+    // MARK: - Formatting
+
+    private func amountText(_ value: Double) -> String {
+        String(format: "%.2f", value)
     }
 }
-
