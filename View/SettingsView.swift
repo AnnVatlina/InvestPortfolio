@@ -119,6 +119,22 @@ struct CurrenciesSettingsView: View {
             .filter { selectedCurrencySet.contains($0.rawValue) && $0 != baseCurrency }
     }
 
+    /// Tapping into a field lower in a scrolled list can land on the keyboard instead,
+    /// since the keyboard covers rows below the one currently focused. Driving focus with
+    /// the keyboard's own "Next"/"Done" button sidesteps that entirely.
+    @FocusState private var focusedRateCurrency: DepositCurrency?
+
+    private func advanceFocus(after currency: DepositCurrency) {
+        guard let index = currenciesNeedingRates.firstIndex(of: currency) else {
+            focusedRateCurrency = nil
+            return
+        }
+        let nextIndex = currenciesNeedingRates.index(after: index)
+        focusedRateCurrency = nextIndex < currenciesNeedingRates.endIndex
+            ? currenciesNeedingRates[nextIndex]
+            : nil
+    }
+
     /// Text binding over the JSON rate map. An empty or unparseable field clears the rate,
     /// which surfaces the currency as "missing" on the dashboard instead of zeroing the total.
     private func rateBinding(for currency: DepositCurrency) -> Binding<String> {
@@ -200,6 +216,9 @@ struct CurrenciesSettingsView: View {
                             .keyboardType(.numbersAndPunctuation)
                             .multilineTextAlignment(.trailing)
                             .frame(maxWidth: 120)
+                            .focused($focusedRateCurrency, equals: currency)
+                            .submitLabel(currency == currenciesNeedingRates.last ? .done : .next)
+                            .onSubmit { advanceFocus(after: currency) }
                             Text(baseCurrency.rawValue)
                                 .foregroundStyle(.secondary)
                         }
