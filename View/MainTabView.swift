@@ -17,14 +17,9 @@ struct MainTabView: View {
 
             // 0: Главная
             NavigationStack {
-                HomeTabView(
-                    container: container,
-                    openDeposits: { selectedIndex = 1 },
-                    openSubscriptions: { selectedIndex = 2 },
-                    openAnalytics: { selectedIndex = 3 }
-                )
-                .navigationBarTitleDisplayMode(.inline)
-                .navigationTitle("home.tab.title")
+                HomeTabView(container: container)
+                    .navigationBarTitleDisplayMode(.inline)
+                    .navigationTitle("home.tab.title")
             }
             .tabItem { Label("home.tab.title", systemImage: "house.fill") }
             .tag(0)

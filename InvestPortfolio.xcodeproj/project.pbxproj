@@ -22,6 +22,8 @@
 		9523DDAB2FBB85F400E24324 /* DepositsViewModelTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9523DDAA2FBB85F400E24324 /* DepositsViewModelTests.swift */; };
 		9539C4222F93FC9D003A105C /* AnalyticsViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9539C4212F93FC9D003A105C /* AnalyticsViewModel.swift */; };
 		9539C4242F93FCB9003A105C /* AnalyticsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9539C4232F93FCB9003A105C /* AnalyticsView.swift */; };
+		953C6246305EFFDB00D5C07B /* HomeViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 953C6245305EFFDB00D5C07B /* HomeViewModel.swift */; };
+		953C6248305EFFF400D5C07B /* HomeViewModelTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 953C6247305EFFF400D5C07B /* HomeViewModelTests.swift */; };
 		9557F9792F810AB10086715E /* Settings.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9557F9782F810AB10086715E /* Settings.swift */; };
 		95892D362F95F07500A30CA9 /* Color+Brand.swift in Sources */ = {isa = PBXBuildFile; fileRef = 95892D352F95F07500A30CA9 /* Color+Brand.swift */; };
 		95A86BD02F82B8BD009B94CF /* AppSchema.swift in Sources */ = {isa = PBXBuildFile; fileRef = 95A86BCF2F82B8BD009B94CF /* AppSchema.swift */; };
@@ -34,15 +36,10 @@
 		95AD90862F8252A50064CD19 /* SubscriptionsViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 95AD90852F8252A50064CD19 /* SubscriptionsViewModel.swift */; };
 		95AD90882F8252CA0064CD19 /* SubscriptionsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 95AD90872F8252CA0064CD19 /* SubscriptionsView.swift */; };
 		95CCEE182FC9886E00694936 /* AnalyticsViewModelTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 95CCEE172FC9886E00694936 /* AnalyticsViewModelTests.swift */; };
-		95DA000C2FD0000100000001 /* CSVImporterTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 95DA000B2FD0000100000001 /* CSVImporterTests.swift */; };
-		95DA000A2FD0000100000001 /* CSVExporterTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 95DA00092FD0000100000001 /* CSVExporterTests.swift */; };
-		95DA00082FD0000100000001 /* DashboardViewModelTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 95DA00072FD0000100000001 /* DashboardViewModelTests.swift */; };
-		95DA00062FD0000100000001 /* CurrencyConverterTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 95DA00052FD0000100000001 /* CurrencyConverterTests.swift */; };
-		95DA00042FD0000100000001 /* DashboardViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 95DA00032FD0000100000001 /* DashboardViewModel.swift */; };
-		95DA00022FD0000100000001 /* CurrencyConverter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 95DA00012FD0000100000001 /* CurrencyConverter.swift */; };
 		95D967FA2F04193400079C66 /* HomeTabView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 95D967F92F04193400079C66 /* HomeTabView.swift */; };
-		95D967FC2F04193500079C66 /* LandingCard.swift in Sources */ = {isa = PBXBuildFile; fileRef = 95D967FB2F04193500079C66 /* LandingCard.swift */; };
 		95D967FE2F04193500079C66 /* Color+TertiaryLabel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 95D967FD2F04193500079C66 /* Color+TertiaryLabel.swift */; };
+		95DA000A2FD0000100000001 /* CSVExporterTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 95DA00092FD0000100000001 /* CSVExporterTests.swift */; };
+		95DA000C2FD0000100000001 /* CSVImporterTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 95DA000B2FD0000100000001 /* CSVImporterTests.swift */; };
 		95E87C1F2F9493A600E238D5 /* CSVImporter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 95E87C1E2F9493A600E238D5 /* CSVImporter.swift */; };
 		95E87C212F94A27D00E238D5 /* SampleDataService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 95E87C202F94A27D00E238D5 /* SampleDataService.swift */; };
 		95E87C232F94A28C00E238D5 /* OnboardingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 95E87C222F94A28C00E238D5 /* OnboardingView.swift */; };
@@ -86,6 +83,8 @@
 		953C14A02F056E61003998D2 /* Base */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = Base; path = Base.lproj/Localizable.strings; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.plist; };
 		953C14A12F056E61003998D2 /* ru */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = ru; path = ru.lproj/Localizable.strings; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.plist; };
 		953C14A52F056EDD003998D2 /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/Localizable.strings; sourceTree = "<group>"; };
+		953C6245305EFFDB00D5C07B /* HomeViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomeViewModel.swift; sourceTree = "<group>"; };
+		953C6247305EFFF400D5C07B /* HomeViewModelTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomeViewModelTests.swift; sourceTree = "<group>"; };
 		9557F9782F810AB10086715E /* Settings.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Settings.swift; sourceTree = "<group>"; };
 		95892D352F95F07500A30CA9 /* Color+Brand.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Color+Brand.swift"; sourceTree = "<group>"; };
 		95A86BCF2F82B8BD009B94CF /* AppSchema.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppSchema.swift; sourceTree = "<group>"; };
@@ -98,15 +97,10 @@
 		95AD90852F8252A50064CD19 /* SubscriptionsViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SubscriptionsViewModel.swift; sourceTree = "<group>"; };
 		95AD90872F8252CA0064CD19 /* SubscriptionsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SubscriptionsView.swift; sourceTree = "<group>"; };
 		95CCEE172FC9886E00694936 /* AnalyticsViewModelTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AnalyticsViewModelTests.swift; sourceTree = "<group>"; };
-		95DA000B2FD0000100000001 /* CSVImporterTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CSVImporterTests.swift; sourceTree = "<group>"; };
-		95DA00092FD0000100000001 /* CSVExporterTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CSVExporterTests.swift; sourceTree = "<group>"; };
-		95DA00072FD0000100000001 /* DashboardViewModelTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DashboardViewModelTests.swift; sourceTree = "<group>"; };
-		95DA00052FD0000100000001 /* CurrencyConverterTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CurrencyConverterTests.swift; sourceTree = "<group>"; };
-		95DA00032FD0000100000001 /* DashboardViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DashboardViewModel.swift; sourceTree = "<group>"; };
-		95DA00012FD0000100000001 /* CurrencyConverter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CurrencyConverter.swift; sourceTree = "<group>"; };
 		95D967F92F04193400079C66 /* HomeTabView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomeTabView.swift; sourceTree = "<group>"; };
-		95D967FB2F04193500079C66 /* LandingCard.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LandingCard.swift; sourceTree = "<group>"; };
 		95D967FD2F04193500079C66 /* Color+TertiaryLabel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Color+TertiaryLabel.swift"; sourceTree = "<group>"; };
+		95DA00092FD0000100000001 /* CSVExporterTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CSVExporterTests.swift; sourceTree = "<group>"; };
+		95DA000B2FD0000100000001 /* CSVImporterTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CSVImporterTests.swift; sourceTree = "<group>"; };
 		95E87C1E2F9493A600E238D5 /* CSVImporter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CSVImporter.swift; sourceTree = "<group>"; };
 		95E87C202F94A27D00E238D5 /* SampleDataService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SampleDataService.swift; sourceTree = "<group>"; };
 		95E87C222F94A28C00E238D5 /* OnboardingView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OnboardingView.swift; sourceTree = "<group>"; };
@@ -153,8 +147,7 @@
 				95CCEE172FC9886E00694936 /* AnalyticsViewModelTests.swift */,
 				95DA000B2FD0000100000001 /* CSVImporterTests.swift */,
 				95DA00092FD0000100000001 /* CSVExporterTests.swift */,
-				95DA00072FD0000100000001 /* DashboardViewModelTests.swift */,
-				95DA00052FD0000100000001 /* CurrencyConverterTests.swift */,
+				953C6247305EFFF400D5C07B /* HomeViewModelTests.swift */,
 			);
 			path = InvestPortfolioTests;
 			sourceTree = "<group>";
@@ -180,7 +173,7 @@
 				950800042F0406560041AD54 /* DepositsViewModel.swift */,
 				95AD90852F8252A50064CD19 /* SubscriptionsViewModel.swift */,
 				9539C4212F93FC9D003A105C /* AnalyticsViewModel.swift */,
-				95DA00032FD0000100000001 /* DashboardViewModel.swift */,
+				953C6245305EFFDB00D5C07B /* HomeViewModel.swift */,
 			);
 			path = ViewModel;
 			sourceTree = "<group>";
@@ -204,7 +197,6 @@
 				95A86BD32F82BDF8009B94CF /* CSVExporter.swift */,
 				95E87C1E2F9493A600E238D5 /* CSVImporter.swift */,
 				95E87C202F94A27D00E238D5 /* SampleDataService.swift */,
-				95DA00012FD0000100000001 /* CurrencyConverter.swift */,
 			);
 			path = Service;
 			sourceTree = "<group>";
@@ -258,7 +250,6 @@
 				950800022F04064E0041AD54 /* DepositsView.swift */,
 				950800142F040E5A0041AD54 /* SettingsView.swift */,
 				95D967F92F04193400079C66 /* HomeTabView.swift */,
-				95D967FB2F04193500079C66 /* LandingCard.swift */,
 				95D967FD2F04193500079C66 /* Color+TertiaryLabel.swift */,
 				95AD90872F8252CA0064CD19 /* SubscriptionsView.swift */,
 				9539C4232F93FCB9003A105C /* AnalyticsView.swift */,
@@ -375,12 +366,11 @@
 				95AD90882F8252CA0064CD19 /* SubscriptionsView.swift in Sources */,
 				950800032F04064E0041AD54 /* DepositsView.swift in Sources */,
 				950800132F040B6C0041AD54 /* RootView.swift in Sources */,
-				95D967FC2F04193500079C66 /* LandingCard.swift in Sources */,
 				95E87C212F94A27D00E238D5 /* SampleDataService.swift in Sources */,
 				9539C4222F93FC9D003A105C /* AnalyticsViewModel.swift in Sources */,
-				95DA00042FD0000100000001 /* DashboardViewModel.swift in Sources */,
 				95AD90842F8252960064CD19 /* SubscriptionsService.swift in Sources */,
 				950800112F0409A60041AD54 /* DepositsService.swift in Sources */,
+				953C6246305EFFDB00D5C07B /* HomeViewModel.swift in Sources */,
 				95AD907E2F8252720064CD19 /* SubscriptionBillingCycle.swift in Sources */,
 				95AD90802F82527B0064CD19 /* Subscription.swift in Sources */,
 				95D967FA2F04193400079C66 /* HomeTabView.swift in Sources */,
@@ -393,7 +383,6 @@
 				95A86BD42F82BDF8009B94CF /* CSVExporter.swift in Sources */,
 				1A283CB0A1273797A2EDF575 /* MainTabView.swift in Sources */,
 				95E87C1F2F9493A600E238D5 /* CSVImporter.swift in Sources */,
-				95DA00022FD0000100000001 /* CurrencyConverter.swift in Sources */,
 				9508000D2F0406770041AD54 /* DepositsRepository.swift in Sources */,
 				95D967FE2F04193500079C66 /* Color+TertiaryLabel.swift in Sources */,
 				95AD90862F8252A50064CD19 /* SubscriptionsViewModel.swift in Sources */,
@@ -408,9 +397,8 @@
 				42FE55B393A3181535CBC9F8 /* SubscriptionRepositoryTests.swift in Sources */,
 				95CCEE182FC9886E00694936 /* AnalyticsViewModelTests.swift in Sources */,
 				95DA000C2FD0000100000001 /* CSVImporterTests.swift in Sources */,
+				953C6248305EFFF400D5C07B /* HomeViewModelTests.swift in Sources */,
 				95DA000A2FD0000100000001 /* CSVExporterTests.swift in Sources */,
-				95DA00082FD0000100000001 /* DashboardViewModelTests.swift in Sources */,
-				95DA00062FD0000100000001 /* CurrencyConverterTests.swift in Sources */,
 				9523DDAB2FBB85F400E24324 /* DepositsViewModelTests.swift in Sources */,
 				518517179F516B8CCFD2E88F /* SubscriptionServiceTests.swift in Sources */,
 				EC6792D387AAEE27DD44A4FF /* SubscriptionViewModelTests.swift in Sources */,

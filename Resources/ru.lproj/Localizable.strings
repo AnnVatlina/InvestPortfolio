@@ -214,19 +214,10 @@
 "auth.error.passwordMismatch" = "Пароли не совпадают";
 "auth.logout.action" = "Выйти";
 
-// MARK: - Dashboard
-"dashboard.netWorth.title" = "Капитал";
-"dashboard.breakdown.deposits" = "Вклады";
-"dashboard.breakdown.income" = "Накопленный доход";
-"dashboard.breakdown.subscriptions" = "Подписки за год";
-"dashboard.rates.missing.title" = "Нужны курсы валют";
-"dashboard.rates.missing.format" = "Не учтено в сумме: %@. Нажмите, чтобы задать курсы.";
-"dashboard.allocation.title" = "Распределение по валютам";
-"dashboard.upcoming.title" = "Ближайшие 30 дней";
-
-// MARK: - Base currency & rates
-"settings.baseCurrency.title" = "Базовая валюта";
-"settings.baseCurrency.footer" = "Все итоги на главном экране показываются в этой валюте.";
-"settings.rates.title" = "Курсы валют";
-"settings.rates.footer.format" = "Сколько %@ стоит одна единица валюты. Оставьте пустым, чтобы исключить валюту из итогов.";
-"settings.rates.placeholder" = "Курс";
+// MARK: - Home
+"home.loading" = "Загрузка...";
+"home.upcomingPayments.title" = "Ближайшие платежи";
+"home.upcomingPayments.empty" = "Нет ближайших платежей";
+"home.openDeposits.title" = "Открытые вклады";
+"home.openDeposits.empty" = "Нет открытых вкладов";
+"home.openDeposits.noEndDate" = "Без даты окончания";

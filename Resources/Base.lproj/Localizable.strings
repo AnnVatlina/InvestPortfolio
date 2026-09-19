@@ -192,19 +192,10 @@
 "settings.export.portfolio" = "Export Portfolio";
 "settings.export.error" = "Failed to create export file";
 
-// MARK: - Dashboard
-"dashboard.netWorth.title" = "Net Worth";
-"dashboard.breakdown.deposits" = "Deposits";
-"dashboard.breakdown.income" = "Accrued interest";
-"dashboard.breakdown.subscriptions" = "Subscriptions per year";
-"dashboard.rates.missing.title" = "Exchange rates needed";
-"dashboard.rates.missing.format" = "Not included in the total: %@. Tap to set rates.";
-"dashboard.allocation.title" = "Allocation by currency";
-"dashboard.upcoming.title" = "Next 30 days";
-
-// MARK: - Base currency & rates
-"settings.baseCurrency.title" = "Base currency";
-"settings.baseCurrency.footer" = "All totals on the dashboard are shown in this currency.";
-"settings.rates.title" = "Exchange rates";
-"settings.rates.footer.format" = "How many %@ one unit of each currency is worth. Leave blank to exclude a currency from totals.";
-"settings.rates.placeholder" = "Rate";
+// MARK: - Home
+"home.loading" = "Loading...";
+"home.upcomingPayments.title" = "Upcoming Payments";
+"home.upcomingPayments.empty" = "No upcoming payments";
+"home.openDeposits.title" = "Open Deposits";
+"home.openDeposits.empty" = "No open deposits";
+"home.openDeposits.noEndDate" = "No end date";
