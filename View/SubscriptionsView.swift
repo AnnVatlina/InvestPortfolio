@@ -90,11 +90,11 @@ struct SubscriptionsView: View {
         }
         .task { await vm.load() }
         .refreshable { await vm.load() }
-        .alert(String(localized: "common.error"), isPresented: Binding(
+        .alert(LanguageBundle.string("common.error"), isPresented: Binding(
             get: { vm.operationError != nil },
             set: { if !$0 { vm.operationError = nil } }
         )) {
-            Button(String(localized: "common.ok"), role: .cancel) { vm.operationError = nil }
+            Button(LanguageBundle.string("common.ok"), role: .cancel) { vm.operationError = nil }
         } message: {
             Text(vm.operationError ?? "")
         }
@@ -109,19 +109,19 @@ struct SubscriptionsView: View {
                 // Upcoming payments (next 7 days)
                 let soon = vm.upcoming(withinDays: 7)
                 if !soon.isEmpty {
-                    Section(String(localized: "subscriptions.section.upcoming")) {
+                    Section(LanguageBundle.string("subscriptions.section.upcoming")) {
                         ForEach(soon) { sub in upcomingRow(sub) }
                     }
                 }
 
                 // Monthly cost summary (recurring only, always from active subs)
                 if !vm.activeCurrencies.filter({ vm.totalMonthlyCost(in: $0) > 0 }).isEmpty {
-                    Section(String(localized: "subscriptions.section.summary")) {
+                    Section(LanguageBundle.string("subscriptions.section.summary")) {
                         ForEach(vm.activeCurrencies, id: \.self) { currency in
                             let cost = vm.totalMonthlyCost(in: currency)
                             if cost > 0 {
                                 HStack {
-                                    Text(String(localized: "subscriptions.summary.monthly"))
+                                    Text(LanguageBundle.string("subscriptions.summary.monthly"))
                                         .foregroundColor(.secondary)
                                     Spacer()
                                     Text(String(format: "%.2f %@", cost, currency.rawValue))
@@ -135,7 +135,7 @@ struct SubscriptionsView: View {
                 // Filtered & paginated section
                 Section {
                     if vm.pagedSubscriptions.isEmpty {
-                        Text(String(localized: "subscriptions.filter.empty"))
+                        Text(LanguageBundle.string("subscriptions.filter.empty"))
                             .font(.subheadline).foregroundColor(.secondary)
                             .frame(maxWidth: .infinity, alignment: .center)
                             .padding(.vertical, 12)
@@ -207,7 +207,7 @@ struct SubscriptionsView: View {
             )) {
                 ForEach(SubscriptionPageSize.allCases) { size in
                     Text(size == .unlimited
-                         ? String(localized: "subscriptions.pageSize.all")
+                         ? LanguageBundle.string("subscriptions.pageSize.all")
                          : "\(size.rawValue)")
                         .tag(size)
                 }
@@ -230,7 +230,7 @@ struct SubscriptionsView: View {
             Spacer()
 
             Text(String(
-                format: String(localized: "subscriptions.pagination.format"),
+                format: LanguageBundle.string("subscriptions.pagination.format"),
                 vm.currentPage, vm.totalPages
             ))
             .font(.footnote).monospacedDigit().foregroundColor(.secondary)
@@ -251,10 +251,10 @@ struct SubscriptionsView: View {
 
     private func filterLabel(for filter: SubscriptionStatusFilter) -> String {
         switch filter {
-        case .all:       return String(localized: "subscriptions.filter.all")
-        case .active:    return String(localized: "subscriptions.filter.active")
-        case .cancelled: return String(localized: "subscriptions.filter.cancelled")
-        case .paid:      return String(localized: "subscriptions.filter.paid")
+        case .all:       return LanguageBundle.string("subscriptions.filter.all")
+        case .active:    return LanguageBundle.string("subscriptions.filter.active")
+        case .cancelled: return LanguageBundle.string("subscriptions.filter.cancelled")
+        case .paid:      return LanguageBundle.string("subscriptions.filter.paid")
         }
     }
 
@@ -333,7 +333,7 @@ private struct SubscriptionRow: View {
                         Text(cat).font(.caption).foregroundColor(.secondary)
                         Text("·").font(.caption).foregroundColor(.secondary)
                     }
-                    Text(String(localized: billingCycleKey))
+                    Text(LanguageBundle.string(billingCycleKey))
                         .font(.caption).foregroundColor(.secondary)
                     Spacer()
                     Text(statusLabel)
@@ -352,8 +352,8 @@ private struct SubscriptionRow: View {
                                 .font(.caption2)
                                 .foregroundColor(isPurchased ? .secondary : .orange)
                             Text(isPurchased
-                                 ? String(localized: "subscriptions.oneTime.purchased")
-                                 : String(localized: "subscriptions.oneTime.scheduledFor")
+                                 ? LanguageBundle.string("subscriptions.oneTime.purchased")
+                                 : LanguageBundle.string("subscriptions.oneTime.scheduledFor")
                                      + " " + subscription.startDate.formatted(Date.FormatStyle(date: .abbreviated, time: .omitted).locale(locale)))
                                 .font(.caption)
                                 .foregroundColor(isPurchased ? .secondary : .orange)
@@ -363,12 +363,12 @@ private struct SubscriptionRow: View {
                         HStack(spacing: 4) {
                             Image(systemName: "calendar.badge.clock")
                                 .font(.caption2).foregroundColor(.orange)
-                            Text(String(localized: "subscriptions.nextPayment")
+                            Text(LanguageBundle.string("subscriptions.nextPayment")
                                  + ": " + subscription.nextPaymentDate.formatted(Date.FormatStyle(date: .abbreviated, time: .omitted).locale(locale)))
                                 .font(.caption).foregroundColor(.orange)
                             if subscription.billingCycle != .monthly {
                                 Spacer()
-                                Text(String(format: String(localized: "subscriptions.monthly.cost.format"),
+                                Text(String(format: LanguageBundle.string("subscriptions.monthly.cost.format"),
                                             monthlyCost, subscription.currency.rawValue))
                                     .font(.caption2).foregroundColor(.secondary)
                             }
@@ -379,7 +379,7 @@ private struct SubscriptionRow: View {
                     HStack(spacing: 4) {
                         Image(systemName: "xmark.circle")
                             .font(.caption2).foregroundColor(.secondary)
-                        Text(String(format: String(localized: "subscriptions.cancelled.on.format"),
+                        Text(String(format: LanguageBundle.string("subscriptions.cancelled.on.format"),
                                     end.formatted(Date.FormatStyle(date: .abbreviated, time: .omitted).locale(locale))))
                             .font(.caption).foregroundColor(.secondary)
                     }
@@ -390,7 +390,7 @@ private struct SubscriptionRow: View {
         .opacity(subscription.isActive ? 1.0 : 0.6)
     }
 
-    private var billingCycleKey: String.LocalizationValue {
+    private var billingCycleKey: String {
         switch subscription.billingCycle {
         case .weekly:    return "subscriptions.cycle.weekly"
         case .monthly:   return "subscriptions.cycle.monthly"
@@ -401,9 +401,9 @@ private struct SubscriptionRow: View {
     }
 
     private var statusLabel: String {
-        if !subscription.isActive { return String(localized: "subscriptions.status.cancelled") }
-        if isOneTime && isPurchased { return String(localized: "subscriptions.status.paid") }
-        return String(localized: "subscriptions.status.active")
+        if !subscription.isActive { return LanguageBundle.string("subscriptions.status.cancelled") }
+        if isOneTime && isPurchased { return LanguageBundle.string("subscriptions.status.paid") }
+        return LanguageBundle.string("subscriptions.status.active")
     }
 
     private var statusColor: Color {
@@ -551,25 +551,25 @@ struct SubscriptionFormSheet: View {
                         .padding(.vertical, 4)
                     }
                 } header: {
-                    Text(String(localized: "subscriptions.field.icon"))
+                    Text(LanguageBundle.string("subscriptions.field.icon"))
                 }
 
                 Section {
-                    TextField(String(localized: "subscriptions.field.name"), text: $title)
-                    TextField(String(localized: "subscriptions.field.category"), text: $category)
+                    TextField(LanguageBundle.string("subscriptions.field.name"), text: $title)
+                    TextField(LanguageBundle.string("subscriptions.field.category"), text: $category)
                 }
 
                 Section {
-                    TextField(String(localized: "subscriptions.field.amount"), text: $amountText)
+                    TextField(LanguageBundle.string("subscriptions.field.amount"), text: $amountText)
                         .keyboardType(.decimalPad)
-                    Picker(String(localized: "subscriptions.field.currency"), selection: $currency) {
+                    Picker(LanguageBundle.string("subscriptions.field.currency"), selection: $currency) {
                         ForEach(DepositCurrency.allCases.filter { selectedCurrencies.contains($0.rawValue) }) { c in
                             Text(c.rawValue).tag(c)
                         }
                     }
-                    Picker(String(localized: "subscriptions.field.billingCycle"), selection: $billingCycle) {
+                    Picker(LanguageBundle.string("subscriptions.field.billingCycle"), selection: $billingCycle) {
                         ForEach(SubscriptionBillingCycle.allCases) { cycle in
-                            Text(String(localized: billingCycleLabel(cycle))).tag(cycle)
+                            Text(LanguageBundle.string(billingCycleLabel(cycle))).tag(cycle)
                         }
                     }
                 }
@@ -578,8 +578,8 @@ struct SubscriptionFormSheet: View {
                 Section {
                     DatePicker(
                         billingCycle.isRecurring
-                            ? String(localized: "subscriptions.field.startDate")
-                            : String(localized: "subscriptions.field.purchaseDate"),
+                            ? LanguageBundle.string("subscriptions.field.startDate")
+                            : LanguageBundle.string("subscriptions.field.purchaseDate"),
                         selection: $startDate,
                         displayedComponents: .date
                     )
@@ -587,10 +587,10 @@ struct SubscriptionFormSheet: View {
 
                 if case .edit = mode {
                     Section {
-                        Toggle(String(localized: "subscriptions.field.isActive"), isOn: $isActive)
+                        Toggle(LanguageBundle.string("subscriptions.field.isActive"), isOn: $isActive)
                         if !isActive {
                             DatePicker(
-                                String(localized: "subscriptions.field.endDate"),
+                                LanguageBundle.string("subscriptions.field.endDate"),
                                 selection: $endDate,
                                 displayedComponents: .date
                             )
@@ -608,10 +608,10 @@ struct SubscriptionFormSheet: View {
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 ToolbarItem(placement: .cancellationAction) {
-                    Button(String(localized: "common.cancel")) { dismiss() }
+                    Button(LanguageBundle.string("common.cancel")) { dismiss() }
                 }
                 ToolbarItem(placement: .confirmationAction) {
-                    Button(String(localized: "common.save")) { save() }
+                    Button(LanguageBundle.string("common.save")) { save() }
                 }
             }
         }
@@ -619,12 +619,12 @@ struct SubscriptionFormSheet: View {
 
     private var formTitle: String {
         switch mode {
-        case .add:  return String(localized: "subscriptions.add.title")
-        case .edit: return String(localized: "subscriptions.edit.title")
+        case .add:  return LanguageBundle.string("subscriptions.add.title")
+        case .edit: return LanguageBundle.string("subscriptions.edit.title")
         }
     }
 
-    private func billingCycleLabel(_ cycle: SubscriptionBillingCycle) -> String.LocalizationValue {
+    private func billingCycleLabel(_ cycle: SubscriptionBillingCycle) -> String {
         switch cycle {
         case .weekly:    return "subscriptions.cycle.weekly"
         case .monthly:   return "subscriptions.cycle.monthly"
@@ -636,7 +636,7 @@ struct SubscriptionFormSheet: View {
 
     private func save() {
         guard !title.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty else {
-            validationError = String(localized: "subscriptions.error.emptyTitle")
+            validationError = LanguageBundle.string("subscriptions.error.emptyTitle")
             return
         }
         let amount = Double(amountText.replacingOccurrences(of: ",", with: ".")) ?? 0

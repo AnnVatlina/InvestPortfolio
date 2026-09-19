@@ -170,7 +170,7 @@ final class SubscriptionsViewModel: ObservableObject {
         iconName: String?
     ) async {
         guard !title.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty else {
-            operationError = String(localized: "subscriptions.error.emptyTitle")
+            operationError = LanguageBundle.string("subscriptions.error.emptyTitle")
             return
         }
         do {
@@ -300,8 +300,8 @@ final class SubscriptionsViewModel: ObservableObject {
                 )
             }
 
-        let notifTitle = String(localized: "subscriptions.notification.title")
-        let bodyFormat = String(localized: "subscriptions.notification.body.format")
+        let notifTitle = LanguageBundle.string("subscriptions.notification.title")
+        let bodyFormat = LanguageBundle.string("subscriptions.notification.body.format")
         let center = UNUserNotificationCenter.current()
         center.requestAuthorization(options: [.alert, .sound]) { granted, _ in
             guard granted else { return }
@@ -331,8 +331,8 @@ final class SubscriptionsViewModel: ObservableObject {
             currency: subscription.currency.rawValue,
             dates: dates
         )
-        let notifTitle = String(localized: "subscriptions.notification.title")
-        let bodyFormat = String(localized: "subscriptions.notification.body.format")
+        let notifTitle = LanguageBundle.string("subscriptions.notification.title")
+        let bodyFormat = LanguageBundle.string("subscriptions.notification.body.format")
         let center = UNUserNotificationCenter.current()
         center.requestAuthorization(options: [.alert, .sound]) { granted, _ in
             guard granted else { return }

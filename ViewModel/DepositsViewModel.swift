@@ -51,7 +51,7 @@ final class DepositsViewModel: ObservableObject {
         annualInterestRate: Double
     ) async {
         guard !title.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty else {
-            errorMessage = String(localized: "deposits.error.emptyTitle")
+            errorMessage = LanguageBundle.string("deposits.error.emptyTitle")
             return
         }
 
@@ -104,7 +104,7 @@ final class DepositsViewModel: ObservableObject {
         annualInterestRate: Double
     ) async {
         guard !title.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty else {
-            errorMessage = String(localized: "deposits.error.emptyTitle")
+            errorMessage = LanguageBundle.string("deposits.error.emptyTitle")
             return
         }
 
@@ -152,8 +152,8 @@ final class DepositsViewModel: ObservableObject {
         center.requestAuthorization(options: [.alert, .sound]) { granted, _ in
             guard granted else { return }
             let content = UNMutableNotificationContent()
-            content.title = String(localized: "deposits.notification.title")
-            content.body = String(format: String(localized: "deposits.notification.body.format"), title)
+            content.title = LanguageBundle.string("deposits.notification.title")
+            content.body = String(format: LanguageBundle.string("deposits.notification.body.format"), title)
             content.sound = .default
 
             let components = Calendar.current.dateComponents([.year, .month, .day, .hour, .minute], from: fireDate)

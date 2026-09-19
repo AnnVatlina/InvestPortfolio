@@ -7,14 +7,22 @@
 //  How it works:
 //  1. `object_setClass(Bundle.main, LanguageBundle.self)` replaces the class of the
 //     Bundle.main singleton so every subsequent `localizedString(forKey:value:table:)` call
-//     (including `String(localized:)`, SwiftUI `Text("key")`, format strings, etc.) is
-//     intercepted here.
+//     is intercepted here.
 //  2. When the user picks a language, `LanguageBundle.set(languageCode:)` swaps the
 //     override bundle to the matching .lproj, and the next SwiftUI render cycle picks up
 //     the new strings automatically.
 //
 //  Call `LanguageBundle.activate()` once in `InvestPortfolioApp.init()` and
 //  `LanguageBundle.set(languageCode:)` whenever `App_LocaleIdentifier` changes.
+//
+//  IMPORTANT: `String(localized:)` does NOT go through this override. It resolves via
+//  Swift's newer LocalizedStringResource machinery, which reads resources directly rather
+//  than calling the overridden `localizedString(forKey:value:table:)` selector below — so it
+//  silently ignores the in-app language choice and always follows the device's system
+//  language. Use `LanguageBundle.string(_:)` instead everywhere a `String` (not a SwiftUI
+//  `Text`/`LocalizedStringKey`) is needed. Plain `Text("key")` and anything else that takes
+//  a `LocalizedStringKey` literal (`.navigationTitle`, `Label`, etc.) is unaffected — that
+//  path dispatches through the override correctly on its own.
 //
 
 import Foundation
@@ -41,6 +49,13 @@ final class LanguageBundle: Bundle, @unchecked Sendable {
         } else {
             overrideBundle = nil
         }
+    }
+
+    /// Resolves a key against the in-app language choice. Use this instead of
+    /// `String(localized:)` for any localized `String` value — see the note at the top of
+    /// this file for why `String(localized:)` doesn't work here.
+    static func string(_ key: String) -> String {
+        Bundle.main.localizedString(forKey: key, value: nil, table: nil)
     }
 
     // MARK: - Override

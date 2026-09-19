@@ -208,7 +208,7 @@ struct DataSettingsView: View {
             Button("common.ok") { importSummary = nil }
         } message: {
             if let s = importSummary {
-                Text(String(format: String(localized: "settings.import.result.format"), s.imported, s.skipped, s.failed))
+                Text(String(format: LanguageBundle.string("settings.import.result.format"), s.imported, s.skipped, s.failed))
             }
         }
         .fileImporter(
@@ -246,12 +246,12 @@ struct DataSettingsView: View {
                 do {
                     let csv = try await build()
                     guard let url = CSVExporter.writeToTempFile(csv, named: filename) else {
-                        exportError = String(localized: "settings.export.error")
+                        exportError = LanguageBundle.string("settings.export.error")
                         return
                     }
                     exportItem = ExportItem(url: url)
                 } catch {
-                    exportError = String(format: String(localized: "common.unknownError.format"), error.localizedDescription)
+                    exportError = String(format: LanguageBundle.string("common.unknownError.format"), error.localizedDescription)
                 }
             }
         } label: {

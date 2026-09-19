@@ -74,29 +74,29 @@ struct DepositsView: View {
                 }
             }
         }
-        .alert(String(localized: "deposits.delete.confirm.title"), isPresented: Binding(
+        .alert(LanguageBundle.string("deposits.delete.confirm.title"), isPresented: Binding(
             get: { depositToDelete != nil },
             set: { if !$0 { depositToDelete = nil } }
         )) {
-            Button(String(localized: "deposits.delete.action"), role: .destructive) {
+            Button(LanguageBundle.string("deposits.delete.action"), role: .destructive) {
                 if let deposit = depositToDelete {
                     Task { await vm.deleteDeposit(deposit) }
                 }
                 depositToDelete = nil
             }
-            Button(String(localized: "common.cancel"), role: .cancel) {
+            Button(LanguageBundle.string("common.cancel"), role: .cancel) {
                 depositToDelete = nil
             }
         } message: {
-            Text(String(localized: "deposits.delete.confirm.message"))
+            Text(LanguageBundle.string("deposits.delete.confirm.message"))
         }
         .task { await vm.load() }
         .refreshable { await vm.load() }
-        .alert(String(localized: "common.error"), isPresented: Binding(
+        .alert(LanguageBundle.string("common.error"), isPresented: Binding(
             get: { vm.operationError != nil },
             set: { if !$0 { vm.operationError = nil } }
         )) {
-            Button(String(localized: "common.ok"), role: .cancel) { vm.operationError = nil }
+            Button(LanguageBundle.string("common.ok"), role: .cancel) { vm.operationError = nil }
         } message: {
             Text(vm.operationError ?? "")
         }
@@ -125,7 +125,7 @@ struct DepositsView: View {
             Image(systemName: "banknote")
                 .font(.largeTitle)
                 .foregroundColor(.secondary)
-            Text(String(localized: "deposits.empty"))
+            Text(LanguageBundle.string("deposits.empty"))
                 .foregroundColor(.secondary)
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity)
@@ -133,14 +133,14 @@ struct DepositsView: View {
 
     private func errorView(_ error: String) -> some View {
         VStack(spacing: 8) {
-            Text(String(localized: "common.error"))
+            Text(LanguageBundle.string("common.error"))
                 .font(.headline)
             Text(error)
                 .font(.caption)
                 .foregroundColor(.secondary)
                 .multilineTextAlignment(.center)
                 .padding(.horizontal)
-            Button(String(localized: "common.retry")) {
+            Button(LanguageBundle.string("common.retry")) {
                 Task { await vm.load() }
             }
             .buttonStyle(.bordered)
@@ -182,8 +182,8 @@ private struct DepositRow: View {
                 VStack(alignment: .trailing, spacing: 4) {
                     // Бейдж статуса
                     Text(isClosed
-                         ? String(localized: "deposits.status.closed")
-                         : String(localized: "deposits.status.active"))
+                         ? LanguageBundle.string("deposits.status.closed")
+                         : LanguageBundle.string("deposits.status.active"))
                         .font(.caption2)
                         .fontWeight(.medium)
                         .padding(.horizontal, 7)
@@ -191,7 +191,7 @@ private struct DepositRow: View {
                         .background(isClosed ? Color.secondary.opacity(0.15) : Color.brand.opacity(0.15))
                         .foregroundColor(isClosed ? .secondary : .brand)
                         .clipShape(Capsule())
-                    Text(String(format: String(localized: "deposits.rate.format"), deposit.annualInterestRate))
+                    Text(String(format: LanguageBundle.string("deposits.rate.format"), deposit.annualInterestRate))
                         .font(.caption)
                         .foregroundColor(.secondary)
                 }
@@ -230,7 +230,7 @@ private struct DepositRow: View {
             HStack(spacing: 16) {
                 // Для закрытых: "Заработано", для активных: "На сегодня"
                 Label {
-                    Text(String(format: String(localized: isClosed
+                    Text(String(format: LanguageBundle.string(isClosed
                                                ? "deposits.income.earned.format"
                                                : "deposits.income.today.format"),
                                 summary.incomeToDate, deposit.currency.rawValue))
@@ -244,7 +244,7 @@ private struct DepositRow: View {
 
                 if let forecast = summary.forecastIncomeToCloseDate {
                     Label {
-                        Text(String(format: String(localized: "deposits.income.forecast.format"),
+                        Text(String(format: LanguageBundle.string("deposits.income.forecast.format"),
                                     forecast, deposit.currency.rawValue))
                             .font(.subheadline)
                             .foregroundColor(.orange)
@@ -324,8 +324,8 @@ private struct DepositFormSheet: View {
 
     private var navigationTitle: String {
         switch mode {
-        case .add: return String(localized: "deposits.add.title")
-        case .edit: return String(localized: "deposits.edit.title")
+        case .add: return LanguageBundle.string("deposits.add.title")
+        case .edit: return LanguageBundle.string("deposits.edit.title")
         }
     }
 
@@ -333,14 +333,14 @@ private struct DepositFormSheet: View {
         NavigationStack {
             Form {
                 Section {
-                    TextField(String(localized: "deposits.field.name"), text: $title)
-                    TextField(String(localized: "deposits.field.bankName"), text: $bankName)
+                    TextField(LanguageBundle.string("deposits.field.name"), text: $title)
+                    TextField(LanguageBundle.string("deposits.field.bankName"), text: $bankName)
                 }
 
                 Section {
-                    TextField(String(localized: "deposits.field.amount"), text: $amountText)
+                    TextField(LanguageBundle.string("deposits.field.amount"), text: $amountText)
                         .keyboardType(.decimalPad)
-                    Picker(String(localized: "deposits.field.currency"), selection: $currency) {
+                    Picker(LanguageBundle.string("deposits.field.currency"), selection: $currency) {
                         ForEach(DepositCurrency.allCases.filter { selectedCurrencies.contains($0.rawValue) }) { curr in
                             Text(curr.rawValue).tag(curr)
                         }
@@ -348,18 +348,18 @@ private struct DepositFormSheet: View {
                 }
 
                 Section {
-                    DatePicker(String(localized: "deposits.field.openDate"), selection: $openDate, displayedComponents: .date)
-                    Toggle(String(localized: "deposits.field.hasCloseDate"), isOn: $hasCloseDate.animation())
+                    DatePicker(LanguageBundle.string("deposits.field.openDate"), selection: $openDate, displayedComponents: .date)
+                    Toggle(LanguageBundle.string("deposits.field.hasCloseDate"), isOn: $hasCloseDate.animation())
                     if hasCloseDate {
-                        DatePicker(String(localized: "deposits.field.closeDate"), selection: $closeDate, in: openDate..., displayedComponents: .date)
+                        DatePicker(LanguageBundle.string("deposits.field.closeDate"), selection: $closeDate, in: openDate..., displayedComponents: .date)
                     }
                 }
 
                 Section {
                     HStack {
-                        TextField(String(localized: "deposits.field.annualInterest"), text: $interestText)
+                        TextField(LanguageBundle.string("deposits.field.annualInterest"), text: $interestText)
                             .keyboardType(.decimalPad)
-                        Text(String(localized: "common.percentSign"))
+                        Text(LanguageBundle.string("common.percentSign"))
                             .foregroundColor(.secondary)
                     }
                 }
@@ -376,10 +376,10 @@ private struct DepositFormSheet: View {
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 ToolbarItem(placement: .cancellationAction) {
-                    Button(String(localized: "common.cancel")) { dismiss() }
+                    Button(LanguageBundle.string("common.cancel")) { dismiss() }
                 }
                 ToolbarItem(placement: .confirmationAction) {
-                    Button(String(localized: "common.save")) { save() }
+                    Button(LanguageBundle.string("common.save")) { save() }
                 }
             }
         }
@@ -387,7 +387,7 @@ private struct DepositFormSheet: View {
 
     private func save() {
         guard !title.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty else {
-            validationError = String(localized: "deposits.error.emptyTitle")
+            validationError = LanguageBundle.string("deposits.error.emptyTitle")
             return
         }
         let amount = Double(amountText.replacingOccurrences(of: ",", with: ".")) ?? 0
