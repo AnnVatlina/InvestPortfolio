@@ -102,9 +102,42 @@ struct SettingsView: View {
 
 struct CurrenciesSettingsView: View {
     @AppStorage("Settings_SelectedCurrencies") private var selectedCurrenciesRaw: String = DepositCurrency.defaultSelection
+    @AppStorage(CurrencySettings.baseCurrencyKey) private var baseCurrencyRaw: String = CurrencySettings.defaultBaseCurrency.rawValue
+    @AppStorage(CurrencySettings.ratesKey) private var ratesJSON: String = CurrencySettings.defaultRatesJSON
 
     private var selectedCurrencySet: Set<String> {
         Set(selectedCurrenciesRaw.split(separator: ",").map { String($0) })
+    }
+
+    private var baseCurrency: DepositCurrency {
+        DepositCurrency(rawValue: baseCurrencyRaw) ?? CurrencySettings.defaultBaseCurrency
+    }
+
+    /// Selected currencies that need a rate — everything except the base one.
+    private var currenciesNeedingRates: [DepositCurrency] {
+        DepositCurrency.allCases
+            .filter { selectedCurrencySet.contains($0.rawValue) && $0 != baseCurrency }
+    }
+
+    /// Text binding over the JSON rate map. An empty or unparseable field clears the rate,
+    /// which surfaces the currency as "missing" on the dashboard instead of zeroing the total.
+    private func rateBinding(for currency: DepositCurrency) -> Binding<String> {
+        Binding(
+            get: {
+                guard let rate = CurrencySettings.decodeRates(ratesJSON)[currency], rate > 0 else { return "" }
+                return String(format: "%g", rate)
+            },
+            set: { newValue in
+                var rates = CurrencySettings.decodeRates(ratesJSON)
+                let normalized = newValue.replacingOccurrences(of: ",", with: ".")
+                if let value = Double(normalized), value > 0 {
+                    rates[currency] = value
+                } else {
+                    rates.removeValue(forKey: currency)
+                }
+                ratesJSON = CurrencySettings.encodeRates(rates)
+            }
+        )
     }
 
     private func currencyBinding(for currency: DepositCurrency) -> Binding<Bool> {
@@ -137,6 +170,48 @@ struct CurrenciesSettingsView: View {
                 }
             } footer: {
                 Text("settings.currencies.footer")
+            }
+
+            Section {
+                Picker("settings.baseCurrency.title", selection: $baseCurrencyRaw) {
+                    ForEach(DepositCurrency.allCases) { currency in
+                        Text(currency.rawValue).tag(currency.rawValue)
+                    }
+                }
+            } header: {
+                Text("settings.baseCurrency.title")
+            } footer: {
+                Text("settings.baseCurrency.footer")
+            }
+
+            if !currenciesNeedingRates.isEmpty {
+                Section {
+                    ForEach(currenciesNeedingRates) { currency in
+                        HStack {
+                            Text(currency.rawValue)
+                            Spacer()
+                            TextField(
+                                String(localized: "settings.rates.placeholder"),
+                                text: rateBinding(for: currency)
+                            )
+                            // .decimalPad only offers the separator matching the device's
+                            // region, not the in-app language — so "." or "," can be missing
+                            // entirely. This keyboard has both; parsing already accepts either.
+                            .keyboardType(.numbersAndPunctuation)
+                            .multilineTextAlignment(.trailing)
+                            .frame(maxWidth: 120)
+                            Text(baseCurrency.rawValue)
+                                .foregroundStyle(.secondary)
+                        }
+                    }
+                } header: {
+                    Text("settings.rates.title")
+                } footer: {
+                    Text(String(
+                        format: String(localized: "settings.rates.footer.format"),
+                        baseCurrency.rawValue
+                    ))
+                }
             }
         }
         .listStyle(.insetGrouped)

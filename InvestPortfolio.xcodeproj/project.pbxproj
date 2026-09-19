@@ -34,6 +34,10 @@
 		95AD90862F8252A50064CD19 /* SubscriptionsViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 95AD90852F8252A50064CD19 /* SubscriptionsViewModel.swift */; };
 		95AD90882F8252CA0064CD19 /* SubscriptionsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 95AD90872F8252CA0064CD19 /* SubscriptionsView.swift */; };
 		95CCEE182FC9886E00694936 /* AnalyticsViewModelTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 95CCEE172FC9886E00694936 /* AnalyticsViewModelTests.swift */; };
+		95DA00082FD0000100000001 /* DashboardViewModelTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 95DA00072FD0000100000001 /* DashboardViewModelTests.swift */; };
+		95DA00062FD0000100000001 /* CurrencyConverterTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 95DA00052FD0000100000001 /* CurrencyConverterTests.swift */; };
+		95DA00042FD0000100000001 /* DashboardViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 95DA00032FD0000100000001 /* DashboardViewModel.swift */; };
+		95DA00022FD0000100000001 /* CurrencyConverter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 95DA00012FD0000100000001 /* CurrencyConverter.swift */; };
 		95D967FA2F04193400079C66 /* HomeTabView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 95D967F92F04193400079C66 /* HomeTabView.swift */; };
 		95D967FC2F04193500079C66 /* LandingCard.swift in Sources */ = {isa = PBXBuildFile; fileRef = 95D967FB2F04193500079C66 /* LandingCard.swift */; };
 		95D967FE2F04193500079C66 /* Color+TertiaryLabel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 95D967FD2F04193500079C66 /* Color+TertiaryLabel.swift */; };
@@ -92,6 +96,10 @@
 		95AD90852F8252A50064CD19 /* SubscriptionsViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SubscriptionsViewModel.swift; sourceTree = "<group>"; };
 		95AD90872F8252CA0064CD19 /* SubscriptionsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SubscriptionsView.swift; sourceTree = "<group>"; };
 		95CCEE172FC9886E00694936 /* AnalyticsViewModelTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AnalyticsViewModelTests.swift; sourceTree = "<group>"; };
+		95DA00072FD0000100000001 /* DashboardViewModelTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DashboardViewModelTests.swift; sourceTree = "<group>"; };
+		95DA00052FD0000100000001 /* CurrencyConverterTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CurrencyConverterTests.swift; sourceTree = "<group>"; };
+		95DA00032FD0000100000001 /* DashboardViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DashboardViewModel.swift; sourceTree = "<group>"; };
+		95DA00012FD0000100000001 /* CurrencyConverter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CurrencyConverter.swift; sourceTree = "<group>"; };
 		95D967F92F04193400079C66 /* HomeTabView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomeTabView.swift; sourceTree = "<group>"; };
 		95D967FB2F04193500079C66 /* LandingCard.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LandingCard.swift; sourceTree = "<group>"; };
 		95D967FD2F04193500079C66 /* Color+TertiaryLabel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Color+TertiaryLabel.swift"; sourceTree = "<group>"; };
@@ -139,6 +147,8 @@
 				B26A38B2C0B92497C74625F2 /* SubscriptionViewModelTests.swift */,
 				9523DDAA2FBB85F400E24324 /* DepositsViewModelTests.swift */,
 				95CCEE172FC9886E00694936 /* AnalyticsViewModelTests.swift */,
+				95DA00072FD0000100000001 /* DashboardViewModelTests.swift */,
+				95DA00052FD0000100000001 /* CurrencyConverterTests.swift */,
 			);
 			path = InvestPortfolioTests;
 			sourceTree = "<group>";
@@ -164,6 +174,7 @@
 				950800042F0406560041AD54 /* DepositsViewModel.swift */,
 				95AD90852F8252A50064CD19 /* SubscriptionsViewModel.swift */,
 				9539C4212F93FC9D003A105C /* AnalyticsViewModel.swift */,
+				95DA00032FD0000100000001 /* DashboardViewModel.swift */,
 			);
 			path = ViewModel;
 			sourceTree = "<group>";
@@ -187,6 +198,7 @@
 				95A86BD32F82BDF8009B94CF /* CSVExporter.swift */,
 				95E87C1E2F9493A600E238D5 /* CSVImporter.swift */,
 				95E87C202F94A27D00E238D5 /* SampleDataService.swift */,
+				95DA00012FD0000100000001 /* CurrencyConverter.swift */,
 			);
 			path = Service;
 			sourceTree = "<group>";
@@ -360,6 +372,7 @@
 				95D967FC2F04193500079C66 /* LandingCard.swift in Sources */,
 				95E87C212F94A27D00E238D5 /* SampleDataService.swift in Sources */,
 				9539C4222F93FC9D003A105C /* AnalyticsViewModel.swift in Sources */,
+				95DA00042FD0000100000001 /* DashboardViewModel.swift in Sources */,
 				95AD90842F8252960064CD19 /* SubscriptionsService.swift in Sources */,
 				950800112F0409A60041AD54 /* DepositsService.swift in Sources */,
 				95AD907E2F8252720064CD19 /* SubscriptionBillingCycle.swift in Sources */,
@@ -374,6 +387,7 @@
 				95A86BD42F82BDF8009B94CF /* CSVExporter.swift in Sources */,
 				1A283CB0A1273797A2EDF575 /* MainTabView.swift in Sources */,
 				95E87C1F2F9493A600E238D5 /* CSVImporter.swift in Sources */,
+				95DA00022FD0000100000001 /* CurrencyConverter.swift in Sources */,
 				9508000D2F0406770041AD54 /* DepositsRepository.swift in Sources */,
 				95D967FE2F04193500079C66 /* Color+TertiaryLabel.swift in Sources */,
 				95AD90862F8252A50064CD19 /* SubscriptionsViewModel.swift in Sources */,
@@ -387,6 +401,8 @@
 			files = (
 				42FE55B393A3181535CBC9F8 /* SubscriptionRepositoryTests.swift in Sources */,
 				95CCEE182FC9886E00694936 /* AnalyticsViewModelTests.swift in Sources */,
+				95DA00082FD0000100000001 /* DashboardViewModelTests.swift in Sources */,
+				95DA00062FD0000100000001 /* CurrencyConverterTests.swift in Sources */,
 				9523DDAB2FBB85F400E24324 /* DepositsViewModelTests.swift in Sources */,
 				518517179F516B8CCFD2E88F /* SubscriptionServiceTests.swift in Sources */,
 				EC6792D387AAEE27DD44A4FF /* SubscriptionViewModelTests.swift in Sources */,

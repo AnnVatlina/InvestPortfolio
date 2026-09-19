@@ -18,10 +18,10 @@ struct MainTabView: View {
             // 0: Главная
             NavigationStack {
                 HomeTabView(
+                    container: container,
                     openDeposits: { selectedIndex = 1 },
                     openSubscriptions: { selectedIndex = 2 },
-                    openAnalytics: { selectedIndex = 3 },
-                    openSettings: { selectedIndex = 4 }
+                    openAnalytics: { selectedIndex = 3 }
                 )
                 .navigationBarTitleDisplayMode(.inline)
                 .navigationTitle("home.tab.title")
@@ -51,17 +51,10 @@ struct MainTabView: View {
             .tabItem { Label("analytics.title", systemImage: "chart.bar.fill") }
             .tag(3)
 
-            // 4: Настройки
-            NavigationStack {
-                SettingsView()
-                    .navigationTitle("settings.title")
-            }
-            .tabItem { Label("settings.title", systemImage: "gearshape.fill") }
-            .tag(4)
-
         }
         .onAppear {
-            if !(0...4).contains(selectedIndex) { selectedIndex = 0 }
+            // Настройки переехали в тулбар дашборда — сохранённый индекс 4 больше невалиден
+            if !(0...3).contains(selectedIndex) { selectedIndex = 0 }
         }
 
     }
