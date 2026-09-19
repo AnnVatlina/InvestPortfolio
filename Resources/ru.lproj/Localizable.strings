@@ -1,14 +1,11 @@
 // Localizable.strings — Russian (ru.lproj)
 "app.name" = "Rentivo";
-"app.title" = "Rentivo: Personal Finance";
 "common.ok" = "ОК";
 "common.cancel" = "Отмена";
 "common.error" = "Ошибка";
 "common.retry" = "Повторить";
-"common.add" = "Добавить";
 "common.percentSign" = "%";
 "common.unknownError.format" = "Неизвестная ошибка: %@";
-"network.offline" = "Нет соединения";
 
 "settings.title" = "Настройки";
 "settings.language" = "Язык";
@@ -18,15 +15,7 @@
 "about.title" = "О приложении";
 "about.version" = "Версия 1.0";
 
-"home.summary.deposits" = "Вклады";
-"home.summary.monthly" = "Подписки / мес";
-"home.portfolio.title2" = "Мой портфель";
-"home.portfolio.title" = "Портфель";
-"home.portfolio.open" = "Перейти к портфелю";
-"home.portfolio.loginRequired" = "Требуется вход";
-
 "deposits.title" = "Вклады";
-"deposits.open" = "Просмотреть вклады";
 "deposits.add.title" = "Добавить вклад";
 "deposits.field.name" = "Название";
 "deposits.field.amount" = "Сумма";
@@ -38,8 +27,6 @@
 "deposits.loading" = "Загрузка вкладов...";
 "deposits.empty" = "Пока нет вкладов";
 "deposits.rate.format" = "Ставка: %.2f%%";
-"deposits.opened.format" = "Открыт: %@";
-"deposits.closed.format" = "Закрытие: %@";
 "deposits.income.today.format" = "Доход на сегодня: %.2f %@";
 "deposits.income.forecast.format" = "Прогноз к закрытию: %.2f %@";
 "deposits.income.earned.format" = "Заработано: %.2f %@";
@@ -55,46 +42,12 @@
 "deposits.notification.body.format" = "Вклад «%@» закрывается через 7 дней.";
 "common.save" = "Сохранить";
 
-"report.mode.byBank" = "По банку";
-"report.mode.byCurrency" = "По валюте";
-"report.mode.byIncome" = "По доходу";
-"report.noBank" = "Без банка";
-"report.center.banks" = "банков";
-"report.center.currencies" = "валют";
-"report.center.deposits" = "вкладов";
-"report.card.deposits" = "вкл.";
-"report.card.today" = "сегодня";
-"report.card.annual" = "в год";
-"report.empty" = "Нет данных для отчёта";
-"report.monthly.title" = "Доход по месяцам";
-"report.monthly.empty" = "Нет данных за текущий год";
-
-"portfolio.loading" = "Загрузка портфеля...";
-"portfolio.empty" = "Портфель пуст";
-"portfolio.quantity.format" = "Кол-во: %.2f";
-"portfolio.profit.format" = "P/L: %.2f";
-
-"cash.loading" = "Загрузка операций...";
-"cash.operations.empty" = "Нет операций";
-"cash.load.error.format" = "Ошибка загрузки операций: %@";
-
 "home.tab.title" = "Главная";
-"home.portfolio.title2" = "Мой портфель";
 
 "settings.currencies.title" = "Валюты";
-"settings.currencies.description" = "Выберите валюты, доступные при добавлении вклада";
-
-"currency.USD" = "USD";
-"currency.EUR" = "EUR";
-"currency.GBP" = "GBP";
-"currency.RUB" = "RUB";
-"currency.CNY" = "CNY";
-"currency.JPY" = "JPY";
-"currency.CHF" = "CHF";
 
 // MARK: - Подписки
 "subscriptions.title" = "Подписки";
-"subscriptions.open" = "Управление подписками";
 "subscriptions.loading" = "Загрузка подписок...";
 "subscriptions.empty" = "Подписок пока нет";
 "subscriptions.add.title" = "Добавить подписку";
@@ -115,7 +68,6 @@
 "subscriptions.nextPayment" = "Следующий платёж";
 "subscriptions.section.upcoming" = "Ближайшие (7 дней)";
 "subscriptions.section.summary" = "Итого в месяц";
-"subscriptions.section.all" = "Все подписки";
 "subscriptions.summary.monthly" = "В месяц";
 "subscriptions.field.icon" = "Иконка";
 "subscriptions.field.name" = "Название";
@@ -125,20 +77,12 @@
 "subscriptions.field.billingCycle" = "Период оплаты";
 "subscriptions.field.startDate" = "Дата начала";
 "subscriptions.field.isActive" = "Активна";
-"subscriptions.report.upcoming" = "Ближайшие платежи (30 дней)";
-"subscriptions.report.annual" = "Годовые расходы";
-"subscriptions.report.total" = "Итого";
-"subscriptions.report.card.count" = "подп.";
-"subscriptions.report.card.monthly" = "в месяц";
-"subscriptions.report.card.annual" = "в год";
 
 "subscriptions.cycle.oneTime" = "Единоразово";
 "subscriptions.status.paid" = "Оплачено";
 "subscriptions.oneTime.purchased" = "Куплено";
 "subscriptions.oneTime.scheduledFor" = "Запланировано на";
 "subscriptions.field.purchaseDate" = "Дата покупки";
-"subscriptions.report.chart.title" = "Платежи по месяцам";
-"subscriptions.report.chart.empty" = "Нет данных о платежах за этот год";
 "subscriptions.field.endDate" = "Дата окончания";
 "subscriptions.cancelled.on.format" = "Отменено %@";
 
@@ -169,7 +113,6 @@
 
 // MARK: - Аналитика
 "analytics.title" = "Аналитика";
-"analytics.open" = "Посмотреть анализ";
 "analytics.loading" = "Загрузка данных...";
 "analytics.empty" = "Добавьте вклады или подписки для анализа";
 "analytics.income" = "Доходы";
@@ -195,24 +138,9 @@
 "settings.export.title" = "Экспорт данных";
 "settings.export.deposits" = "Экспорт вкладов";
 "settings.export.subscriptions" = "Экспорт подписок";
-"settings.export.cashOperations" = "Экспорт операций";
-"settings.export.portfolio" = "Экспорт портфеля";
 "settings.export.error" = "Не удалось создать файл экспорта";
 
 // MARK: - Auth (Rentivo)
-"auth.login.title" = "Вход";
-"auth.register.title" = "Создать аккаунт";
-"auth.field.email" = "Email";
-"auth.field.password" = "Пароль";
-"auth.field.confirmPassword" = "Подтвердите пароль";
-"auth.login.action" = "Войти";
-"auth.register.action" = "Создать аккаунт";
-"auth.switch.toRegister" = "Нет аккаунта? Зарегистрируйтесь";
-"auth.switch.toLogin" = "Уже есть аккаунт? Войти";
-"auth.error.emptyEmail" = "Введите email";
-"auth.error.emptyPassword" = "Введите пароль";
-"auth.error.passwordMismatch" = "Пароли не совпадают";
-"auth.logout.action" = "Выйти";
 
 // MARK: - Home
 "home.loading" = "Загрузка...";

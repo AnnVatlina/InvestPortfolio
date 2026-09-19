@@ -1,14 +1,11 @@
 // Localizable.strings — English (en.lproj)
 "app.name" = "Rentivo";
-"app.title" = "Rentivo: Personal Finance";
 "common.ok" = "OK";
 "common.cancel" = "Cancel";
 "common.error" = "Error";
 "common.retry" = "Retry";
-"common.add" = "Add";
 "common.percentSign" = "%";
 "common.unknownError.format" = "Unknown error: %@";
-"network.offline" = "No connection";
 
 "settings.title" = "Settings";
 "settings.language" = "Language";
@@ -18,15 +15,7 @@
 "about.title" = "About";
 "about.version" = "Version 1.0";
 
-"home.summary.deposits" = "Deposits";
-"home.summary.monthly" = "Subscriptions / mo";
-"home.portfolio.title2" = "My Portfolio";
-"home.portfolio.title" = "Portfolio";
-"home.portfolio.open" = "Open portfolio";
-"home.portfolio.loginRequired" = "Sign in required";
-
 "deposits.title" = "Deposits";
-"deposits.open" = "View deposits";
 "deposits.add.title" = "Add deposit";
 "deposits.field.name" = "Title";
 "deposits.field.amount" = "Amount";
@@ -38,8 +27,6 @@
 "deposits.loading" = "Loading deposits...";
 "deposits.empty" = "No deposits yet";
 "deposits.rate.format" = "Rate: %.2f%%";
-"deposits.opened.format" = "Opened: %@";
-"deposits.closed.format" = "Closed: %@";
 "deposits.income.today.format" = "Income to date: %.2f %@";
 "deposits.income.forecast.format" = "Forecast to close: %.2f %@";
 "deposits.income.earned.format" = "Earned: %.2f %@";
@@ -55,46 +42,12 @@
 "deposits.notification.body.format" = "Your deposit \"%@\" expires in 7 days.";
 "common.save" = "Save";
 
-"report.mode.byBank" = "By Bank";
-"report.mode.byCurrency" = "By Currency";
-"report.mode.byIncome" = "By Income";
-"report.noBank" = "No Bank";
-"report.center.banks" = "banks";
-"report.center.currencies" = "currencies";
-"report.center.deposits" = "deposits";
-"report.card.deposits" = "dep.";
-"report.card.today" = "today";
-"report.card.annual" = "per year";
-"report.empty" = "No data for report";
-"report.monthly.title" = "Monthly Income";
-"report.monthly.empty" = "No income data for current year";
-
-"portfolio.loading" = "Loading portfolio...";
-"portfolio.empty" = "Portfolio is empty";
-"portfolio.quantity.format" = "Qty: %.2f";
-"portfolio.profit.format" = "P/L: %.2f";
-
-"cash.loading" = "Loading operations...";
-"cash.operations.empty" = "No operations";
-"cash.load.error.format" = "Failed to load operations: %@";
-
 "home.tab.title" = "Home";
-"home.portfolio.title2" = "My Portfolio";
 
 "settings.currencies.title" = "Currencies";
-"settings.currencies.description" = "Select currencies shown when adding a deposit";
-
-"currency.USD" = "USD";
-"currency.EUR" = "EUR";
-"currency.GBP" = "GBP";
-"currency.RUB" = "RUB";
-"currency.CNY" = "CNY";
-"currency.JPY" = "JPY";
-"currency.CHF" = "CHF";
 
 // MARK: - Subscriptions
 "subscriptions.title" = "Subscriptions";
-"subscriptions.open" = "Manage subscriptions";
 "subscriptions.loading" = "Loading subscriptions...";
 "subscriptions.empty" = "No subscriptions yet";
 "subscriptions.add.title" = "Add Subscription";
@@ -115,7 +68,6 @@
 "subscriptions.nextPayment" = "Next payment";
 "subscriptions.section.upcoming" = "Upcoming (7 days)";
 "subscriptions.section.summary" = "Monthly total";
-"subscriptions.section.all" = "All subscriptions";
 "subscriptions.summary.monthly" = "Per month";
 "subscriptions.field.icon" = "Icon";
 "subscriptions.field.name" = "Name";
@@ -125,20 +77,12 @@
 "subscriptions.field.billingCycle" = "Billing cycle";
 "subscriptions.field.startDate" = "Start date";
 "subscriptions.field.isActive" = "Active";
-"subscriptions.report.upcoming" = "Upcoming payments (30 days)";
-"subscriptions.report.annual" = "Annual breakdown";
-"subscriptions.report.total" = "Total";
-"subscriptions.report.card.count" = "subs";
-"subscriptions.report.card.monthly" = "per month";
-"subscriptions.report.card.annual" = "per year";
 
 "subscriptions.cycle.oneTime" = "One-time";
 "subscriptions.status.paid" = "Paid";
 "subscriptions.oneTime.purchased" = "Purchased";
 "subscriptions.oneTime.scheduledFor" = "Scheduled for";
 "subscriptions.field.purchaseDate" = "Purchase date";
-"subscriptions.report.chart.title" = "Monthly payments";
-"subscriptions.report.chart.empty" = "No payment data for this year";
 "subscriptions.field.endDate" = "End date";
 "subscriptions.cancelled.on.format" = "Cancelled on %@";
 
@@ -169,7 +113,6 @@
 
 // MARK: - Analytics
 "analytics.title" = "Analytics";
-"analytics.open" = "View analysis";
 "analytics.loading" = "Loading data...";
 "analytics.empty" = "Add deposits or subscriptions to see analysis";
 "analytics.income" = "Income";
@@ -195,24 +138,9 @@
 "settings.export.title" = "Export Data";
 "settings.export.deposits" = "Export Deposits";
 "settings.export.subscriptions" = "Export Subscriptions";
-"settings.export.cashOperations" = "Export Cash Operations";
-"settings.export.portfolio" = "Export Portfolio";
 "settings.export.error" = "Failed to create export file";
 
 // MARK: - Auth (Rentivo)
-"auth.login.title" = "Sign In";
-"auth.register.title" = "Create Account";
-"auth.field.email" = "Email";
-"auth.field.password" = "Password";
-"auth.field.confirmPassword" = "Confirm Password";
-"auth.login.action" = "Sign In";
-"auth.register.action" = "Create Account";
-"auth.switch.toRegister" = "Don't have an account? Register";
-"auth.switch.toLogin" = "Already have an account? Sign In";
-"auth.error.emptyEmail" = "Please enter your email";
-"auth.error.emptyPassword" = "Please enter your password";
-"auth.error.passwordMismatch" = "Passwords do not match";
-"auth.logout.action" = "Sign Out";
 
 // MARK: - Home
 "home.loading" = "Loading...";

@@ -1,11 +1,9 @@
 // Localizable.strings — English (en.lproj)
 "app.name" = "Rentivo";
-"app.title" = "Rentivo: Personal Finance";
 "common.ok" = "OK";
 "common.cancel" = "Cancel";
 "common.error" = "Error";
 "common.retry" = "Retry";
-"common.add" = "Add";
 "common.percentSign" = "%";
 "common.unknownError.format" = "Unknown error: %@";
 
@@ -14,13 +12,7 @@
 "about.title" = "About";
 "about.version" = "Version 1.0";
 
-"home.portfolio.title2" = "My Portfolio";
-"home.portfolio.title" = "Portfolio";
-"home.portfolio.open" = "Open portfolio";
-"home.portfolio.loginRequired" = "Sign in required";
-
 "deposits.title" = "Deposits";
-"deposits.open" = "View deposits";
 "deposits.add.title" = "Add deposit";
 "deposits.field.name" = "Title";
 "deposits.field.amount" = "Amount";
@@ -32,8 +24,6 @@
 "deposits.loading" = "Loading deposits...";
 "deposits.empty" = "No deposits yet";
 "deposits.rate.format" = "Rate: %.2f%%";
-"deposits.opened.format" = "Opened: %@";
-"deposits.closed.format" = "Closed: %@";
 "deposits.income.today.format" = "Income to date: %.2f %@";
 "deposits.income.forecast.format" = "Forecast to close: %.2f %@";
 "deposits.income.earned.format" = "Earned: %.2f %@";
@@ -49,45 +39,14 @@
 "deposits.notification.body.format" = "Your deposit \"%@\" expires in 7 days.";
 "common.save" = "Save";
 
-"report.mode.byBank" = "By Bank";
-"report.mode.byCurrency" = "By Currency";
-"report.mode.byIncome" = "By Income";
-"report.noBank" = "No Bank";
-"report.center.banks" = "banks";
-"report.center.currencies" = "currencies";
-"report.center.deposits" = "deposits";
-"report.card.deposits" = "dep.";
-"report.card.today" = "today";
-"report.card.annual" = "per year";
-"report.empty" = "No data for report";
-"report.monthly.title" = "Monthly Income";
-"report.monthly.empty" = "No income data for current year";
-
-"portfolio.loading" = "Loading portfolio...";
-"portfolio.empty" = "Portfolio is empty";
-"portfolio.quantity.format" = "Qty: %.2f";
-"portfolio.profit.format" = "P/L: %.2f";
-
-"cash.loading" = "Loading operations...";
-"cash.operations.empty" = "No operations";
-"cash.load.error.format" = "Failed to load operations: %@";
-
 "home.tab.title" = "Home";
 "settings.language" = "Language";
 "settings.currencies.title" = "Currencies";
-"settings.currencies.description" = "Select currencies shown when adding a deposit";
-
-"currency.USD" = "USD";
-"currency.EUR" = "EUR";
-"currency.GBP" = "GBP";
-"currency.RUB" = "RUB";
-"currency.CNY" = "CNY";
-"currency.JPY" = "JPY";
-"currency.CHF" = "CHF";
+"settings.currencies.footer" = "Selected currencies appear in deposits, subscriptions and analytics. At least one must remain active.";
+"settings.data.title" = "Data";
 
 // MARK: - Subscriptions
 "subscriptions.title" = "Subscriptions";
-"subscriptions.open" = "Manage subscriptions";
 "subscriptions.loading" = "Loading subscriptions...";
 "subscriptions.empty" = "No subscriptions yet";
 "subscriptions.add.title" = "Add Subscription";
@@ -98,8 +57,8 @@
 "subscriptions.error.emptyTitle" = "Please enter a title";
 "subscriptions.status.active" = "Active";
 "subscriptions.status.cancelled" = "Cancelled";
-"subscriptions.notification.title" = "Payment Tomorrow";
-"subscriptions.notification.body.format" = "\"%@\" — payment of %@ %@ is due tomorrow.";
+"subscriptions.notification.title" = "Subscription Payment Today";
+"subscriptions.notification.body.format" = "\"%@\" — %@ %@ will be charged today.";
 "subscriptions.cycle.weekly" = "Weekly";
 "subscriptions.cycle.monthly" = "Monthly";
 "subscriptions.cycle.quarterly" = "Quarterly";
@@ -108,7 +67,6 @@
 "subscriptions.nextPayment" = "Next payment";
 "subscriptions.section.upcoming" = "Upcoming (7 days)";
 "subscriptions.section.summary" = "Monthly total";
-"subscriptions.section.all" = "All subscriptions";
 "subscriptions.summary.monthly" = "Per month";
 "subscriptions.field.icon" = "Icon";
 "subscriptions.field.name" = "Name";
@@ -118,20 +76,12 @@
 "subscriptions.field.billingCycle" = "Billing cycle";
 "subscriptions.field.startDate" = "Start date";
 "subscriptions.field.isActive" = "Active";
-"subscriptions.report.upcoming" = "Upcoming payments (30 days)";
-"subscriptions.report.annual" = "Annual breakdown";
-"subscriptions.report.total" = "Total";
-"subscriptions.report.card.count" = "subs";
-"subscriptions.report.card.monthly" = "per month";
-"subscriptions.report.card.annual" = "per year";
 
 "subscriptions.cycle.oneTime" = "One-time";
 "subscriptions.status.paid" = "Paid";
 "subscriptions.oneTime.purchased" = "Purchased";
 "subscriptions.oneTime.scheduledFor" = "Scheduled for";
 "subscriptions.field.purchaseDate" = "Purchase date";
-"subscriptions.report.chart.title" = "Monthly payments";
-"subscriptions.report.chart.empty" = "No payment data for this year";
 "subscriptions.field.endDate" = "End date";
 "subscriptions.cancelled.on.format" = "Cancelled on %@";
 
@@ -162,7 +112,6 @@
 
 // MARK: - Analytics
 "analytics.title" = "Analytics";
-"analytics.open" = "View analysis";
 "analytics.loading" = "Loading data...";
 "analytics.empty" = "Add deposits or subscriptions to see analysis";
 "analytics.income" = "Income";
@@ -188,8 +137,6 @@
 "settings.export.title" = "Export Data";
 "settings.export.deposits" = "Export Deposits";
 "settings.export.subscriptions" = "Export Subscriptions";
-"settings.export.cashOperations" = "Export Cash Operations";
-"settings.export.portfolio" = "Export Portfolio";
 "settings.export.error" = "Failed to create export file";
 
 // MARK: - Home
