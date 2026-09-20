@@ -1,0 +1,11 @@
+// Localizable.strings — English (InvestPortfolioWidgets)
+"widget.subscriptions.title" = "Subscriptions";
+"widget.subscriptions.empty" = "No upcoming payments";
+"widget.subscriptions.displayName" = "Upcoming Payment";
+"widget.subscriptions.description" = "Shows the nearest upcoming subscription payment.";
+
+"widget.deposits.title" = "Deposits";
+"widget.deposits.empty" = "No open deposits";
+"widget.deposits.noEndDate" = "No end date";
+"widget.deposits.displayName" = "Deposit Closing";
+"widget.deposits.description" = "Shows the deposit that closes soonest.";

@@ -3,7 +3,7 @@
 	archiveVersion = 1;
 	classes = {
 	};
-	objectVersion = 56;
+	objectVersion = 70;
 	objects = {
 
 /* Begin PBXBuildFile section */
@@ -24,6 +24,17 @@
 		9539C4242F93FCB9003A105C /* AnalyticsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9539C4232F93FCB9003A105C /* AnalyticsView.swift */; };
 		953C6246305EFFDB00D5C07B /* HomeViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 953C6245305EFFDB00D5C07B /* HomeViewModel.swift */; };
 		953C6248305EFFF400D5C07B /* HomeViewModelTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 953C6247305EFFF400D5C07B /* HomeViewModelTests.swift */; };
+		953C624F305FA07600D5C07B /* WidgetKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 953C624E305FA07600D5C07B /* WidgetKit.framework */; };
+		953C6251305FA07600D5C07B /* SwiftUI.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 953C6250305FA07600D5C07B /* SwiftUI.framework */; };
+		953C625C305FA07700D5C07B /* InvestPortfolioWidgetsExtension.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = 953C624D305FA07600D5C07B /* InvestPortfolioWidgetsExtension.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
+		953C6265305FA13400D5C07B /* HomeQueries.swift in Sources */ = {isa = PBXBuildFile; fileRef = 953C6264305FA13400D5C07B /* HomeQueries.swift */; };
+		953C6266305FA31F00D5C07B /* AppSchema.swift in Sources */ = {isa = PBXBuildFile; fileRef = 95A86BCF2F82B8BD009B94CF /* AppSchema.swift */; };
+		953C6267305FA31F00D5C07B /* Deposit.swift in Sources */ = {isa = PBXBuildFile; fileRef = 950800082F0406650041AD54 /* Deposit.swift */; };
+		953C6268305FA31F00D5C07B /* SubscriptionBillingCycle.swift in Sources */ = {isa = PBXBuildFile; fileRef = 95AD907D2F8252720064CD19 /* SubscriptionBillingCycle.swift */; };
+		953C6269305FA31F00D5C07B /* HomeQueries.swift in Sources */ = {isa = PBXBuildFile; fileRef = 953C6264305FA13400D5C07B /* HomeQueries.swift */; };
+		953C626A305FA31F00D5C07B /* DepositCurrency.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9508000E2F04077E0041AD54 /* DepositCurrency.swift */; };
+		953C626B305FA31F00D5C07B /* Subscription.swift in Sources */ = {isa = PBXBuildFile; fileRef = 95AD907F2F82527B0064CD19 /* Subscription.swift */; };
+		953C627E305FA42500D5C07B /* Settings.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9557F9782F810AB10086715E /* Settings.swift */; };
 		9557F9792F810AB10086715E /* Settings.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9557F9782F810AB10086715E /* Settings.swift */; };
 		95892D362F95F07500A30CA9 /* Color+Brand.swift in Sources */ = {isa = PBXBuildFile; fileRef = 95892D352F95F07500A30CA9 /* Color+Brand.swift */; };
 		95A86BD02F82B8BD009B94CF /* AppSchema.swift in Sources */ = {isa = PBXBuildFile; fileRef = 95A86BCF2F82B8BD009B94CF /* AppSchema.swift */; };
@@ -59,7 +70,28 @@
 			remoteGlobalIDString = 76F201F3639A13B5439A0C3F;
 			remoteInfo = InvestPortfolio;
 		};
+		953C625A305FA07700D5C07B /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = EFA73E3C964F10E63EF43557 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 953C624C305FA07600D5C07B;
+			remoteInfo = InvestPortfolioWidgetsExtension;
+		};
 /* End PBXContainerItemProxy section */
+
+/* Begin PBXCopyFilesBuildPhase section */
+		953C6261305FA07700D5C07B /* Embed Foundation Extensions */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "";
+			dstSubfolderSpec = 13;
+			files = (
+				953C625C305FA07700D5C07B /* InvestPortfolioWidgetsExtension.appex in Embed Foundation Extensions */,
+			);
+			name = "Embed Foundation Extensions";
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
 		3D043D3718FB956DCC29034F /* SubscriptionRepositoryTests.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = SubscriptionRepositoryTests.swift; sourceTree = "<group>"; };
@@ -85,6 +117,12 @@
 		953C14A52F056EDD003998D2 /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/Localizable.strings; sourceTree = "<group>"; };
 		953C6245305EFFDB00D5C07B /* HomeViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomeViewModel.swift; sourceTree = "<group>"; };
 		953C6247305EFFF400D5C07B /* HomeViewModelTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomeViewModelTests.swift; sourceTree = "<group>"; };
+		953C624D305FA07600D5C07B /* InvestPortfolioWidgetsExtension.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = InvestPortfolioWidgetsExtension.appex; sourceTree = BUILT_PRODUCTS_DIR; };
+		953C624E305FA07600D5C07B /* WidgetKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = WidgetKit.framework; path = /System/Library/Frameworks/WidgetKit.framework; sourceTree = "<absolute>"; };
+		953C6250305FA07600D5C07B /* SwiftUI.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SwiftUI.framework; path = /System/Library/Frameworks/SwiftUI.framework; sourceTree = "<absolute>"; };
+		953C6262305FA09800D5C07B /* InvestPortfolio.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = InvestPortfolio.entitlements; sourceTree = "<group>"; };
+		953C6263305FA09900D5C07B /* InvestPortfolioWidgetsExtension.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = InvestPortfolioWidgetsExtension.entitlements; sourceTree = "<group>"; };
+		953C6264305FA13400D5C07B /* HomeQueries.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomeQueries.swift; sourceTree = "<group>"; };
 		9557F9782F810AB10086715E /* Settings.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Settings.swift; sourceTree = "<group>"; };
 		95892D352F95F07500A30CA9 /* Color+Brand.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Color+Brand.swift"; sourceTree = "<group>"; };
 		95A86BCF2F82B8BD009B94CF /* AppSchema.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppSchema.swift; sourceTree = "<group>"; };
@@ -110,11 +148,34 @@
 		FD3DA74885FAB544805FB0DE /* InvestPortfolioTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = InvestPortfolioTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
+/* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
+		953C625D305FA07700D5C07B /* PBXFileSystemSynchronizedBuildFileExceptionSet */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				Info.plist,
+			);
+			target = 953C624C305FA07600D5C07B /* InvestPortfolioWidgetsExtension */;
+		};
+/* End PBXFileSystemSynchronizedBuildFileExceptionSet section */
+
+/* Begin PBXFileSystemSynchronizedRootGroup section */
+		953C6252305FA07600D5C07B /* InvestPortfolioWidgets */ = {isa = PBXFileSystemSynchronizedRootGroup; exceptions = (953C625D305FA07700D5C07B /* PBXFileSystemSynchronizedBuildFileExceptionSet */, ); explicitFileTypes = {}; explicitFolders = (); path = InvestPortfolioWidgets; sourceTree = "<group>"; };
+/* End PBXFileSystemSynchronizedRootGroup section */
+
 /* Begin PBXFrameworksBuildPhase section */
 		744AD1B4389E289D237E65B2 /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		953C624A305FA07600D5C07B /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				953C6251305FA07600D5C07B /* SwiftUI.framework in Frameworks */,
+				953C624F305FA07600D5C07B /* WidgetKit.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -133,6 +194,8 @@
 			isa = PBXGroup;
 			children = (
 				A3ACFD84F36A64ABF8AEDAB1 /* iOS */,
+				953C624E305FA07600D5C07B /* WidgetKit.framework */,
+				953C6250305FA07600D5C07B /* SwiftUI.framework */,
 			);
 			name = Frameworks;
 			sourceTree = "<group>";
@@ -212,6 +275,7 @@
 				95AD907F2F82527B0064CD19 /* Subscription.swift */,
 				95AD90812F8252890064CD19 /* SubscriptionsRepository.swift */,
 				95A86BCF2F82B8BD009B94CF /* AppSchema.swift */,
+				953C6264305FA13400D5C07B /* HomeQueries.swift */,
 			);
 			path = Model;
 			sourceTree = "<group>";
@@ -221,6 +285,7 @@
 			children = (
 				51AB3E044295A2DF769A31B9 /* InvestPortfolio.app */,
 				FD3DA74885FAB544805FB0DE /* InvestPortfolioTests.xctest */,
+				953C624D305FA07600D5C07B /* InvestPortfolioWidgetsExtension.appex */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -228,6 +293,8 @@
 		E8A54F4948D5CE89D5072384 = {
 			isa = PBXGroup;
 			children = (
+				953C6263305FA09900D5C07B /* InvestPortfolioWidgetsExtension.entitlements */,
+				953C6262305FA09800D5C07B /* InvestPortfolio.entitlements */,
 				95151F8C2EFFC86800285671 /* Assets.xcassets */,
 				5E8A6769F38550C7E7261987 /* InvestPortfolioApp.swift */,
 				BC60E8CE818846C2907E2ED6 /* PrivacyInfo.xcprivacy */,
@@ -235,6 +302,7 @@
 				C60896E4F8DFA38C232D7907 /* Service */,
 				95D968032F041B8500079C66 /* ViewModel */,
 				FAFE7386D23E096595A28133 /* View */,
+				953C6252305FA07600D5C07B /* InvestPortfolioWidgets */,
 				E6624A5CBCC7422DE34E6EE4 /* Products */,
 				953C14A42F056E61003998D2 /* Resources */,
 				951109882F81614000EE2EEE /* App */,
@@ -287,15 +355,39 @@
 				6E030E50B3665BB4C2A92840 /* Sources */,
 				744AD1B4389E289D237E65B2 /* Frameworks */,
 				95F8B8132F06E0A6001CD71A /* Resources */,
+				953C6261305FA07700D5C07B /* Embed Foundation Extensions */,
 			);
 			buildRules = (
 			);
 			dependencies = (
+				953C625B305FA07700D5C07B /* PBXTargetDependency */,
 			);
 			name = InvestPortfolio;
 			productName = InvestPortfolio;
 			productReference = 51AB3E044295A2DF769A31B9 /* InvestPortfolio.app */;
 			productType = "com.apple.product-type.application";
+		};
+		953C624C305FA07600D5C07B /* InvestPortfolioWidgetsExtension */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 953C625E305FA07700D5C07B /* Build configuration list for PBXNativeTarget "InvestPortfolioWidgetsExtension" */;
+			buildPhases = (
+				953C6249305FA07600D5C07B /* Sources */,
+				953C624A305FA07600D5C07B /* Frameworks */,
+				953C624B305FA07600D5C07B /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			fileSystemSynchronizedGroups = (
+				953C6252305FA07600D5C07B /* InvestPortfolioWidgets */,
+			);
+			name = InvestPortfolioWidgetsExtension;
+			packageProductDependencies = (
+			);
+			productName = InvestPortfolioWidgetsExtension;
+			productReference = 953C624D305FA07600D5C07B /* InvestPortfolioWidgetsExtension.appex */;
+			productType = "com.apple.product-type.app-extension";
 		};
 /* End PBXNativeTarget section */
 
@@ -304,11 +396,14 @@
 			isa = PBXProject;
 			attributes = {
 				BuildIndependentTargetsInParallel = 1;
-				LastSwiftUpdateCheck = 1500;
+				LastSwiftUpdateCheck = 2700;
 				LastUpgradeCheck = 2650;
 				TargetAttributes = {
 					76F201F3639A13B5439A0C3F = {
 						CreatedOnToolsVersion = 15.0;
+					};
+					953C624C305FA07600D5C07B = {
+						CreatedOnToolsVersion = 27.0;
 					};
 				};
 			};
@@ -328,12 +423,20 @@
 			targets = (
 				76F201F3639A13B5439A0C3F /* InvestPortfolio */,
 				11E16C5A9770848BFAFFB028 /* InvestPortfolioTests */,
+				953C624C305FA07600D5C07B /* InvestPortfolioWidgetsExtension */,
 			);
 		};
 /* End PBXProject section */
 
 /* Begin PBXResourcesBuildPhase section */
 		7235C16F3FCE13074DA46C5F /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		953C624B305FA07600D5C07B /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -368,6 +471,7 @@
 				950800132F040B6C0041AD54 /* RootView.swift in Sources */,
 				95E87C212F94A27D00E238D5 /* SampleDataService.swift in Sources */,
 				9539C4222F93FC9D003A105C /* AnalyticsViewModel.swift in Sources */,
+				953C6265305FA13400D5C07B /* HomeQueries.swift in Sources */,
 				95AD90842F8252960064CD19 /* SubscriptionsService.swift in Sources */,
 				950800112F0409A60041AD54 /* DepositsService.swift in Sources */,
 				953C6246305EFFDB00D5C07B /* HomeViewModel.swift in Sources */,
@@ -405,9 +509,28 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		953C6249305FA07600D5C07B /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				953C6266305FA31F00D5C07B /* AppSchema.swift in Sources */,
+				953C6267305FA31F00D5C07B /* Deposit.swift in Sources */,
+				953C6268305FA31F00D5C07B /* SubscriptionBillingCycle.swift in Sources */,
+				953C6269305FA31F00D5C07B /* HomeQueries.swift in Sources */,
+				953C626A305FA31F00D5C07B /* DepositCurrency.swift in Sources */,
+				953C627E305FA42500D5C07B /* Settings.swift in Sources */,
+				953C626B305FA31F00D5C07B /* Subscription.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 /* End PBXSourcesBuildPhase section */
 
 /* Begin PBXTargetDependency section */
+		953C625B305FA07700D5C07B /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 953C624C305FA07600D5C07B /* InvestPortfolioWidgetsExtension */;
+			targetProxy = 953C625A305FA07700D5C07B /* PBXContainerItemProxy */;
+		};
 		AFAE64B4AC56E82B37EDA95B /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
 			name = InvestPortfolio;
@@ -536,11 +659,100 @@
 			};
 			name = Release;
 		};
+		953C625F305FA07700D5C07B /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				ASSETCATALOG_COMPILER_WIDGET_BACKGROUND_COLOR_NAME = WidgetBackground;
+				CODE_SIGN_ENTITLEMENTS = InvestPortfolioWidgetsExtension.entitlements;
+				CODE_SIGN_IDENTITY = "Apple Development";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = SVVTWN6V74;
+				ENABLE_APP_SANDBOX = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = InvestPortfolioWidgets/Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = InvestPortfolioWidgets;
+				INFOPLIST_KEY_NSHumanReadableCopyright = "";
+				IPHONEOS_DEPLOYMENT_TARGET = 27.0;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@executable_path/../../Frameworks",
+				);
+				"LD_RUNPATH_SEARCH_PATHS[sdk=macosx*]" = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+					"@executable_path/../../../../Frameworks",
+				);
+				MACOSX_DEPLOYMENT_TARGET = 27.0;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = io.rentivo.app.InvestPortfolioWidgets;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				REGISTER_APP_GROUPS = YES;
+				SDKROOT = auto;
+				SKIP_INSTALL = YES;
+				STRING_CATALOG_GENERATE_SYMBOLS = YES;
+				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator macosx xros xrsimulator";
+				SWIFT_APPROACHABLE_CONCURRENCY = YES;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2,7";
+				XROS_DEPLOYMENT_TARGET = 27.0;
+			};
+			name = Debug;
+		};
+		953C6260305FA07700D5C07B /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				ASSETCATALOG_COMPILER_WIDGET_BACKGROUND_COLOR_NAME = WidgetBackground;
+				CODE_SIGN_ENTITLEMENTS = InvestPortfolioWidgetsExtension.entitlements;
+				CODE_SIGN_IDENTITY = "Apple Development";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = SVVTWN6V74;
+				ENABLE_APP_SANDBOX = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = InvestPortfolioWidgets/Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = InvestPortfolioWidgets;
+				INFOPLIST_KEY_NSHumanReadableCopyright = "";
+				IPHONEOS_DEPLOYMENT_TARGET = 27.0;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@executable_path/../../Frameworks",
+				);
+				"LD_RUNPATH_SEARCH_PATHS[sdk=macosx*]" = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+					"@executable_path/../../../../Frameworks",
+				);
+				MACOSX_DEPLOYMENT_TARGET = 27.0;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = io.rentivo.app.InvestPortfolioWidgets;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				REGISTER_APP_GROUPS = YES;
+				SDKROOT = auto;
+				SKIP_INSTALL = YES;
+				STRING_CATALOG_GENERATE_SYMBOLS = YES;
+				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator macosx xros xrsimulator";
+				SWIFT_APPROACHABLE_CONCURRENCY = YES;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2,7";
+				XROS_DEPLOYMENT_TARGET = 27.0;
+			};
+			name = Release;
+		};
 		APP_52616859928B7A02E23230E3 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
 				ASSETCATALOG_COMPILER_INCLUDE_ALL_APPICON_ASSETS = YES;
+				CODE_SIGN_ENTITLEMENTS = InvestPortfolio.entitlements;
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 6;
@@ -564,6 +776,7 @@
 				PRODUCT_BUNDLE_IDENTIFIER = io.rentivo.app;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
+				REGISTER_APP_GROUPS = YES;
 				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
 				SUPPORTS_MACCATALYST = NO;
 				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = NO;
@@ -579,6 +792,7 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
 				ASSETCATALOG_COMPILER_INCLUDE_ALL_APPICON_ASSETS = YES;
+				CODE_SIGN_ENTITLEMENTS = InvestPortfolio.entitlements;
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 6;
@@ -602,6 +816,7 @@
 				PRODUCT_BUNDLE_IDENTIFIER = io.rentivo.app;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
+				REGISTER_APP_GROUPS = YES;
 				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
 				SUPPORTS_MACCATALYST = NO;
 				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = NO;
@@ -681,6 +896,15 @@
 			buildConfigurations = (
 				52616859928B7A02E23230E3 /* Debug */,
 				EC3279092AD51915907F6FFB /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		953C625E305FA07700D5C07B /* Build configuration list for PBXNativeTarget "InvestPortfolioWidgetsExtension" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				953C625F305FA07700D5C07B /* Debug */,
+				953C6260305FA07700D5C07B /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;

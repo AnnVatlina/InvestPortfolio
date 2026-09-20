@@ -137,6 +137,19 @@ struct HomeViewModelUpcomingSubscriptionsTests {
         #expect(titles.first == "Sooner")
     }
 
+    @Test("Subscription due earlier today is still upcoming, not stale")
+    func dueEarlierTodayIsStillUpcoming() async {
+        // nextPaymentDate for a subscription due today normalizes to today's midnight.
+        // Comparing against the exact current instant (rather than start-of-day) would
+        // wrongly drop it the moment any time passes after midnight — this is exactly the
+        // scenario a test run any time after 00:00 exercises.
+        let todayMidnight = Calendar.current.startOfDay(for: Date())
+        let vm = await makeVM(subscriptions: [
+            sub(title: "DueToday", cycle: .monthly, startDate: todayMidnight)
+        ])
+        #expect(vm.upcomingSubscriptions().map(\.title) == ["DueToday"])
+    }
+
     @Test("Respects the limit parameter")
     func respectsLimit() async {
         let subs = (0..<10).map { sub(title: "Sub\($0)", cycle: .monthly, startDate: daysFromNow(-1)) }

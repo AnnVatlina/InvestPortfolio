@@ -1,0 +1,11 @@
+// Localizable.strings — Russian (InvestPortfolioWidgets)
+"widget.subscriptions.title" = "Подписки";
+"widget.subscriptions.empty" = "Нет ближайших платежей";
+"widget.subscriptions.displayName" = "Ближайший платёж";
+"widget.subscriptions.description" = "Показывает ближайший платёж по подписке.";
+
+"widget.deposits.title" = "Вклады";
+"widget.deposits.empty" = "Нет открытых вкладов";
+"widget.deposits.noEndDate" = "Без даты окончания";
+"widget.deposits.displayName" = "Закрытие вклада";
+"widget.deposits.description" = "Показывает вклад, который закроется раньше всех.";

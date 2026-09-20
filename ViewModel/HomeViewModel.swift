@@ -42,27 +42,12 @@ final class HomeViewModel: ObservableObject {
     }
 
     /// Deposits that haven't closed yet, soonest end date first.
-    /// Deposits with no end date sort last — there's nothing to be soon about.
     var openDeposits: [Deposit] {
-        let now = Date()
-        return deposits
-            .filter { $0.closeDate == nil || $0.closeDate! > now }
-            .sorted { ($0.closeDate ?? .distantFuture) < ($1.closeDate ?? .distantFuture) }
+        deposits.openSortedByCloseDate
     }
 
     /// The nearest upcoming payments across active subscriptions, soonest first.
-    /// One-time purchases already made are not "upcoming" and are excluded.
     func upcomingSubscriptions(limit: Int = 5) -> [Subscription] {
-        let now = Date()
-        return Array(
-            subscriptions
-                .filter { $0.isActive && dueDate(for: $0) >= now }
-                .sorted { dueDate(for: $0) < dueDate(for: $1) }
-                .prefix(limit)
-        )
-    }
-
-    private func dueDate(for subscription: Subscription) -> Date {
-        subscription.billingCycle.isRecurring ? subscription.nextPaymentDate : subscription.startDate
+        subscriptions.nearestUpcoming(limit: limit)
     }
 }

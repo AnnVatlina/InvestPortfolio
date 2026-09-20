@@ -4,6 +4,7 @@
 
 import Foundation
 @preconcurrency import UserNotifications
+import WidgetKit
 
 // MARK: - Filter & Pagination types
 
@@ -185,6 +186,7 @@ final class SubscriptionsViewModel: ObservableObject {
                 isActive: true
             )
             try await service.add(sub)
+            WidgetCenter.shared.reloadAllTimelines()
             await load()
             if billingCycle.isRecurring,
                let added = subscriptions.first(where: { $0.id == sub.id }) {
@@ -199,6 +201,7 @@ final class SubscriptionsViewModel: ObservableObject {
         cancelNotifications(for: subscription)
         do {
             try await service.delete(id: subscription.id)
+            WidgetCenter.shared.reloadAllTimelines()
             await load()
         } catch {
             operationError = error.localizedDescription
@@ -230,6 +233,7 @@ final class SubscriptionsViewModel: ObservableObject {
                 isActive: isActive,
                 endDate: isActive ? nil : endDate
             )
+            WidgetCenter.shared.reloadAllTimelines()
             await load()
             if let updated = subscriptions.first(where: { $0.id == id }) {
                 cancelNotifications(for: updated)

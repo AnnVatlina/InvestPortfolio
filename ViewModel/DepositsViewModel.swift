@@ -6,6 +6,7 @@
 
 import Foundation
 @preconcurrency import UserNotifications
+import WidgetKit
 
 @MainActor
 final class DepositsViewModel: ObservableObject {
@@ -73,6 +74,7 @@ final class DepositsViewModel: ObservableObject {
             if let close = closeDate {
                 scheduleCloseNotification(depositId: deposit.id, title: title, closeDate: close)
             }
+            WidgetCenter.shared.reloadAllTimelines()
             await load()
         } catch {
             operationError = error.localizedDescription
@@ -85,6 +87,7 @@ final class DepositsViewModel: ObservableObject {
         do {
             cancelCloseNotification(depositId: deposit.id)
             try await service.delete(id: deposit.id)
+            WidgetCenter.shared.reloadAllTimelines()
             await load()
         } catch {
             operationError = error.localizedDescription
@@ -127,6 +130,7 @@ final class DepositsViewModel: ObservableObject {
             if let close = closeDate {
                 scheduleCloseNotification(depositId: id, title: title, closeDate: close)
             }
+            WidgetCenter.shared.reloadAllTimelines()
             await load()
         } catch {
             operationError = error.localizedDescription

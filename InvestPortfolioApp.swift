@@ -27,22 +27,50 @@ struct InvestPortfolioApp: App {
             Settings.self,
             Subscription.self
         ])
+        let storeURL = Self.sharedStoreURL()
+        let config = ModelConfiguration(url: storeURL)
         let modelContainer: ModelContainer
         do {
-            modelContainer = try ModelContainer(for: schema)
+            modelContainer = try ModelContainer(for: schema, configurations: config)
         } catch {
             // Файл базы недоступен (напр. после смены Bundle ID) — удаляем и создаём заново.
-            let storeURL = URL.applicationSupportDirectory.appending(path: "default.store")
             try? FileManager.default.removeItem(at: storeURL)
             try? FileManager.default.removeItem(at: storeURL.appendingPathExtension("shm"))
             try? FileManager.default.removeItem(at: storeURL.appendingPathExtension("wal"))
             do {
-                modelContainer = try ModelContainer(for: schema)
+                modelContainer = try ModelContainer(for: schema, configurations: config)
             } catch {
                 fatalError("Не удалось создать ModelContainer: \(error)")
             }
         }
         _container = StateObject(wrappedValue: DIContainer(modelContainer: modelContainer))
+    }
+
+    /// The store lives in the App Group container so the widget extension can read the same
+    /// data. Falls back to the app's own container if the group is unavailable for some reason
+    /// (e.g. provisioning issue) so the app still works, just without widget access.
+    private static func sharedStoreURL() -> URL {
+        let legacyStoreURL = URL.applicationSupportDirectory.appending(path: "default.store")
+        guard let groupURL = FileManager.default.containerURL(
+            forSecurityApplicationGroupIdentifier: "group.io.rentivo.app"
+        ) else {
+            return legacyStoreURL
+        }
+
+        let sharedStoreURL = groupURL.appending(path: "default.store")
+
+        // One-time migration: earlier versions (before the widget extension existed)
+        // stored data outside the App Group. Copy it over so existing users don't lose data.
+        if !FileManager.default.fileExists(atPath: sharedStoreURL.path),
+           FileManager.default.fileExists(atPath: legacyStoreURL.path) {
+            for suffix in ["", "-shm", "-wal"] {
+                let from = URL(fileURLWithPath: legacyStoreURL.path + suffix)
+                let to = URL(fileURLWithPath: sharedStoreURL.path + suffix)
+                guard FileManager.default.fileExists(atPath: from.path) else { continue }
+                try? FileManager.default.copyItem(at: from, to: to)
+            }
+        }
+        return sharedStoreURL
     }
 
     var body: some Scene {
