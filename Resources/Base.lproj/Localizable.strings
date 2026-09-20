@@ -146,3 +146,23 @@
 "home.openDeposits.title" = "Open Deposits";
 "home.openDeposits.empty" = "No open deposits";
 "home.openDeposits.noEndDate" = "No end date";
+
+// MARK: - Accessibility
+"a11y.previousYear" = "Previous year";
+"a11y.nextYear" = "Next year";
+"a11y.previousMonth" = "Previous month";
+"a11y.nextMonth" = "Next month";
+"a11y.previousPage" = "Previous page";
+"a11y.nextPage" = "Next page";
+"a11y.icon.default" = "Default icon";
+"a11y.icon.tv" = "TV";
+"a11y.icon.music" = "Music";
+"a11y.icon.games" = "Games";
+"a11y.icon.cloud" = "Cloud storage";
+"a11y.icon.books" = "Books";
+"a11y.icon.fitness" = "Fitness";
+"a11y.icon.food" = "Food";
+"a11y.icon.news" = "News";
+"a11y.icon.podcast" = "Podcast";
+"a11y.icon.shopping" = "Shopping";
+"a11y.icon.phone" = "Phone";

@@ -149,3 +149,23 @@
 "home.openDeposits.title" = "Открытые вклады";
 "home.openDeposits.empty" = "Нет открытых вкладов";
 "home.openDeposits.noEndDate" = "Без даты окончания";
+
+// MARK: - Accessibility
+"a11y.previousYear" = "Предыдущий год";
+"a11y.nextYear" = "Следующий год";
+"a11y.previousMonth" = "Предыдущий месяц";
+"a11y.nextMonth" = "Следующий месяц";
+"a11y.previousPage" = "Предыдущая страница";
+"a11y.nextPage" = "Следующая страница";
+"a11y.icon.default" = "Иконка по умолчанию";
+"a11y.icon.tv" = "Телевидение";
+"a11y.icon.music" = "Музыка";
+"a11y.icon.games" = "Игры";
+"a11y.icon.cloud" = "Облачное хранилище";
+"a11y.icon.books" = "Книги";
+"a11y.icon.fitness" = "Фитнес";
+"a11y.icon.food" = "Еда";
+"a11y.icon.news" = "Новости";
+"a11y.icon.podcast" = "Подкасты";
+"a11y.icon.shopping" = "Покупки";
+"a11y.icon.phone" = "Телефон";

@@ -76,6 +76,7 @@ struct AnalyticsView: View {
             } label: {
                 Image(systemName: "chevron.left").font(.title3.bold())
             }
+            .accessibilityLabel(Text("a11y.previousYear"))
             .disabled(vm.selectedYear <= vm.yearRange.lowerBound)
 
             Spacer()
@@ -87,6 +88,7 @@ struct AnalyticsView: View {
             } label: {
                 Image(systemName: "chevron.right").font(.title3.bold())
             }
+            .accessibilityLabel(Text("a11y.nextYear"))
             .disabled(vm.selectedYear >= vm.yearRange.upperBound)
         }
         .padding(.horizontal)
@@ -108,6 +110,7 @@ struct AnalyticsView: View {
             } label: {
                 Image(systemName: "chevron.left").font(.subheadline.bold())
             }
+            .accessibilityLabel(Text("a11y.previousMonth"))
             .disabled(vm.selectedMonth <= 1)
 
             Spacer()
@@ -122,6 +125,7 @@ struct AnalyticsView: View {
             } label: {
                 Image(systemName: "chevron.right").font(.subheadline.bold())
             }
+            .accessibilityLabel(Text("a11y.nextMonth"))
             .disabled(vm.selectedMonth >= 12)
         }
     }

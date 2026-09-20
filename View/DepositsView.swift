@@ -41,6 +41,7 @@ struct DepositsView: View {
                 } label: {
                     Image(systemName: "plus")
                 }
+                .accessibilityLabel(Text("deposits.add.title"))
             }
         }
         .sheet(isPresented: $showAddSheet) {
@@ -110,6 +111,8 @@ struct DepositsView: View {
                 DepositRow(deposit: deposit, summary: vm.incomeSummary(for: deposit))
                     .contentShape(Rectangle())
                     .onTapGesture { depositToEdit = deposit }
+                    .accessibilityElement(children: .combine)
+                    .accessibilityAddTraits(.isButton)
             }
             .onDelete { indexSet in
                 if let index = indexSet.first {

@@ -37,6 +37,7 @@ struct SubscriptionsView: View {
                 Button { showAddSheet = true } label: {
                     Image(systemName: "plus")
                 }
+                .accessibilityLabel(Text("subscriptions.add.title"))
             }
         }
         .sheet(isPresented: $showAddSheet) {
@@ -130,6 +131,8 @@ struct SubscriptionsView: View {
                         )
                         .contentShape(Rectangle())
                         .onTapGesture { subscriptionToEdit = sub }
+                        .accessibilityElement(children: .combine)
+                        .accessibilityAddTraits(.isButton)
                     }
                     .onDelete { indexSet in
                         if let index = indexSet.first {
@@ -211,6 +214,7 @@ struct SubscriptionsView: View {
             Button { vm.currentPage -= 1 } label: {
                 Image(systemName: "chevron.left").padding(.trailing, 4)
             }
+            .accessibilityLabel(Text("a11y.previousPage"))
             .disabled(vm.currentPage <= 1)
 
             Spacer()
@@ -226,6 +230,7 @@ struct SubscriptionsView: View {
             Button { vm.currentPage += 1 } label: {
                 Image(systemName: "chevron.right").padding(.leading, 4)
             }
+            .accessibilityLabel(Text("a11y.nextPage"))
             .disabled(vm.currentPage >= vm.totalPages)
         }
         .buttonStyle(.borderless)
@@ -466,19 +471,19 @@ struct SubscriptionFormSheet: View {
     @State private var endDate: Date
     @State private var validationError: String?
 
-    static let iconPresets: [(symbol: String, label: String)] = [
-        ("repeat.circle.fill", "Default"),
-        ("tv.fill", "TV"),
-        ("music.note", "Music"),
-        ("gamecontroller.fill", "Games"),
-        ("cloud.fill", "Cloud"),
-        ("book.fill", "Books"),
-        ("gym.bag.fill", "Fitness"),
-        ("fork.knife", "Food"),
-        ("newspaper.fill", "News"),
-        ("mic.fill", "Podcast"),
-        ("cart.fill", "Shopping"),
-        ("phone.fill", "Phone"),
+    static let iconPresets: [(symbol: String, labelKey: String)] = [
+        ("repeat.circle.fill", "a11y.icon.default"),
+        ("tv.fill", "a11y.icon.tv"),
+        ("music.note", "a11y.icon.music"),
+        ("gamecontroller.fill", "a11y.icon.games"),
+        ("cloud.fill", "a11y.icon.cloud"),
+        ("book.fill", "a11y.icon.books"),
+        ("gym.bag.fill", "a11y.icon.fitness"),
+        ("fork.knife", "a11y.icon.food"),
+        ("newspaper.fill", "a11y.icon.news"),
+        ("mic.fill", "a11y.icon.podcast"),
+        ("cart.fill", "a11y.icon.shopping"),
+        ("phone.fill", "a11y.icon.phone"),
     ]
 
     init(mode: SubscriptionFormMode, onSave: @escaping (SubscriptionFormData) -> Void) {
@@ -532,6 +537,7 @@ struct SubscriptionFormSheet: View {
                                     }
                                 }
                                 .buttonStyle(.plain)
+                                .accessibilityLabel(LanguageBundle.string(preset.labelKey))
                             }
                         }
                         .padding(.vertical, 4)
