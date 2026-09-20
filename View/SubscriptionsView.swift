@@ -171,8 +171,12 @@ struct SubscriptionsView: View {
                 }
             }
             .padding(.horizontal, 16)
-            .padding(.vertical, 10)
         }
+        // Fixed height so the bar doesn't depend on an intrinsic-size layout
+        // pass that a sibling List can otherwise win first, which made the
+        // bar render with zero height until any later layout pass (state
+        // change, scroll, rotation) corrected it.
+        .frame(height: 54)
         .background(Color(.systemGroupedBackground))
     }
 
