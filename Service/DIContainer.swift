@@ -54,6 +54,7 @@ final class DIContainer: ObservableObject {
         let config = ModelConfiguration(isStoredInMemoryOnly: true)
         let container = try! ModelContainer(
             for: Deposit.self,
+                DepositTransaction.self,
                 Settings.self,
                 Subscription.self,
             configurations: config

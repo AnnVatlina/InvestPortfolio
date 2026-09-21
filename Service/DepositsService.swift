@@ -17,8 +17,22 @@ protocol DepositsService {
     func fetchAll() async throws -> [Deposit]
     func add(_ deposit: Deposit) async throws
     func delete(id: UUID) async throws
-    func update(id: UUID, title: String, bankName: String?, amount: Double, currency: DepositCurrency, openDate: Date, closeDate: Date?, annualInterestRate: Double, interestType: DepositInterestType, capitalizationPeriod: CapitalizationPeriod?) async throws
-    func incomeSummary(for deposit: Deposit, asOf date: Date) -> DepositIncomeSummary
+    func update(id: UUID, title: String, bankName: String?, amount: Double, currency: DepositCurrency, openDate: Date, closeDate: Date?, annualInterestRate: Double, interestType: DepositInterestType, capitalizationPeriod: CapitalizationPeriod?, allowsReplenishment: Bool, allowsPartialWithdrawal: Bool) async throws
+    func incomeSummary(for deposit: Deposit, transactions: [DepositTransaction], asOf date: Date) -> DepositIncomeSummary
+
+    // MARK: - Transactions (contributions / partial withdrawals)
+
+    func transactions(forDepositId depositId: UUID) async throws -> [DepositTransaction]
+    func addTransaction(_ transaction: DepositTransaction) async throws
+    func deleteTransaction(id: UUID) async throws
+}
+
+extension DepositsService {
+    /// Convenience for callers that don't have the deposit's transaction history at hand —
+    /// equivalent to passing an empty transactions array.
+    func incomeSummary(for deposit: Deposit, asOf date: Date) -> DepositIncomeSummary {
+        incomeSummary(for: deposit, transactions: [], asOf: date)
+    }
 }
 
 final class DefaultDepositsService: DepositsService {
@@ -42,65 +56,99 @@ final class DefaultDepositsService: DepositsService {
         try await repository.delete(id: id)
     }
 
-    func update(id: UUID, title: String, bankName: String?, amount: Double, currency: DepositCurrency, openDate: Date, closeDate: Date?, annualInterestRate: Double, interestType: DepositInterestType, capitalizationPeriod: CapitalizationPeriod?) async throws {
-        try await repository.update(id: id, title: title, bankName: bankName, amount: amount, currency: currency, openDate: openDate, closeDate: closeDate, annualInterestRate: annualInterestRate, interestType: interestType, capitalizationPeriod: capitalizationPeriod)
+    func update(id: UUID, title: String, bankName: String?, amount: Double, currency: DepositCurrency, openDate: Date, closeDate: Date?, annualInterestRate: Double, interestType: DepositInterestType, capitalizationPeriod: CapitalizationPeriod?, allowsReplenishment: Bool, allowsPartialWithdrawal: Bool) async throws {
+        try await repository.update(id: id, title: title, bankName: bankName, amount: amount, currency: currency, openDate: openDate, closeDate: closeDate, annualInterestRate: annualInterestRate, interestType: interestType, capitalizationPeriod: capitalizationPeriod, allowsReplenishment: allowsReplenishment, allowsPartialWithdrawal: allowsPartialWithdrawal)
     }
 
-    func incomeSummary(for deposit: Deposit, asOf date: Date) -> DepositIncomeSummary {
+    func transactions(forDepositId depositId: UUID) async throws -> [DepositTransaction] {
+        try await repository.transactions(forDepositId: depositId)
+    }
+
+    func addTransaction(_ transaction: DepositTransaction) async throws {
+        try await repository.addTransaction(transaction)
+    }
+
+    func deleteTransaction(id: UUID) async throws {
+        try await repository.deleteTransaction(id: id)
+    }
+
+    func incomeSummary(for deposit: Deposit, transactions: [DepositTransaction], asOf date: Date) -> DepositIncomeSummary {
         // For closed deposits, income is calculated up to the close date, not today
         let cappedDate = deposit.closeDate.map { min(date, $0) } ?? date
-        let incomeEarned = income(for: deposit, until: cappedDate)
+        let incomeEarned = income(for: deposit, transactions: transactions, until: cappedDate)
 
         // Show the forecast only if the close date hasn't arrived yet
         let forecast: Double?
         if let close = deposit.closeDate, close > deposit.openDate, close > date {
-            forecast = income(for: deposit, until: close)
+            forecast = income(for: deposit, transactions: transactions, until: close)
         } else {
             forecast = nil
         }
         return DepositIncomeSummary(incomeToDate: incomeEarned, forecastIncomeToCloseDate: forecast)
     }
 
-    private func income(for deposit: Deposit, until date: Date) -> Double {
-        let end = max(deposit.openDate, date)
-        switch deposit.interestType {
-        case .simple:
-            return simpleIncome(for: deposit, until: end)
-        case .capitalized:
-            return capitalizedIncome(for: deposit, until: end)
+    // A point in time where the deposit's principal changes (a contribution/withdrawal)
+    // or where accrued interest folds into the principal (a capitalization boundary).
+    private enum Checkpoint {
+        case capitalization(Date)
+        case transaction(Date, amount: Double)
+
+        var date: Date {
+            switch self {
+            case .capitalization(let date): return date
+            case .transaction(let date, _): return date
+            }
         }
     }
 
-    private func simpleIncome(for deposit: Deposit, until end: Date) -> Double {
-        let days = daysBetween(deposit.openDate - 1, end)
+    // Walks the deposit's timeline from openDate to `end`, applying transactions to the
+    // principal as they occur and folding accrued interest into the principal at each
+    // capitalization boundary (for capitalized deposits). Reduces to the plain simple/
+    // capitalized formulas when there are no transactions.
+    private func income(for deposit: Deposit, transactions: [DepositTransaction], until end: Date) -> Double {
+        let end = max(deposit.openDate, end)
         let dailyRate = (deposit.annualInterestRate / 100.0) / 365.0
-        return deposit.amount * dailyRate * Double(days)
-    }
 
-    // Начисляет проценты на каждой границе периода капитализации к телу вклада,
-    // затем считает простой процент на остатке (неполном периоде) до даты `end`.
-    private func capitalizedIncome(for deposit: Deposit, until end: Date) -> Double {
-        guard let period = deposit.capitalizationPeriod else {
-            return simpleIncome(for: deposit, until: end)
+        var checkpoints: [Checkpoint] = transactions
+            .filter { $0.date > deposit.openDate && $0.date <= end }
+            .map { .transaction($0.date, amount: $0.amount) }
+
+        if deposit.interestType == .capitalized, let period = deposit.capitalizationPeriod {
+            var boundary = deposit.openDate
+            while let next = calendar.date(byAdding: period.dateComponents, to: boundary), next <= end {
+                checkpoints.append(.capitalization(next))
+                boundary = next
+            }
         }
-        let dailyRate = (deposit.annualInterestRate / 100.0) / 365.0
+
+        checkpoints.sort { $0.date < $1.date }
+
         var principal = deposit.amount
-        var periodStart = deposit.openDate
-        // Тот же сдвиг на 1 секунду, что и в simpleIncome — включает день открытия в счёт
-        // дней только для самого первого периода, дальше границы периодов считаются как есть.
-        var dayCountAnchor = deposit.openDate - 1
+        var pendingInterest = 0.0
+        var netTransactions = 0.0
+        // The 1-second shift includes the opening day in the day count only for the very
+        // first segment — later checkpoint boundaries are counted as-is.
+        var anchor = deposit.openDate - 1
 
-        while let periodEnd = calendar.date(byAdding: period.dateComponents, to: periodStart),
-              periodEnd <= end {
-            let days = daysBetween(dayCountAnchor, periodEnd)
-            principal += principal * dailyRate * Double(days)
-            periodStart = periodEnd
-            dayCountAnchor = periodEnd
+        for checkpoint in checkpoints {
+            let days = daysBetween(anchor, checkpoint.date)
+            pendingInterest += principal * dailyRate * Double(days)
+            switch checkpoint {
+            case .capitalization:
+                principal += pendingInterest
+                pendingInterest = 0
+            case .transaction(_, let amount):
+                principal += amount
+                netTransactions += amount
+            }
+            anchor = checkpoint.date
         }
 
-        let remainingDays = daysBetween(dayCountAnchor, end)
-        let finalAmount = principal + principal * dailyRate * Double(remainingDays)
-        return finalAmount - deposit.amount
+        let remainingDays = daysBetween(anchor, end)
+        pendingInterest += principal * dailyRate * Double(remainingDays)
+
+        let finalAmount = principal + pendingInterest
+        return finalAmount - deposit.amount - netTransactions
     }
 
     private func daysBetween(_ start: Date, _ end: Date) -> Int {

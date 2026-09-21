@@ -27,6 +27,11 @@ final class Deposit {
     var interestTypeRaw: String = DepositInterestType.simple.rawValue
     var capitalizationPeriodRaw: String? = nil
 
+    // Whether this deposit accepts additional contributions / partial withdrawals
+    // as DepositTransaction entries after it's opened.
+    var allowsReplenishment: Bool = false
+    var allowsPartialWithdrawal: Bool = false
+
     /// Typed accessor — computed, not stored by SwiftData.
     var currency: DepositCurrency {
         get { DepositCurrency(rawValue: currencyRaw) ?? .RUB }
@@ -56,7 +61,9 @@ final class Deposit {
         closeDate: Date? = nil,
         annualInterestRate: Double,
         interestType: DepositInterestType = .simple,
-        capitalizationPeriod: CapitalizationPeriod? = nil
+        capitalizationPeriod: CapitalizationPeriod? = nil,
+        allowsReplenishment: Bool = false,
+        allowsPartialWithdrawal: Bool = false
     ) {
         self.id = id
         self.title = title
@@ -69,5 +76,7 @@ final class Deposit {
         self.annualInterestRate = annualInterestRate
         self.interestTypeRaw = interestType.rawValue
         self.capitalizationPeriodRaw = capitalizationPeriod?.rawValue
+        self.allowsReplenishment = allowsReplenishment
+        self.allowsPartialWithdrawal = allowsPartialWithdrawal
     }
 }

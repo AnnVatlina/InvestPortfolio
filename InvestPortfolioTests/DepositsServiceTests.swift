@@ -141,3 +141,96 @@ struct DepositsServiceCapitalizedInterestTests {
         #expect(summary.forecastIncomeToCloseDate! > summary.incomeToDate)
     }
 }
+
+// MARK: - Transactions (contributions / partial withdrawals)
+
+@Suite("DefaultDepositsService — transactions")
+struct DepositsServiceTransactionsTests {
+
+    let service = DefaultDepositsService(repository: InMemoryDepositsRepository())
+
+    @Test("A contribution accrues interest on both the old and the new principal")
+    func contributionExactValue() {
+        let now = Date()
+        let openDate = Calendar.current.date(byAdding: .day, value: -100, to: now)!
+        let contributionDate = Calendar.current.date(byAdding: .day, value: -50, to: now)!
+        let deposit = makeDeposit(amount: 100_000, openDate: openDate, rate: 12.0, interestType: .simple)
+        let transaction = DepositTransaction(depositId: deposit.id, date: contributionDate, amount: 50_000)
+
+        let summary = service.incomeSummary(for: deposit, transactions: [transaction], asOf: now)
+
+        let dailyRate = 0.12 / 365.0
+        let expected = dailyRate * 50 * (100_000 + 150_000)
+        #expect(abs(summary.incomeToDate - expected) < 1.0)
+    }
+
+    @Test("A contribution increases income relative to no contribution")
+    func contributionIncreasesIncome() {
+        let now = Date()
+        let openDate = Calendar.current.date(byAdding: .day, value: -100, to: now)!
+        let contributionDate = Calendar.current.date(byAdding: .day, value: -50, to: now)!
+        let deposit = makeDeposit(amount: 100_000, openDate: openDate, rate: 12.0)
+        let transaction = DepositTransaction(depositId: deposit.id, date: contributionDate, amount: 50_000)
+
+        let withContribution = service.incomeSummary(for: deposit, transactions: [transaction], asOf: now).incomeToDate
+        let without = service.incomeSummary(for: deposit, asOf: now).incomeToDate
+
+        #expect(withContribution > without)
+    }
+
+    @Test("A withdrawal decreases income relative to no withdrawal")
+    func withdrawalDecreasesIncome() {
+        let now = Date()
+        let openDate = Calendar.current.date(byAdding: .day, value: -100, to: now)!
+        let withdrawalDate = Calendar.current.date(byAdding: .day, value: -50, to: now)!
+        let deposit = makeDeposit(amount: 100_000, openDate: openDate, rate: 12.0)
+        let transaction = DepositTransaction(depositId: deposit.id, date: withdrawalDate, amount: -30_000)
+
+        let withWithdrawal = service.incomeSummary(for: deposit, transactions: [transaction], asOf: now).incomeToDate
+        let without = service.incomeSummary(for: deposit, asOf: now).incomeToDate
+
+        #expect(withWithdrawal < without)
+    }
+
+    @Test("A contribution before a capitalization boundary compounds along with the rest of the principal")
+    func contributionCompoundsOnCapitalizedDeposit() {
+        let openDate = Calendar.current.date(byAdding: .day, value: -400, to: Date())!
+        let contributionDate = Calendar.current.date(byAdding: .day, value: -390, to: Date())!
+        let deposit = makeDeposit(openDate: openDate, rate: 12.0, interestType: .capitalized, capitalizationPeriod: .monthly)
+        let transaction = DepositTransaction(depositId: deposit.id, date: contributionDate, amount: 50_000)
+
+        let withContribution = service.incomeSummary(for: deposit, transactions: [transaction], asOf: Date()).incomeToDate
+        let without = service.incomeSummary(for: deposit, asOf: Date()).incomeToDate
+
+        #expect(withContribution > without)
+    }
+
+    @Test("Transactions dated after the asOf date are ignored")
+    func futureTransactionsAreIgnored() {
+        let now = Date()
+        let openDate = Calendar.current.date(byAdding: .day, value: -100, to: now)!
+        let futureDate = Calendar.current.date(byAdding: .day, value: 10, to: now)!
+        let deposit = makeDeposit(amount: 100_000, openDate: openDate, rate: 12.0)
+        let futureTransaction = DepositTransaction(depositId: deposit.id, date: futureDate, amount: 50_000)
+
+        let withFutureTransaction = service.incomeSummary(for: deposit, transactions: [futureTransaction], asOf: now).incomeToDate
+        let without = service.incomeSummary(for: deposit, asOf: now).incomeToDate
+
+        #expect(abs(withFutureTransaction - without) < 0.001)
+    }
+
+    @Test("addTransaction, transactions(forDepositId:) and deleteTransaction round-trip through the repository")
+    func transactionCRUDRoundTrips() async throws {
+        let deposit = makeDeposit(amount: 100_000, openDate: Date())
+        let transaction = DepositTransaction(depositId: deposit.id, date: Date(), amount: 10_000)
+
+        try await service.addTransaction(transaction)
+        let fetched = try await service.transactions(forDepositId: deposit.id)
+        #expect(fetched.count == 1)
+        #expect(fetched.first?.amount == 10_000)
+
+        try await service.deleteTransaction(id: transaction.id)
+        let afterDelete = try await service.transactions(forDepositId: deposit.id)
+        #expect(afterDelete.isEmpty)
+    }
+}

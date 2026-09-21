@@ -51,7 +51,9 @@ final class DepositsViewModel: ObservableObject {
         closeDate: Date?,
         annualInterestRate: Double,
         interestType: DepositInterestType = .simple,
-        capitalizationPeriod: CapitalizationPeriod? = nil
+        capitalizationPeriod: CapitalizationPeriod? = nil,
+        allowsReplenishment: Bool = false,
+        allowsPartialWithdrawal: Bool = false
     ) async {
         guard !title.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty else {
             errorMessage = LanguageBundle.string("deposits.error.emptyTitle")
@@ -72,7 +74,9 @@ final class DepositsViewModel: ObservableObject {
                 closeDate: closeDate,
                 annualInterestRate: annualInterestRate,
                 interestType: interestType,
-                capitalizationPeriod: capitalizationPeriod
+                capitalizationPeriod: capitalizationPeriod,
+                allowsReplenishment: allowsReplenishment,
+                allowsPartialWithdrawal: allowsPartialWithdrawal
             )
             try await service.add(deposit)
             if let close = closeDate {
@@ -110,7 +114,9 @@ final class DepositsViewModel: ObservableObject {
         closeDate: Date?,
         annualInterestRate: Double,
         interestType: DepositInterestType = .simple,
-        capitalizationPeriod: CapitalizationPeriod? = nil
+        capitalizationPeriod: CapitalizationPeriod? = nil,
+        allowsReplenishment: Bool = false,
+        allowsPartialWithdrawal: Bool = false
     ) async {
         guard !title.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty else {
             errorMessage = LanguageBundle.string("deposits.error.emptyTitle")
@@ -132,7 +138,9 @@ final class DepositsViewModel: ObservableObject {
                 closeDate: closeDate,
                 annualInterestRate: annualInterestRate,
                 interestType: interestType,
-                capitalizationPeriod: capitalizationPeriod
+                capitalizationPeriod: capitalizationPeriod,
+                allowsReplenishment: allowsReplenishment,
+                allowsPartialWithdrawal: allowsPartialWithdrawal
             )
             cancelCloseNotification(depositId: id)
             if let close = closeDate {

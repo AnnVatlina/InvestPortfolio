@@ -11,11 +11,18 @@ protocol DepositsRepository {
     func fetchAll() async throws -> [Deposit]
     func add(_ deposit: Deposit) async throws
     func delete(id: UUID) async throws
-    func update(id: UUID, title: String, bankName: String?, amount: Double, currency: DepositCurrency, openDate: Date, closeDate: Date?, annualInterestRate: Double, interestType: DepositInterestType, capitalizationPeriod: CapitalizationPeriod?) async throws
+    func update(id: UUID, title: String, bankName: String?, amount: Double, currency: DepositCurrency, openDate: Date, closeDate: Date?, annualInterestRate: Double, interestType: DepositInterestType, capitalizationPeriod: CapitalizationPeriod?, allowsReplenishment: Bool, allowsPartialWithdrawal: Bool) async throws
+
+    // MARK: - Transactions (contributions / partial withdrawals)
+
+    func transactions(forDepositId depositId: UUID) async throws -> [DepositTransaction]
+    func addTransaction(_ transaction: DepositTransaction) async throws
+    func deleteTransaction(id: UUID) async throws
 }
 
 final class InMemoryDepositsRepository: DepositsRepository {
     private var deposits: [Deposit] = []
+    private var depositTransactions: [DepositTransaction] = []
 
     func fetchAll() async throws -> [Deposit] {
         deposits
@@ -27,9 +34,10 @@ final class InMemoryDepositsRepository: DepositsRepository {
 
     func delete(id: UUID) async throws {
         deposits.removeAll { $0.id == id }
+        depositTransactions.removeAll { $0.depositId == id }
     }
 
-    func update(id: UUID, title: String, bankName: String?, amount: Double, currency: DepositCurrency, openDate: Date, closeDate: Date?, annualInterestRate: Double, interestType: DepositInterestType, capitalizationPeriod: CapitalizationPeriod?) async throws {
+    func update(id: UUID, title: String, bankName: String?, amount: Double, currency: DepositCurrency, openDate: Date, closeDate: Date?, annualInterestRate: Double, interestType: DepositInterestType, capitalizationPeriod: CapitalizationPeriod?, allowsReplenishment: Bool, allowsPartialWithdrawal: Bool) async throws {
         guard let index = deposits.firstIndex(where: { $0.id == id }) else { return }
         deposits[index].title = title
         deposits[index].bankName = bankName
@@ -40,6 +48,22 @@ final class InMemoryDepositsRepository: DepositsRepository {
         deposits[index].annualInterestRate = annualInterestRate
         deposits[index].interestType = interestType
         deposits[index].capitalizationPeriod = capitalizationPeriod
+        deposits[index].allowsReplenishment = allowsReplenishment
+        deposits[index].allowsPartialWithdrawal = allowsPartialWithdrawal
+    }
+
+    func transactions(forDepositId depositId: UUID) async throws -> [DepositTransaction] {
+        depositTransactions
+            .filter { $0.depositId == depositId }
+            .sorted { $0.date < $1.date }
+    }
+
+    func addTransaction(_ transaction: DepositTransaction) async throws {
+        depositTransactions.append(transaction)
+    }
+
+    func deleteTransaction(id: UUID) async throws {
+        depositTransactions.removeAll { $0.id == id }
     }
 
 }
@@ -63,10 +87,15 @@ actor SwiftDataDepositsRepository: @preconcurrency DepositsRepository {
         let descriptor = FetchDescriptor(predicate: predicate)
         guard let deposit = try modelContext.fetch(descriptor).first else { return }
         modelContext.delete(deposit)
+
+        let transactionPredicate = #Predicate<DepositTransaction> { $0.depositId == id }
+        let transactions = try modelContext.fetch(FetchDescriptor(predicate: transactionPredicate))
+        transactions.forEach { modelContext.delete($0) }
+
         try modelContext.save()
     }
 
-    func update(id: UUID, title: String, bankName: String?, amount: Double, currency: DepositCurrency, openDate: Date, closeDate: Date?, annualInterestRate: Double, interestType: DepositInterestType, capitalizationPeriod: CapitalizationPeriod?) async throws {
+    func update(id: UUID, title: String, bankName: String?, amount: Double, currency: DepositCurrency, openDate: Date, closeDate: Date?, annualInterestRate: Double, interestType: DepositInterestType, capitalizationPeriod: CapitalizationPeriod?, allowsReplenishment: Bool, allowsPartialWithdrawal: Bool) async throws {
         let predicate = #Predicate<Deposit> { $0.id == id }
         let descriptor = FetchDescriptor(predicate: predicate)
         guard let deposit = try modelContext.fetch(descriptor).first else { return }
@@ -79,6 +108,27 @@ actor SwiftDataDepositsRepository: @preconcurrency DepositsRepository {
         deposit.annualInterestRate = annualInterestRate
         deposit.interestType = interestType
         deposit.capitalizationPeriod = capitalizationPeriod
+        deposit.allowsReplenishment = allowsReplenishment
+        deposit.allowsPartialWithdrawal = allowsPartialWithdrawal
+        try modelContext.save()
+    }
+
+    func transactions(forDepositId depositId: UUID) async throws -> [DepositTransaction] {
+        let predicate = #Predicate<DepositTransaction> { $0.depositId == depositId }
+        let descriptor = FetchDescriptor(predicate: predicate, sortBy: [SortDescriptor(\.date, order: .forward)])
+        return try modelContext.fetch(descriptor)
+    }
+
+    func addTransaction(_ transaction: DepositTransaction) async throws {
+        modelContext.insert(transaction)
+        try modelContext.save()
+    }
+
+    func deleteTransaction(id: UUID) async throws {
+        let predicate = #Predicate<DepositTransaction> { $0.id == id }
+        let descriptor = FetchDescriptor(predicate: predicate)
+        guard let transaction = try modelContext.fetch(descriptor).first else { return }
+        modelContext.delete(transaction)
         try modelContext.save()
     }
 

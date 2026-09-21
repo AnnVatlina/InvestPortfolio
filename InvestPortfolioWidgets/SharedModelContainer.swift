@@ -21,7 +21,7 @@ enum SharedModelContainer {
             return nil
         }
         let storeURL = groupURL.appendingPathComponent("default.store")
-        let schema = Schema([Deposit.self, Settings.self, Subscription.self])
+        let schema = Schema([Deposit.self, DepositTransaction.self, Settings.self, Subscription.self])
         let config = ModelConfiguration(url: storeURL)
         return try? ModelContainer(for: schema, configurations: config)
     }

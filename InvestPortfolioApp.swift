@@ -24,6 +24,7 @@ struct InvestPortfolioApp: App {
 
         let schema = Schema([
             Deposit.self,
+            DepositTransaction.self,
             Settings.self,
             Subscription.self
         ])

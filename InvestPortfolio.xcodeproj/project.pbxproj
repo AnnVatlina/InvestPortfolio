@@ -25,6 +25,8 @@
 		952BB1C23060ED0900686092 /* CapitalizationPeriod.swift in Sources */ = {isa = PBXBuildFile; fileRef = 952BB1C13060ED0900686092 /* CapitalizationPeriod.swift */; };
 		952BB1C33060ED0900686092 /* CapitalizationPeriod.swift in Sources */ = {isa = PBXBuildFile; fileRef = 952BB1C13060ED0900686092 /* CapitalizationPeriod.swift */; };
 		952BB1C53060EE7B00686092 /* DepositsServiceTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 952BB1C43060EE7B00686092 /* DepositsServiceTests.swift */; };
+		952BB1E93060F23500686092 /* DepositTransaction.swift in Sources */ = {isa = PBXBuildFile; fileRef = 952BB1E83060F23500686092 /* DepositTransaction.swift */; };
+		952BB1EA3060F23500686092 /* DepositTransaction.swift in Sources */ = {isa = PBXBuildFile; fileRef = 952BB1E83060F23500686092 /* DepositTransaction.swift */; };
 		9539C4222F93FC9D003A105C /* AnalyticsViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9539C4212F93FC9D003A105C /* AnalyticsViewModel.swift */; };
 		9539C4242F93FCB9003A105C /* AnalyticsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9539C4232F93FCB9003A105C /* AnalyticsView.swift */; };
 		953C6246305EFFDB00D5C07B /* HomeViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 953C6245305EFFDB00D5C07B /* HomeViewModel.swift */; };
@@ -118,6 +120,7 @@
 		952BB1BE3060ED0900686092 /* DepositInterestType.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DepositInterestType.swift; sourceTree = "<group>"; };
 		952BB1C13060ED0900686092 /* CapitalizationPeriod.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CapitalizationPeriod.swift; sourceTree = "<group>"; };
 		952BB1C43060EE7B00686092 /* DepositsServiceTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DepositsServiceTests.swift; sourceTree = "<group>"; };
+		952BB1E83060F23500686092 /* DepositTransaction.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DepositTransaction.swift; sourceTree = "<group>"; };
 		9539C4212F93FC9D003A105C /* AnalyticsViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AnalyticsViewModel.swift; sourceTree = "<group>"; };
 		9539C4232F93FCB9003A105C /* AnalyticsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AnalyticsView.swift; sourceTree = "<group>"; };
 		953C14A02F056E61003998D2 /* Base */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = Base; path = Base.lproj/Localizable.strings; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.plist; };
@@ -287,6 +290,7 @@
 				953C6264305FA13400D5C07B /* HomeQueries.swift */,
 				952BB1BE3060ED0900686092 /* DepositInterestType.swift */,
 				952BB1C13060ED0900686092 /* CapitalizationPeriod.swift */,
+				952BB1E83060F23500686092 /* DepositTransaction.swift */,
 			);
 			path = Model;
 			sourceTree = "<group>";
@@ -488,6 +492,7 @@
 				953C6246305EFFDB00D5C07B /* HomeViewModel.swift in Sources */,
 				95AD907E2F8252720064CD19 /* SubscriptionBillingCycle.swift in Sources */,
 				95AD90802F82527B0064CD19 /* Subscription.swift in Sources */,
+				952BB1E93060F23500686092 /* DepositTransaction.swift in Sources */,
 				95D967FA2F04193400079C66 /* HomeTabView.swift in Sources */,
 				952BB1C23060ED0900686092 /* CapitalizationPeriod.swift in Sources */,
 				950800052F0406560041AD54 /* DepositsViewModel.swift in Sources */,
@@ -534,6 +539,7 @@
 				953C626A305FA31F00D5C07B /* DepositCurrency.swift in Sources */,
 				953C627E305FA42500D5C07B /* Settings.swift in Sources */,
 				953C626B305FA31F00D5C07B /* Subscription.swift in Sources */,
+				952BB1EA3060F23500686092 /* DepositTransaction.swift in Sources */,
 				952BB1C33060ED0900686092 /* CapitalizationPeriod.swift in Sources */,
 				952BB1C03060ED0900686092 /* DepositInterestType.swift in Sources */,
 			);
