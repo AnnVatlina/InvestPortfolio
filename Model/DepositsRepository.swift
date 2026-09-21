@@ -16,6 +16,7 @@ protocol DepositsRepository {
     // MARK: - Transactions (contributions / partial withdrawals)
 
     func transactions(forDepositId depositId: UUID) async throws -> [DepositTransaction]
+    func fetchAllTransactions() async throws -> [DepositTransaction]
     func addTransaction(_ transaction: DepositTransaction) async throws
     func deleteTransaction(id: UUID) async throws
 }
@@ -59,6 +60,10 @@ final class InMemoryDepositsRepository: DepositsRepository {
         depositTransactions
             .filter { $0.depositId == depositId }
             .sorted { $0.date < $1.date }
+    }
+
+    func fetchAllTransactions() async throws -> [DepositTransaction] {
+        depositTransactions.sorted { $0.date < $1.date }
     }
 
     func addTransaction(_ transaction: DepositTransaction) async throws {
@@ -122,6 +127,11 @@ actor SwiftDataDepositsRepository: @preconcurrency DepositsRepository {
     func transactions(forDepositId depositId: UUID) async throws -> [DepositTransaction] {
         let predicate = #Predicate<DepositTransaction> { $0.depositId == depositId }
         let descriptor = FetchDescriptor(predicate: predicate, sortBy: [SortDescriptor(\.date, order: .forward)])
+        return try modelContext.fetch(descriptor)
+    }
+
+    func fetchAllTransactions() async throws -> [DepositTransaction] {
+        let descriptor = FetchDescriptor<DepositTransaction>(sortBy: [SortDescriptor(\.date, order: .forward)])
         return try modelContext.fetch(descriptor)
     }
 

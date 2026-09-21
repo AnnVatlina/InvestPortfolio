@@ -162,6 +162,7 @@
 "settings.import.title" = "Импорт данных";
 "settings.import.deposits" = "Импорт вкладов";
 "settings.import.subscriptions" = "Импорт подписок";
+"settings.import.transactions" = "Импорт истории операций";
 "settings.import.result.title" = "Импорт завершён";
 "settings.import.result.format" = "Добавлено: %d\nПропущено (дубли): %d\nОшибки разбора: %d";
 
@@ -169,6 +170,7 @@
 "settings.export.title" = "Экспорт данных";
 "settings.export.deposits" = "Экспорт вкладов";
 "settings.export.subscriptions" = "Экспорт подписок";
+"settings.export.transactions" = "Экспорт истории операций";
 "settings.export.error" = "Не удалось создать файл экспорта";
 
 // MARK: - Auth (Rentivo)

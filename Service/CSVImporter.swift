@@ -17,7 +17,11 @@ enum CSVImporter {
         let failed: Int     // rows that couldn't be parsed
     }
 
-    /// Parses a deposits CSV (header: ID,Title,Bank,Amount,Currency,OpenDate,CloseDate,AnnualRate%,CreatedAt)
+    /// Parses a deposits CSV (header: ID,Title,Bank,Amount,Currency,OpenDate,CloseDate,AnnualRate%,CreatedAt,
+    /// InterestType,CapitalizationPeriod,AllowsReplenishment,AllowsPartialWithdrawal,IsRevocable,EarlyWithdrawalRate).
+    /// The six columns after CreatedAt were added later — a CSV exported by an older version of
+    /// the app (only 9 columns) still parses, with each missing field falling back to the same
+    /// default `Deposit.init` already uses (simple interest, not replenishable, revocable).
     static func parseDeposits(_ csv: String) -> ParseResult<Deposit> {
         let lines = splitLines(csv).dropFirst() // skip header
         var items: [Deposit] = []
@@ -40,6 +44,13 @@ enum CSVImporter {
             let bankName: String? = f[2].isEmpty ? nil : f[2]
             let closeDate: Date? = f[6].isEmpty ? nil : fmt.date(from: f[6])
 
+            let interestType = f.count > 9 ? (DepositInterestType(rawValue: f[9]) ?? .simple) : .simple
+            let capitalizationPeriod: CapitalizationPeriod? = (f.count > 10 && !f[10].isEmpty) ? CapitalizationPeriod(rawValue: f[10]) : nil
+            let allowsReplenishment = f.count > 11 && f[11].lowercased() == "true"
+            let allowsPartialWithdrawal = f.count > 12 && f[12].lowercased() == "true"
+            let isRevocable = f.count > 13 ? f[13].lowercased() == "true" : true
+            let earlyWithdrawalRate: Double? = (f.count > 14 && !f[14].isEmpty) ? Double(f[14]) : nil
+
             items.append(Deposit(
                 id: id,
                 title: title,
@@ -49,8 +60,36 @@ enum CSVImporter {
                 createdAt: createdAt,
                 openDate: openDate,
                 closeDate: closeDate,
-                annualInterestRate: rate
+                annualInterestRate: rate,
+                interestType: interestType,
+                capitalizationPeriod: capitalizationPeriod,
+                allowsReplenishment: allowsReplenishment,
+                allowsPartialWithdrawal: allowsPartialWithdrawal,
+                isRevocable: isRevocable,
+                earlyWithdrawalRate: earlyWithdrawalRate
             ))
+        }
+        return ParseResult(items: items, failed: failed)
+    }
+
+    /// Parses a deposit-transactions CSV (header: ID,DepositID,Date,Amount).
+    static func parseTransactions(_ csv: String) -> ParseResult<DepositTransaction> {
+        let lines = splitLines(csv).dropFirst()
+        var items: [DepositTransaction] = []
+        var failed = 0
+        let fmt = isoFormatter()
+
+        for line in lines {
+            guard !line.trimmingCharacters(in: .whitespaces).isEmpty else { continue }
+            let f = parseRow(line)
+            guard f.count >= 4,
+                  let id = UUID(uuidString: f[0]),
+                  let depositId = UUID(uuidString: f[1]),
+                  let date = fmt.date(from: f[2]),
+                  let amount = Double(f[3])
+            else { failed += 1; continue }
+
+            items.append(DepositTransaction(id: id, depositId: depositId, date: date, amount: amount))
         }
         return ParseResult(items: items, failed: failed)
     }

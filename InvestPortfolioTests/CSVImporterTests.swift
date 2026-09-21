@@ -32,10 +32,28 @@ private func dep(
     createdAt: Date = wholeSecondDate(2026, 1, 1),
     openDate: Date = wholeSecondDate(2026, 1, 2),
     closeDate: Date? = nil,
-    rate: Double = 10.0
+    rate: Double = 10.0,
+    interestType: DepositInterestType = .simple,
+    capitalizationPeriod: CapitalizationPeriod? = nil,
+    allowsReplenishment: Bool = false,
+    allowsPartialWithdrawal: Bool = false,
+    isRevocable: Bool = true,
+    earlyWithdrawalRate: Double? = nil
 ) -> Deposit {
     Deposit(id: id, title: title, bankName: bankName, amount: amount, currency: currency,
-            createdAt: createdAt, openDate: openDate, closeDate: closeDate, annualInterestRate: rate)
+            createdAt: createdAt, openDate: openDate, closeDate: closeDate, annualInterestRate: rate,
+            interestType: interestType, capitalizationPeriod: capitalizationPeriod,
+            allowsReplenishment: allowsReplenishment, allowsPartialWithdrawal: allowsPartialWithdrawal,
+            isRevocable: isRevocable, earlyWithdrawalRate: earlyWithdrawalRate)
+}
+
+private func transaction(
+    id: UUID = UUID(),
+    depositId: UUID = UUID(),
+    date: Date = wholeSecondDate(2026, 2, 1),
+    amount: Double = 1000
+) -> DepositTransaction {
+    DepositTransaction(id: id, depositId: depositId, date: date, amount: amount)
 }
 
 private func sub(
@@ -81,6 +99,45 @@ struct CSVImporterDepositsRoundTripTests {
         #expect(recovered.openDate == original.openDate)
         #expect(recovered.closeDate == original.closeDate)
         #expect(abs(recovered.annualInterestRate - original.annualInterestRate) < 0.001)
+        #expect(recovered.interestType == original.interestType)
+        #expect(recovered.capitalizationPeriod == original.capitalizationPeriod)
+        #expect(recovered.allowsReplenishment == original.allowsReplenishment)
+        #expect(recovered.allowsPartialWithdrawal == original.allowsPartialWithdrawal)
+        #expect(recovered.isRevocable == original.isRevocable)
+        #expect(recovered.earlyWithdrawalRate == original.earlyWithdrawalRate)
+    }
+
+    @Test("Capitalized, irrevocable, replenishable deposit round-trips all extended fields")
+    func extendedFieldsRoundTrip() {
+        let original = dep(interestType: .capitalized, capitalizationPeriod: .yearly,
+                            allowsReplenishment: true, allowsPartialWithdrawal: true,
+                            isRevocable: false, earlyWithdrawalRate: 2.25)
+        let result = CSVImporter.parseDeposits(CSVExporter.csv(for: [original]))
+        let recovered = try! #require(result.items.first)
+
+        #expect(recovered.interestType == .capitalized)
+        #expect(recovered.capitalizationPeriod == .yearly)
+        #expect(recovered.allowsReplenishment == true)
+        #expect(recovered.allowsPartialWithdrawal == true)
+        #expect(recovered.isRevocable == false)
+        #expect(recovered.earlyWithdrawalRate == 2.25)
+    }
+
+    @Test("A CSV exported before extended columns existed (9 columns) still parses, with default values")
+    func legacyNineColumnCSVUsesDefaults() {
+        let id = UUID()
+        let csv = "ID,Title,Bank,Amount,Currency,OpenDate,CloseDate,AnnualRate%,CreatedAt\n" +
+                  "\(id.uuidString),Legacy,Bank,100000,RUB,2026-01-02T12:00:00Z,,10,2026-01-01T12:00:00Z"
+        let result = CSVImporter.parseDeposits(csv)
+        #expect(result.failed == 0)
+        let recovered = try! #require(result.items.first)
+
+        #expect(recovered.interestType == .simple)
+        #expect(recovered.capitalizationPeriod == nil)
+        #expect(recovered.allowsReplenishment == false)
+        #expect(recovered.allowsPartialWithdrawal == false)
+        #expect(recovered.isRevocable == true)
+        #expect(recovered.earlyWithdrawalRate == nil)
     }
 
     @Test("Nil bankName and closeDate round-trip as nil, not empty string")
@@ -264,5 +321,56 @@ struct CSVImporterEmbeddedNewlineTests {
         #expect(result.failed > 0)
         #expect(result.items.map(\.title) == ["Before", "After"])
         #expect(!result.items.contains { $0.title.contains("Line1") })
+    }
+}
+
+// MARK: - Deposit transactions round-trip
+
+@Suite("CSVImporter — deposit transactions round-trip")
+struct CSVImporterTransactionsRoundTripTests {
+
+    @Test("Every field survives export then import unchanged")
+    func fullRoundTrip() {
+        let original = transaction(amount: -1500.5)
+        let result = CSVImporter.parseTransactions(CSVExporter.csv(for: [original]))
+        #expect(result.failed == 0)
+        let recovered = try! #require(result.items.first)
+
+        #expect(recovered.id == original.id)
+        #expect(recovered.depositId == original.depositId)
+        #expect(recovered.date == original.date)
+        #expect(abs(recovered.amount - original.amount) < 0.001)
+    }
+
+    @Test("Multiple transactions all round-trip, in order")
+    func multipleTransactionsRoundTrip() {
+        let originals = [transaction(amount: 100), transaction(amount: -50), transaction(amount: 200)]
+        let result = CSVImporter.parseTransactions(CSVExporter.csv(for: originals))
+        #expect(result.failed == 0)
+        #expect(result.items.map(\.amount) == [100, -50, 200])
+    }
+
+    @Test("Header-only CSV parses to zero items and zero failures")
+    func headerOnlyIsEmpty() {
+        let result = CSVImporter.parseTransactions("ID,DepositID,Date,Amount")
+        #expect(result.items.isEmpty)
+        #expect(result.failed == 0)
+    }
+
+    @Test("Invalid depositId marks the row as failed")
+    func invalidDepositIdFails() {
+        let csv = "ID,DepositID,Date,Amount\n" +
+                  "\(UUID().uuidString),not-a-uuid,2026-01-01T00:00:00Z,100"
+        let result = CSVImporter.parseTransactions(csv)
+        #expect(result.items.isEmpty)
+        #expect(result.failed == 1)
+    }
+
+    @Test("Too few columns marks the row as failed rather than crashing")
+    func tooFewColumnsFails() {
+        let csv = "ID,DepositID,Date,Amount\n" + "\(UUID().uuidString),\(UUID().uuidString)"
+        let result = CSVImporter.parseTransactions(csv)
+        #expect(result.items.isEmpty)
+        #expect(result.failed == 1)
     }
 }

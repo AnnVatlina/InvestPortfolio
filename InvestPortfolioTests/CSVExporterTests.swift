@@ -20,10 +20,28 @@ private func dep(
     createdAt: Date = Date(),
     openDate: Date = Date(),
     closeDate: Date? = nil,
-    rate: Double = 10.0
+    rate: Double = 10.0,
+    interestType: DepositInterestType = .simple,
+    capitalizationPeriod: CapitalizationPeriod? = nil,
+    allowsReplenishment: Bool = false,
+    allowsPartialWithdrawal: Bool = false,
+    isRevocable: Bool = true,
+    earlyWithdrawalRate: Double? = nil
 ) -> Deposit {
     Deposit(id: id, title: title, bankName: bankName, amount: amount, currency: currency,
-            createdAt: createdAt, openDate: openDate, closeDate: closeDate, annualInterestRate: rate)
+            createdAt: createdAt, openDate: openDate, closeDate: closeDate, annualInterestRate: rate,
+            interestType: interestType, capitalizationPeriod: capitalizationPeriod,
+            allowsReplenishment: allowsReplenishment, allowsPartialWithdrawal: allowsPartialWithdrawal,
+            isRevocable: isRevocable, earlyWithdrawalRate: earlyWithdrawalRate)
+}
+
+private func transaction(
+    id: UUID = UUID(),
+    depositId: UUID = UUID(),
+    date: Date = Date(),
+    amount: Double = 1000
+) -> DepositTransaction {
+    DepositTransaction(id: id, depositId: depositId, date: date, amount: amount)
 }
 
 private func sub(
@@ -52,7 +70,35 @@ struct CSVExporterDepositsTests {
     @Test("Header row matches the documented column order")
     func headerRow() {
         let csv = CSVExporter.csv(for: [Deposit]())
-        #expect(csv == "ID,Title,Bank,Amount,Currency,OpenDate,CloseDate,AnnualRate%,CreatedAt")
+        #expect(csv == "ID,Title,Bank,Amount,Currency,OpenDate,CloseDate,AnnualRate%,CreatedAt,InterestType,CapitalizationPeriod,AllowsReplenishment,AllowsPartialWithdrawal,IsRevocable,EarlyWithdrawalRate")
+    }
+
+    @Test("Capitalized deposit with all flags set renders the extended columns")
+    func extendedColumnsRenderCorrectly() {
+        let d = dep(interestType: .capitalized, capitalizationPeriod: .quarterly,
+                    allowsReplenishment: true, allowsPartialWithdrawal: true,
+                    isRevocable: false, earlyWithdrawalRate: 1.5)
+        let csv = CSVExporter.csv(for: [d])
+        let fields = csv.components(separatedBy: "\n")[1].components(separatedBy: ",")
+        #expect(fields[9] == "capitalized")
+        #expect(fields[10] == "quarterly")
+        #expect(fields[11] == "true")
+        #expect(fields[12] == "true")
+        #expect(fields[13] == "false")
+        #expect(fields[14] == "1.5")
+    }
+
+    @Test("Simple, revocable deposit renders empty fields for the optional extended columns")
+    func defaultExtendedColumnsRenderEmpty() {
+        let d = dep()
+        let csv = CSVExporter.csv(for: [d])
+        let fields = csv.components(separatedBy: "\n")[1].components(separatedBy: ",")
+        #expect(fields[9] == "simple")
+        #expect(fields[10] == "")   // no capitalization period
+        #expect(fields[11] == "false")
+        #expect(fields[12] == "false")
+        #expect(fields[13] == "true")
+        #expect(fields[14] == "")  // no early-withdrawal rate
     }
 
     @Test("Row count equals header plus one line per deposit")
@@ -129,6 +175,32 @@ struct CSVExporterSubscriptionsTests {
         let s = sub(iconName: "gamecontroller.fill")
         let csv = CSVExporter.csv(for: [s])
         #expect(!csv.contains("gamecontroller.fill"))
+    }
+}
+
+// MARK: - Deposit Transactions
+
+@Suite("CSVExporter — deposit transactions")
+struct CSVExporterTransactionsTests {
+
+    @Test("Header row matches the documented column order")
+    func headerRow() {
+        let csv = CSVExporter.csv(for: [DepositTransaction]())
+        #expect(csv == "ID,DepositID,Date,Amount")
+    }
+
+    @Test("Row count equals header plus one line per transaction")
+    func rowCountMatchesTransactionCount() {
+        let csv = CSVExporter.csv(for: [transaction(), transaction()])
+        #expect(csv.components(separatedBy: "\n").count == 3)
+    }
+
+    @Test("A withdrawal's negative amount renders with a minus sign")
+    func negativeAmountRendersCorrectly() {
+        let t = transaction(amount: -500)
+        let csv = CSVExporter.csv(for: [t])
+        let fields = csv.components(separatedBy: "\n")[1].components(separatedBy: ",")
+        #expect(fields[3] == "-500.0")
     }
 }
 

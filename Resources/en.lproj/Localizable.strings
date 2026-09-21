@@ -162,6 +162,7 @@
 "settings.import.title" = "Import Data";
 "settings.import.deposits" = "Import Deposits";
 "settings.import.subscriptions" = "Import Subscriptions";
+"settings.import.transactions" = "Import Transaction History";
 "settings.import.result.title" = "Import Complete";
 "settings.import.result.format" = "Imported: %d\nSkipped (duplicates): %d\nFailed to parse: %d";
 
@@ -169,6 +170,7 @@
 "settings.export.title" = "Export Data";
 "settings.export.deposits" = "Export Deposits";
 "settings.export.subscriptions" = "Export Subscriptions";
+"settings.export.transactions" = "Export Transaction History";
 "settings.export.error" = "Failed to create export file";
 
 // MARK: - Auth (Rentivo)

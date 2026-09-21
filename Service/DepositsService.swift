@@ -23,6 +23,7 @@ protocol DepositsService {
     // MARK: - Transactions (contributions / partial withdrawals)
 
     func transactions(forDepositId depositId: UUID) async throws -> [DepositTransaction]
+    func fetchAllTransactions() async throws -> [DepositTransaction]
     func addTransaction(_ transaction: DepositTransaction) async throws
     func deleteTransaction(id: UUID) async throws
 }
@@ -62,6 +63,10 @@ final class DefaultDepositsService: DepositsService {
 
     func transactions(forDepositId depositId: UUID) async throws -> [DepositTransaction] {
         try await repository.transactions(forDepositId: depositId)
+    }
+
+    func fetchAllTransactions() async throws -> [DepositTransaction] {
+        try await repository.fetchAllTransactions()
     }
 
     func addTransaction(_ transaction: DepositTransaction) async throws {

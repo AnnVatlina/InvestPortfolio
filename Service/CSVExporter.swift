@@ -12,7 +12,7 @@ enum CSVExporter {
     // MARK: - Deposits
 
     static func csv(for deposits: [Deposit]) -> String {
-        var rows: [String] = ["ID,Title,Bank,Amount,Currency,OpenDate,CloseDate,AnnualRate%,CreatedAt"]
+        var rows: [String] = ["ID,Title,Bank,Amount,Currency,OpenDate,CloseDate,AnnualRate%,CreatedAt,InterestType,CapitalizationPeriod,AllowsReplenishment,AllowsPartialWithdrawal,IsRevocable,EarlyWithdrawalRate"]
         let fmt = iso8601Formatter()
         for d in deposits {
             rows.append([
@@ -24,7 +24,29 @@ enum CSVExporter {
                 fmt.string(from: d.openDate),
                 d.closeDate.map { fmt.string(from: $0) } ?? "",
                 String(d.annualInterestRate),
-                fmt.string(from: d.createdAt)
+                fmt.string(from: d.createdAt),
+                d.interestType.rawValue,
+                d.capitalizationPeriod?.rawValue ?? "",
+                d.allowsReplenishment ? "true" : "false",
+                d.allowsPartialWithdrawal ? "true" : "false",
+                d.isRevocable ? "true" : "false",
+                d.earlyWithdrawalRate.map { String($0) } ?? ""
+            ].joined(separator: ","))
+        }
+        return rows.joined(separator: "\n")
+    }
+
+    // MARK: - Deposit Transactions
+
+    static func csv(for transactions: [DepositTransaction]) -> String {
+        var rows: [String] = ["ID,DepositID,Date,Amount"]
+        let fmt = iso8601Formatter()
+        for t in transactions {
+            rows.append([
+                t.id.uuidString,
+                t.depositId.uuidString,
+                fmt.string(from: t.date),
+                String(t.amount)
             ].joined(separator: ","))
         }
         return rows.joined(separator: "\n")

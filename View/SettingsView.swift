@@ -154,7 +154,7 @@ struct DataSettingsView: View {
     @State private var isExporting = false
     @State private var exportError: String?
 
-    private enum ImportType { case deposits, subscriptions }
+    private enum ImportType { case deposits, subscriptions, transactions }
     @State private var currentImportType: ImportType? = nil
     @State private var isShowingImporter = false
     @State private var isImporting = false
@@ -171,12 +171,17 @@ struct DataSettingsView: View {
                     let service = container.makeSubscriptionsService()
                     return CSVExporter.csv(for: try await service.fetchAll())
                 }
+                exportButton(title: "settings.export.transactions", icon: "arrow.left.arrow.right.circle", filename: "deposit-transactions.csv") {
+                    let service = container.makeDepositsService()
+                    return CSVExporter.csv(for: try await service.fetchAllTransactions())
+                }
             }
             .disabled(isExporting)
 
             Section(header: Text("settings.import.title")) {
                 importButton(title: "settings.import.deposits", icon: "square.and.arrow.down", type: .deposits)
                 importButton(title: "settings.import.subscriptions", icon: "square.and.arrow.down", type: .subscriptions)
+                importButton(title: "settings.import.transactions", icon: "square.and.arrow.down", type: .transactions)
             }
             .disabled(isImporting || isExporting)
         }
@@ -221,6 +226,7 @@ struct DataSettingsView: View {
                     switch type {
                     case .deposits: await handleDepositImport(result)
                     case .subscriptions: await handleSubscriptionImport(result)
+                    case .transactions: await handleTransactionImport(result)
                     case nil: break
                     }
                 }
@@ -300,6 +306,32 @@ struct DataSettingsView: View {
             for s in toAdd {
                 do {
                     try await service.add(s)
+                    imported += 1
+                } catch {
+                    failed += 1
+                }
+            }
+            importSummary = ImportSummary(imported: imported, skipped: parsed.items.count - toAdd.count, failed: failed)
+        } catch {
+            exportError = error.localizedDescription
+        }
+    }
+
+    private func handleTransactionImport(_ result: Result<URL, Error>) async {
+        isImporting = true
+        defer { isImporting = false }
+        do {
+            let url = try result.get()
+            let csv = try readCSV(from: url)
+            let parsed = CSVImporter.parseTransactions(csv)
+            let service = container.makeDepositsService()
+            let existingIDs = Set(try await service.fetchAllTransactions().map { $0.id })
+            let toAdd = parsed.items.filter { !existingIDs.contains($0.id) }
+            var imported = 0
+            var failed = parsed.failed
+            for t in toAdd {
+                do {
+                    try await service.addTransaction(t)
                     imported += 1
                 } catch {
                     failed += 1
