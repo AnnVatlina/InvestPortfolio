@@ -8,8 +8,10 @@ import SwiftUI
 
 struct DepositsView: View {
     @StateObject private var vm: DepositsViewModel
+    private let container: DIContainer
 
     init(container: DIContainer) {
+        self.container = container
         _vm = StateObject(wrappedValue: DepositsViewModel(
             service: container.makeDepositsService()
         ))
@@ -17,7 +19,6 @@ struct DepositsView: View {
 
     @Environment(\.locale) private var locale
     @State private var showAddSheet = false
-    @State private var depositToEdit: Deposit? = nil
     @State private var depositToDelete: Deposit? = nil
 
     var body: some View {
@@ -65,29 +66,6 @@ struct DepositsView: View {
                 }
             }
         }
-        .sheet(item: $depositToEdit) { deposit in
-            DepositFormSheet(mode: .edit(deposit)) { formData in
-                Task {
-                    await vm.updateDeposit(
-                        id: deposit.id,
-                        title: formData.title,
-                        bankName: formData.bankName,
-                        amount: formData.amount,
-                        currency: formData.currency,
-                        openDate: formData.openDate,
-                        closeDate: formData.closeDate,
-                        annualInterestRate: formData.annualInterestRate,
-                        interestType: formData.interestType,
-                        capitalizationPeriod: formData.capitalizationPeriod,
-                        allowsReplenishment: formData.allowsReplenishment,
-                        allowsPartialWithdrawal: formData.allowsPartialWithdrawal,
-                        isRevocable: formData.isRevocable,
-                        earlyWithdrawalRate: formData.earlyWithdrawalRate,
-                        actualCloseDate: deposit.actualCloseDate
-                    )
-                }
-            }
-        }
         .alert(LanguageBundle.string("deposits.delete.confirm.title"), isPresented: Binding(
             get: { depositToDelete != nil },
             set: { if !$0 { depositToDelete = nil } }
@@ -121,11 +99,12 @@ struct DepositsView: View {
     private var depositsList: some View {
         List {
             ForEach(vm.deposits) { deposit in
-                DepositRow(deposit: deposit, summary: vm.incomeSummary(for: deposit))
-                    .contentShape(Rectangle())
-                    .onTapGesture { depositToEdit = deposit }
-                    .accessibilityElement(children: .combine)
-                    .accessibilityAddTraits(.isButton)
+                NavigationLink {
+                    DepositDetailView(deposit: deposit, depositsViewModel: vm, container: container)
+                } label: {
+                    DepositRow(deposit: deposit, summary: vm.incomeSummary(for: deposit))
+                        .accessibilityElement(children: .combine)
+                }
             }
             .onDelete { indexSet in
                 if let index = indexSet.first {
@@ -207,6 +186,16 @@ private struct DepositRow: View {
                         .background(isClosed ? Color.secondary.opacity(0.15) : Color.brand.opacity(0.15))
                         .foregroundColor(isClosed ? .secondary : .brand)
                         .clipShape(Capsule())
+                    if deposit.interestType == .capitalized {
+                        Label(LanguageBundle.string("deposits.interestType.capitalized"), systemImage: "arrow.triangle.2.circlepath")
+                            .font(.caption2)
+                            .foregroundColor(.secondary)
+                    }
+                    if !deposit.isRevocable {
+                        Label(LanguageBundle.string("deposits.field.irrevocable"), systemImage: "lock.fill")
+                            .font(.caption2)
+                            .foregroundColor(.secondary)
+                    }
                     Text(String(format: LanguageBundle.string("deposits.rate.format"), deposit.annualInterestRate))
                         .font(.caption)
                         .foregroundColor(.secondary)
@@ -301,7 +290,7 @@ enum DepositFormMode {
     case edit(Deposit)
 }
 
-private struct DepositFormSheet: View {
+struct DepositFormSheet: View {
     let mode: DepositFormMode
     let onSave: (DepositFormData) -> Void
 

@@ -1,0 +1,223 @@
+//
+//  DepositDetailView.swift
+//
+//  Read-only overview of a single deposit: current balance, growth chart, and
+//  transaction history. Editing happens via the explicit "Edit" button, not a tap.
+//
+
+import SwiftUI
+import Charts
+
+struct DepositDetailView: View {
+    @ObservedObject var depositsViewModel: DepositsViewModel
+    @StateObject private var detailViewModel: DepositDetailViewModel
+    @State private var deposit: Deposit
+    @State private var showEditSheet = false
+    @Environment(\.locale) private var locale
+
+    init(deposit: Deposit, depositsViewModel: DepositsViewModel, container: DIContainer) {
+        self._deposit = State(initialValue: deposit)
+        self.depositsViewModel = depositsViewModel
+        self._detailViewModel = StateObject(wrappedValue: DepositDetailViewModel(
+            deposit: deposit,
+            service: container.makeDepositsService()
+        ))
+    }
+
+    private var isClosed: Bool {
+        guard let closeDate = deposit.closeDate else { return false }
+        return closeDate <= Date()
+    }
+
+    var body: some View {
+        ScrollView {
+            VStack(alignment: .leading, spacing: 24) {
+                header
+                chartSection
+                transactionsSection
+            }
+            .padding()
+        }
+        .navigationTitle(deposit.title)
+        .navigationBarTitleDisplayMode(.inline)
+        .toolbar {
+            ToolbarItem(placement: .primaryAction) {
+                Button(LanguageBundle.string("deposits.detail.editAction")) {
+                    showEditSheet = true
+                }
+            }
+        }
+        .task { await detailViewModel.load() }
+        .sheet(isPresented: $showEditSheet) {
+            DepositFormSheet(mode: .edit(deposit)) { formData in
+                Task {
+                    await depositsViewModel.updateDeposit(
+                        id: deposit.id,
+                        title: formData.title,
+                        bankName: formData.bankName,
+                        amount: formData.amount,
+                        currency: formData.currency,
+                        openDate: formData.openDate,
+                        closeDate: formData.closeDate,
+                        annualInterestRate: formData.annualInterestRate,
+                        interestType: formData.interestType,
+                        capitalizationPeriod: formData.capitalizationPeriod,
+                        allowsReplenishment: formData.allowsReplenishment,
+                        allowsPartialWithdrawal: formData.allowsPartialWithdrawal,
+                        isRevocable: formData.isRevocable,
+                        earlyWithdrawalRate: formData.earlyWithdrawalRate,
+                        actualCloseDate: deposit.actualCloseDate
+                    )
+                    // SwiftData mutations from the repository don't update this instance in
+                    // place — pick up the freshly-reloaded object from the shared view model.
+                    if let refreshed = depositsViewModel.deposits.first(where: { $0.id == deposit.id }) {
+                        deposit = refreshed
+                        await detailViewModel.refresh(deposit: refreshed)
+                    }
+                }
+            }
+        }
+    }
+
+    // MARK: - Header
+
+    private var header: some View {
+        VStack(alignment: .leading, spacing: 8) {
+            if let bankName = deposit.bankName, !bankName.isEmpty {
+                Text(bankName)
+                    .font(.subheadline)
+                    .foregroundColor(.secondary)
+            }
+            Text("\(deposit.amount, specifier: "%.0f") \(deposit.currency.rawValue)")
+                .font(.largeTitle)
+                .fontWeight(.bold)
+                .accessibilityLabel(String(format: LanguageBundle.string("deposits.detail.amount.accessibility.format"), deposit.amount, deposit.currency.rawValue))
+
+            HStack(spacing: 8) {
+                badge(
+                    text: isClosed ? LanguageBundle.string("deposits.status.closed") : LanguageBundle.string("deposits.status.active"),
+                    tint: isClosed ? .secondary : .brand
+                )
+                badge(text: String(format: LanguageBundle.string("deposits.rate.format"), deposit.annualInterestRate), tint: .secondary)
+                if deposit.interestType == .capitalized {
+                    badge(text: LanguageBundle.string("deposits.interestType.capitalized"), icon: "arrow.triangle.2.circlepath", tint: .secondary)
+                }
+                if !deposit.isRevocable {
+                    badge(text: LanguageBundle.string("deposits.field.irrevocable"), icon: "lock.fill", tint: .secondary)
+                }
+            }
+            .accessibilityElement(children: .combine)
+        }
+    }
+
+    private func badge(text: String, icon: String? = nil, tint: Color) -> some View {
+        HStack(spacing: 3) {
+            if let icon {
+                Image(systemName: icon)
+            }
+            Text(text)
+        }
+        .font(.caption2)
+        .fontWeight(.medium)
+        .padding(.horizontal, 7)
+        .padding(.vertical, 3)
+        .background(tint.opacity(0.15))
+        .foregroundColor(tint)
+        .clipShape(Capsule())
+    }
+
+    // MARK: - Chart
+
+    private var actualPoints: [DepositBalancePoint] {
+        detailViewModel.chartPoints.filter { !$0.isProjected }
+    }
+
+    private var projectedPoints: [DepositBalancePoint] {
+        // Prepend the last actual point so the dashed segment visually connects to the solid line.
+        let projected = detailViewModel.chartPoints.filter { $0.isProjected }
+        guard let lastActual = actualPoints.last, !projected.isEmpty else { return [] }
+        return [lastActual] + projected
+    }
+
+    private var chartAccessibilityLabel: String {
+        guard let first = detailViewModel.chartPoints.first,
+              let last = detailViewModel.chartPoints.last else { return "" }
+        return String(format: LanguageBundle.string("deposits.detail.chart.accessibility.format"),
+                      first.balance, last.balance, deposit.currency.rawValue)
+    }
+
+    private var chartSection: some View {
+        VStack(alignment: .leading, spacing: 8) {
+            Text(LanguageBundle.string("deposits.detail.chart.title"))
+                .font(.headline)
+
+            if detailViewModel.chartPoints.count > 1 {
+                Chart {
+                    ForEach(actualPoints) { point in
+                        LineMark(x: .value("Date", point.date),
+                                 y: .value("Balance", point.balance))
+                            .foregroundStyle(Color.brand)
+                    }
+                    ForEach(projectedPoints) { point in
+                        LineMark(x: .value("Date", point.date),
+                                 y: .value("Balance", point.balance))
+                            .foregroundStyle(Color.orange)
+                            .lineStyle(StrokeStyle(dash: [4, 4]))
+                    }
+                }
+                .frame(height: 180)
+                .accessibilityElement(children: .ignore)
+                .accessibilityLabel(chartAccessibilityLabel)
+            } else {
+                Text(LanguageBundle.string("deposits.detail.chart.empty"))
+                    .font(.subheadline)
+                    .foregroundColor(.secondary)
+                    .frame(maxWidth: .infinity, minHeight: 80)
+            }
+        }
+    }
+
+    // MARK: - Transaction history
+
+    private var transactionsSection: some View {
+        VStack(alignment: .leading, spacing: 8) {
+            Text(LanguageBundle.string("deposits.detail.transactions.title"))
+                .font(.headline)
+
+            if detailViewModel.transactions.isEmpty {
+                Text(LanguageBundle.string("deposits.detail.transactions.empty"))
+                    .font(.subheadline)
+                    .foregroundColor(.secondary)
+            } else {
+                VStack(spacing: 0) {
+                    ForEach(detailViewModel.transactionsWithRunningBalance(), id: \.transaction.id) { entry in
+                        transactionRow(entry.transaction, balanceAfter: entry.balanceAfter)
+                        if entry.transaction.id != detailViewModel.transactionsWithRunningBalance().last?.transaction.id {
+                            Divider()
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    private func transactionRow(_ transaction: DepositTransaction, balanceAfter: Double) -> some View {
+        HStack {
+            VStack(alignment: .leading, spacing: 2) {
+                Text(transaction.date.formatted(Date.FormatStyle(date: .abbreviated, time: .omitted).locale(locale)))
+                    .font(.caption)
+                    .foregroundColor(.secondary)
+                Text(String(format: LanguageBundle.string("deposits.detail.transaction.balanceAfter.format"),
+                            balanceAfter, deposit.currency.rawValue))
+                    .font(.caption2)
+                    .foregroundColor(.secondary)
+            }
+            Spacer()
+            Text("\(transaction.amount > 0 ? "+" : "")\(transaction.amount, specifier: "%.0f") \(deposit.currency.rawValue)")
+                .fontWeight(.medium)
+                .foregroundColor(transaction.amount > 0 ? .brand : .red)
+        }
+        .padding(.vertical, 6)
+        .accessibilityElement(children: .combine)
+    }
+}

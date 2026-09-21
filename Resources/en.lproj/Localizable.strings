@@ -39,6 +39,14 @@
 "deposits.field.earlyWithdrawalRate" = "Rate on early withdrawal, %";
 "deposits.section.revocability.footer" = "A non-revocable deposit pays a much lower rate if you close it before the close date.";
 "deposits.error.earlyRateTooHigh" = "The early-withdrawal rate can't be higher than the deposit's rate";
+"deposits.detail.editAction" = "Edit";
+"deposits.detail.amount.accessibility.format" = "Current balance: %.2f %@";
+"deposits.detail.chart.title" = "Growth";
+"deposits.detail.chart.empty" = "Not enough data yet";
+"deposits.detail.chart.accessibility.format" = "Growth chart. Started at %.2f, now %.2f %@.";
+"deposits.detail.transactions.title" = "Transaction History";
+"deposits.detail.transactions.empty" = "No transactions yet";
+"deposits.detail.transaction.balanceAfter.format" = "Balance: %.2f %@";
 "deposits.loading" = "Loading deposits...";
 "deposits.empty" = "No deposits yet";
 "deposits.rate.format" = "Rate: %.2f%%";

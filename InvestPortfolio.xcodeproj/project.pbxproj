@@ -27,6 +27,8 @@
 		952BB1C53060EE7B00686092 /* DepositsServiceTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 952BB1C43060EE7B00686092 /* DepositsServiceTests.swift */; };
 		952BB1E93060F23500686092 /* DepositTransaction.swift in Sources */ = {isa = PBXBuildFile; fileRef = 952BB1E83060F23500686092 /* DepositTransaction.swift */; };
 		952BB1EA3060F23500686092 /* DepositTransaction.swift in Sources */ = {isa = PBXBuildFile; fileRef = 952BB1E83060F23500686092 /* DepositTransaction.swift */; };
+		952BB1EC3060F87900686092 /* DepositDetailViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 952BB1EB3060F87900686092 /* DepositDetailViewModel.swift */; };
+		952BB1EE3060F8B300686092 /* DepositDetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 952BB1ED3060F8B300686092 /* DepositDetailView.swift */; };
 		9539C4222F93FC9D003A105C /* AnalyticsViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9539C4212F93FC9D003A105C /* AnalyticsViewModel.swift */; };
 		9539C4242F93FCB9003A105C /* AnalyticsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9539C4232F93FCB9003A105C /* AnalyticsView.swift */; };
 		953C6246305EFFDB00D5C07B /* HomeViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 953C6245305EFFDB00D5C07B /* HomeViewModel.swift */; };
@@ -121,6 +123,8 @@
 		952BB1C13060ED0900686092 /* CapitalizationPeriod.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CapitalizationPeriod.swift; sourceTree = "<group>"; };
 		952BB1C43060EE7B00686092 /* DepositsServiceTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DepositsServiceTests.swift; sourceTree = "<group>"; };
 		952BB1E83060F23500686092 /* DepositTransaction.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DepositTransaction.swift; sourceTree = "<group>"; };
+		952BB1EB3060F87900686092 /* DepositDetailViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DepositDetailViewModel.swift; sourceTree = "<group>"; };
+		952BB1ED3060F8B300686092 /* DepositDetailView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DepositDetailView.swift; sourceTree = "<group>"; };
 		9539C4212F93FC9D003A105C /* AnalyticsViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AnalyticsViewModel.swift; sourceTree = "<group>"; };
 		9539C4232F93FCB9003A105C /* AnalyticsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AnalyticsView.swift; sourceTree = "<group>"; };
 		953C14A02F056E61003998D2 /* Base */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = Base; path = Base.lproj/Localizable.strings; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.plist; };
@@ -249,6 +253,7 @@
 				95AD90852F8252A50064CD19 /* SubscriptionsViewModel.swift */,
 				9539C4212F93FC9D003A105C /* AnalyticsViewModel.swift */,
 				953C6245305EFFDB00D5C07B /* HomeViewModel.swift */,
+				952BB1EB3060F87900686092 /* DepositDetailViewModel.swift */,
 			);
 			path = ViewModel;
 			sourceTree = "<group>";
@@ -338,6 +343,7 @@
 				9539C4232F93FCB9003A105C /* AnalyticsView.swift */,
 				95E87C222F94A28C00E238D5 /* OnboardingView.swift */,
 				95892D352F95F07500A30CA9 /* Color+Brand.swift */,
+				952BB1ED3060F8B300686092 /* DepositDetailView.swift */,
 			);
 			path = View;
 			sourceTree = "<group>";
@@ -479,12 +485,14 @@
 				9511098B2F8161EE00EE2EEE /* DIContainer.swift in Sources */,
 				950800092F0406650041AD54 /* Deposit.swift in Sources */,
 				95A86BD02F82B8BD009B94CF /* AppSchema.swift in Sources */,
+				952BB1EE3060F8B300686092 /* DepositDetailView.swift in Sources */,
 				9539C4242F93FCB9003A105C /* AnalyticsView.swift in Sources */,
 				F8045D927570703468F14EEE /* InvestPortfolioApp.swift in Sources */,
 				95AD90882F8252CA0064CD19 /* SubscriptionsView.swift in Sources */,
 				950800032F04064E0041AD54 /* DepositsView.swift in Sources */,
 				950800132F040B6C0041AD54 /* RootView.swift in Sources */,
 				95E87C212F94A27D00E238D5 /* SampleDataService.swift in Sources */,
+				952BB1EC3060F87900686092 /* DepositDetailViewModel.swift in Sources */,
 				9539C4222F93FC9D003A105C /* AnalyticsViewModel.swift in Sources */,
 				953C6265305FA13400D5C07B /* HomeQueries.swift in Sources */,
 				95AD90842F8252960064CD19 /* SubscriptionsService.swift in Sources */,

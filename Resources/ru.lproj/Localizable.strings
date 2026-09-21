@@ -39,6 +39,14 @@
 "deposits.field.earlyWithdrawalRate" = "Ставка при досрочном закрытии, %";
 "deposits.section.revocability.footer" = "По безотзывному вкладу при досрочном закрытии применяется значительно более низкая ставка.";
 "deposits.error.earlyRateTooHigh" = "Ставка при досрочном закрытии не может быть выше основной ставки вклада";
+"deposits.detail.editAction" = "Изменить";
+"deposits.detail.amount.accessibility.format" = "Текущий остаток: %.2f %@";
+"deposits.detail.chart.title" = "Рост вклада";
+"deposits.detail.chart.empty" = "Пока недостаточно данных";
+"deposits.detail.chart.accessibility.format" = "График роста вклада. Начиналось с %.2f, сейчас %.2f %@.";
+"deposits.detail.transactions.title" = "История операций";
+"deposits.detail.transactions.empty" = "Операций пока нет";
+"deposits.detail.transaction.balanceAfter.format" = "Остаток: %.2f %@";
 "deposits.loading" = "Загрузка вкладов...";
 "deposits.empty" = "Пока нет вкладов";
 "deposits.rate.format" = "Ставка: %.2f%%";

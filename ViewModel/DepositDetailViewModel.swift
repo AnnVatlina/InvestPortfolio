@@ -1,0 +1,107 @@
+//
+//  DepositDetailViewModel.swift
+//
+//  Builds the transaction history and balance-over-time chart series for a single deposit.
+//
+
+import Foundation
+
+struct DepositBalancePoint: Identifiable, Equatable {
+    let id = UUID()
+    let date: Date
+    let balance: Double
+    // True for points after "now" — drawn as a dashed forecast, not an actual measurement.
+    let isProjected: Bool
+}
+
+@MainActor
+final class DepositDetailViewModel: ObservableObject {
+    @Published private(set) var transactions: [DepositTransaction] = []
+    @Published private(set) var chartPoints: [DepositBalancePoint] = []
+    @Published var isLoading = false
+    @Published var errorMessage: String?
+
+    private let service: any DepositsService
+    private var deposit: Deposit
+    private let calendar: Calendar
+
+    init(deposit: Deposit, service: any DepositsService, calendar: Calendar = .current) {
+        self.deposit = deposit
+        self.service = service
+        self.calendar = calendar
+    }
+
+    func load() async {
+        await refresh(deposit: deposit)
+    }
+
+    /// Re-fetches transactions and rebuilds the chart for a (possibly updated) deposit —
+    /// call after an edit, since SwiftData mutations don't update the instance held here in place.
+    func refresh(deposit: Deposit) async {
+        self.deposit = deposit
+        isLoading = true
+        errorMessage = nil
+        defer { isLoading = false }
+        do {
+            transactions = try await service.transactions(forDepositId: deposit.id)
+            chartPoints = buildChartPoints()
+        } catch {
+            errorMessage = error.localizedDescription
+        }
+    }
+
+    /// Running balance immediately after each transaction, oldest first.
+    func transactionsWithRunningBalance() -> [(transaction: DepositTransaction, balanceAfter: Double)] {
+        var balance = deposit.amount
+        var result: [(DepositTransaction, Double)] = []
+        for transaction in transactions.sorted(by: { $0.date < $1.date }) {
+            balance += transaction.amount
+            result.append((transaction, balance))
+        }
+        return result
+    }
+
+    // MARK: - Chart
+
+    private func buildChartPoints() -> [DepositBalancePoint] {
+        let now = Date()
+        let end = deposit.actualCloseDate ?? deposit.closeDate ?? now
+        let chartEnd = max(end, deposit.openDate)
+
+        var sampleDates: Set<Date> = [deposit.openDate, min(now, chartEnd)]
+
+        // Forecast tail endpoint — only meaningful for a still-open deposit with a planned close date.
+        if deposit.actualCloseDate == nil, let close = deposit.closeDate, close > now {
+            sampleDates.insert(close)
+        }
+
+        for transaction in transactions where transaction.date > deposit.openDate && transaction.date <= chartEnd {
+            sampleDates.insert(transaction.date)
+        }
+
+        // Capitalization boundaries give an accurate step curve; for simple interest, monthly
+        // steps just keep the line's resolution consistent — the growth itself is linear either way.
+        if deposit.interestType == .capitalized, let period = deposit.capitalizationPeriod {
+            var boundary = deposit.openDate
+            while let next = calendar.date(byAdding: period.dateComponents, to: boundary), next <= chartEnd {
+                sampleDates.insert(next)
+                boundary = next
+            }
+        } else {
+            var monthBoundary = deposit.openDate
+            while let next = calendar.date(byAdding: .month, value: 1, to: monthBoundary), next <= chartEnd {
+                sampleDates.insert(next)
+                monthBoundary = next
+            }
+        }
+
+        return sampleDates.sorted().map { date in
+            let netTransactions = transactions
+                .filter { $0.date > deposit.openDate && $0.date <= date }
+                .reduce(0.0) { $0 + $1.amount }
+            let income = service.incomeSummary(for: deposit, transactions: transactions, asOf: date).incomeToDate
+            let balance = deposit.amount + netTransactions + income
+            return DepositBalancePoint(date: date, balance: balance, isProjected: date > now)
+        }
+    }
+}
