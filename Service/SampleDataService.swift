@@ -96,7 +96,9 @@ enum SampleDataService {
             createdAt: d(2024, 6, 28),
             openDate:  d(2024, 7, 1),
             closeDate: nil,
-            annualInterestRate: 5.0
+            annualInterestRate: 5.0,
+            interestType: .capitalized,
+            capitalizationPeriod: .monthly
         ),
         Deposit(
             title: "EUR Reserve",
@@ -116,7 +118,9 @@ enum SampleDataService {
             createdAt: d(2025, 5, 28),
             openDate:  d(2025, 6, 1),
             closeDate: d(2026, 6, 1),
-            annualInterestRate: 17.0
+            annualInterestRate: 17.0,
+            interestType: .capitalized,
+            capitalizationPeriod: .quarterly
         ),
         Deposit(
             title: "GEL Deposit",

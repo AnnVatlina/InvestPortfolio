@@ -49,7 +49,9 @@ final class DepositsViewModel: ObservableObject {
         currency: DepositCurrency,
         openDate: Date,
         closeDate: Date?,
-        annualInterestRate: Double
+        annualInterestRate: Double,
+        interestType: DepositInterestType = .simple,
+        capitalizationPeriod: CapitalizationPeriod? = nil
     ) async {
         guard !title.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty else {
             errorMessage = LanguageBundle.string("deposits.error.emptyTitle")
@@ -68,7 +70,9 @@ final class DepositsViewModel: ObservableObject {
                 currency: currency,
                 openDate: openDate,
                 closeDate: closeDate,
-                annualInterestRate: annualInterestRate
+                annualInterestRate: annualInterestRate,
+                interestType: interestType,
+                capitalizationPeriod: capitalizationPeriod
             )
             try await service.add(deposit)
             if let close = closeDate {
@@ -104,7 +108,9 @@ final class DepositsViewModel: ObservableObject {
         currency: DepositCurrency,
         openDate: Date,
         closeDate: Date?,
-        annualInterestRate: Double
+        annualInterestRate: Double,
+        interestType: DepositInterestType = .simple,
+        capitalizationPeriod: CapitalizationPeriod? = nil
     ) async {
         guard !title.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty else {
             errorMessage = LanguageBundle.string("deposits.error.emptyTitle")
@@ -124,7 +130,9 @@ final class DepositsViewModel: ObservableObject {
                 currency: currency,
                 openDate: openDate,
                 closeDate: closeDate,
-                annualInterestRate: annualInterestRate
+                annualInterestRate: annualInterestRate,
+                interestType: interestType,
+                capitalizationPeriod: capitalizationPeriod
             )
             cancelCloseNotification(depositId: id)
             if let close = closeDate {

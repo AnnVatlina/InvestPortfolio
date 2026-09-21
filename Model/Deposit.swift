@@ -21,10 +21,28 @@ final class Deposit {
     var closeDate: Date?
     var annualInterestRate: Double
 
+    // Stored as String/String? for the same reason as currencyRaw — see comment above.
+    // Default values here let SwiftData perform an automatic lightweight migration
+    // for existing deposits created before interest types were introduced.
+    var interestTypeRaw: String = DepositInterestType.simple.rawValue
+    var capitalizationPeriodRaw: String? = nil
+
     /// Typed accessor — computed, not stored by SwiftData.
     var currency: DepositCurrency {
         get { DepositCurrency(rawValue: currencyRaw) ?? .RUB }
         set { currencyRaw = newValue.rawValue }
+    }
+
+    /// Typed accessor — computed, not stored by SwiftData.
+    var interestType: DepositInterestType {
+        get { DepositInterestType(rawValue: interestTypeRaw) ?? .simple }
+        set { interestTypeRaw = newValue.rawValue }
+    }
+
+    /// Typed accessor — computed, not stored by SwiftData. Only meaningful when `interestType == .capitalized`.
+    var capitalizationPeriod: CapitalizationPeriod? {
+        get { capitalizationPeriodRaw.flatMap(CapitalizationPeriod.init(rawValue:)) }
+        set { capitalizationPeriodRaw = newValue?.rawValue }
     }
 
     init(
@@ -36,7 +54,9 @@ final class Deposit {
         createdAt: Date = Date(),
         openDate: Date,
         closeDate: Date? = nil,
-        annualInterestRate: Double
+        annualInterestRate: Double,
+        interestType: DepositInterestType = .simple,
+        capitalizationPeriod: CapitalizationPeriod? = nil
     ) {
         self.id = id
         self.title = title
@@ -47,5 +67,7 @@ final class Deposit {
         self.openDate = openDate
         self.closeDate = closeDate
         self.annualInterestRate = annualInterestRate
+        self.interestTypeRaw = interestType.rawValue
+        self.capitalizationPeriodRaw = capitalizationPeriod?.rawValue
     }
 }

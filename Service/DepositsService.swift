@@ -17,7 +17,7 @@ protocol DepositsService {
     func fetchAll() async throws -> [Deposit]
     func add(_ deposit: Deposit) async throws
     func delete(id: UUID) async throws
-    func update(id: UUID, title: String, bankName: String?, amount: Double, currency: DepositCurrency, openDate: Date, closeDate: Date?, annualInterestRate: Double) async throws
+    func update(id: UUID, title: String, bankName: String?, amount: Double, currency: DepositCurrency, openDate: Date, closeDate: Date?, annualInterestRate: Double, interestType: DepositInterestType, capitalizationPeriod: CapitalizationPeriod?) async throws
     func incomeSummary(for deposit: Deposit, asOf date: Date) -> DepositIncomeSummary
 }
 
@@ -42,8 +42,8 @@ final class DefaultDepositsService: DepositsService {
         try await repository.delete(id: id)
     }
 
-    func update(id: UUID, title: String, bankName: String?, amount: Double, currency: DepositCurrency, openDate: Date, closeDate: Date?, annualInterestRate: Double) async throws {
-        try await repository.update(id: id, title: title, bankName: bankName, amount: amount, currency: currency, openDate: openDate, closeDate: closeDate, annualInterestRate: annualInterestRate)
+    func update(id: UUID, title: String, bankName: String?, amount: Double, currency: DepositCurrency, openDate: Date, closeDate: Date?, annualInterestRate: Double, interestType: DepositInterestType, capitalizationPeriod: CapitalizationPeriod?) async throws {
+        try await repository.update(id: id, title: title, bankName: bankName, amount: amount, currency: currency, openDate: openDate, closeDate: closeDate, annualInterestRate: annualInterestRate, interestType: interestType, capitalizationPeriod: capitalizationPeriod)
     }
 
     func incomeSummary(for deposit: Deposit, asOf date: Date) -> DepositIncomeSummary {

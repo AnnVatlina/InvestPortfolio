@@ -20,6 +20,10 @@
 		950800152F040E5A0041AD54 /* SettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 950800142F040E5A0041AD54 /* SettingsView.swift */; };
 		9511098B2F8161EE00EE2EEE /* DIContainer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9511098A2F8161EE00EE2EEE /* DIContainer.swift */; };
 		9523DDAB2FBB85F400E24324 /* DepositsViewModelTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9523DDAA2FBB85F400E24324 /* DepositsViewModelTests.swift */; };
+		952BB1BF3060ED0900686092 /* DepositInterestType.swift in Sources */ = {isa = PBXBuildFile; fileRef = 952BB1BE3060ED0900686092 /* DepositInterestType.swift */; };
+		952BB1C03060ED0900686092 /* DepositInterestType.swift in Sources */ = {isa = PBXBuildFile; fileRef = 952BB1BE3060ED0900686092 /* DepositInterestType.swift */; };
+		952BB1C23060ED0900686092 /* CapitalizationPeriod.swift in Sources */ = {isa = PBXBuildFile; fileRef = 952BB1C13060ED0900686092 /* CapitalizationPeriod.swift */; };
+		952BB1C33060ED0900686092 /* CapitalizationPeriod.swift in Sources */ = {isa = PBXBuildFile; fileRef = 952BB1C13060ED0900686092 /* CapitalizationPeriod.swift */; };
 		9539C4222F93FC9D003A105C /* AnalyticsViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9539C4212F93FC9D003A105C /* AnalyticsViewModel.swift */; };
 		9539C4242F93FCB9003A105C /* AnalyticsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9539C4232F93FCB9003A105C /* AnalyticsView.swift */; };
 		953C6246305EFFDB00D5C07B /* HomeViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 953C6245305EFFDB00D5C07B /* HomeViewModel.swift */; };
@@ -110,6 +114,8 @@
 		9511098A2F8161EE00EE2EEE /* DIContainer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DIContainer.swift; sourceTree = "<group>"; };
 		95151F8C2EFFC86800285671 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		9523DDAA2FBB85F400E24324 /* DepositsViewModelTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DepositsViewModelTests.swift; sourceTree = "<group>"; };
+		952BB1BE3060ED0900686092 /* DepositInterestType.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DepositInterestType.swift; sourceTree = "<group>"; };
+		952BB1C13060ED0900686092 /* CapitalizationPeriod.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CapitalizationPeriod.swift; sourceTree = "<group>"; };
 		9539C4212F93FC9D003A105C /* AnalyticsViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AnalyticsViewModel.swift; sourceTree = "<group>"; };
 		9539C4232F93FCB9003A105C /* AnalyticsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AnalyticsView.swift; sourceTree = "<group>"; };
 		953C14A02F056E61003998D2 /* Base */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = Base; path = Base.lproj/Localizable.strings; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.plist; };
@@ -276,6 +282,8 @@
 				95AD90812F8252890064CD19 /* SubscriptionsRepository.swift */,
 				95A86BCF2F82B8BD009B94CF /* AppSchema.swift */,
 				953C6264305FA13400D5C07B /* HomeQueries.swift */,
+				952BB1BE3060ED0900686092 /* DepositInterestType.swift */,
+				952BB1C13060ED0900686092 /* CapitalizationPeriod.swift */,
 			);
 			path = Model;
 			sourceTree = "<group>";
@@ -478,6 +486,7 @@
 				95AD907E2F8252720064CD19 /* SubscriptionBillingCycle.swift in Sources */,
 				95AD90802F82527B0064CD19 /* Subscription.swift in Sources */,
 				95D967FA2F04193400079C66 /* HomeTabView.swift in Sources */,
+				952BB1C23060ED0900686092 /* CapitalizationPeriod.swift in Sources */,
 				950800052F0406560041AD54 /* DepositsViewModel.swift in Sources */,
 				95AD90822F8252890064CD19 /* SubscriptionsRepository.swift in Sources */,
 				95892D362F95F07500A30CA9 /* Color+Brand.swift in Sources */,
@@ -488,6 +497,7 @@
 				1A283CB0A1273797A2EDF575 /* MainTabView.swift in Sources */,
 				95E87C1F2F9493A600E238D5 /* CSVImporter.swift in Sources */,
 				9508000D2F0406770041AD54 /* DepositsRepository.swift in Sources */,
+				952BB1BF3060ED0900686092 /* DepositInterestType.swift in Sources */,
 				95D967FE2F04193500079C66 /* Color+TertiaryLabel.swift in Sources */,
 				95AD90862F8252A50064CD19 /* SubscriptionsViewModel.swift in Sources */,
 				95E87C232F94A28C00E238D5 /* OnboardingView.swift in Sources */,
@@ -520,6 +530,8 @@
 				953C626A305FA31F00D5C07B /* DepositCurrency.swift in Sources */,
 				953C627E305FA42500D5C07B /* Settings.swift in Sources */,
 				953C626B305FA31F00D5C07B /* Subscription.swift in Sources */,
+				952BB1C33060ED0900686092 /* CapitalizationPeriod.swift in Sources */,
+				952BB1C03060ED0900686092 /* DepositInterestType.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

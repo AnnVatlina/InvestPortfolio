@@ -11,7 +11,7 @@ protocol DepositsRepository {
     func fetchAll() async throws -> [Deposit]
     func add(_ deposit: Deposit) async throws
     func delete(id: UUID) async throws
-    func update(id: UUID, title: String, bankName: String?, amount: Double, currency: DepositCurrency, openDate: Date, closeDate: Date?, annualInterestRate: Double) async throws
+    func update(id: UUID, title: String, bankName: String?, amount: Double, currency: DepositCurrency, openDate: Date, closeDate: Date?, annualInterestRate: Double, interestType: DepositInterestType, capitalizationPeriod: CapitalizationPeriod?) async throws
 }
 
 final class InMemoryDepositsRepository: DepositsRepository {
@@ -29,7 +29,7 @@ final class InMemoryDepositsRepository: DepositsRepository {
         deposits.removeAll { $0.id == id }
     }
 
-    func update(id: UUID, title: String, bankName: String?, amount: Double, currency: DepositCurrency, openDate: Date, closeDate: Date?, annualInterestRate: Double) async throws {
+    func update(id: UUID, title: String, bankName: String?, amount: Double, currency: DepositCurrency, openDate: Date, closeDate: Date?, annualInterestRate: Double, interestType: DepositInterestType, capitalizationPeriod: CapitalizationPeriod?) async throws {
         guard let index = deposits.firstIndex(where: { $0.id == id }) else { return }
         deposits[index].title = title
         deposits[index].bankName = bankName
@@ -38,6 +38,8 @@ final class InMemoryDepositsRepository: DepositsRepository {
         deposits[index].openDate = openDate
         deposits[index].closeDate = closeDate
         deposits[index].annualInterestRate = annualInterestRate
+        deposits[index].interestType = interestType
+        deposits[index].capitalizationPeriod = capitalizationPeriod
     }
 
 }
@@ -64,7 +66,7 @@ actor SwiftDataDepositsRepository: @preconcurrency DepositsRepository {
         try modelContext.save()
     }
 
-    func update(id: UUID, title: String, bankName: String?, amount: Double, currency: DepositCurrency, openDate: Date, closeDate: Date?, annualInterestRate: Double) async throws {
+    func update(id: UUID, title: String, bankName: String?, amount: Double, currency: DepositCurrency, openDate: Date, closeDate: Date?, annualInterestRate: Double, interestType: DepositInterestType, capitalizationPeriod: CapitalizationPeriod?) async throws {
         let predicate = #Predicate<Deposit> { $0.id == id }
         let descriptor = FetchDescriptor(predicate: predicate)
         guard let deposit = try modelContext.fetch(descriptor).first else { return }
@@ -75,6 +77,8 @@ actor SwiftDataDepositsRepository: @preconcurrency DepositsRepository {
         deposit.openDate = openDate
         deposit.closeDate = closeDate
         deposit.annualInterestRate = annualInterestRate
+        deposit.interestType = interestType
+        deposit.capitalizationPeriod = capitalizationPeriod
         try modelContext.save()
     }
 
