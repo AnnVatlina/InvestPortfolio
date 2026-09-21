@@ -24,6 +24,7 @@
 		952BB1C03060ED0900686092 /* DepositInterestType.swift in Sources */ = {isa = PBXBuildFile; fileRef = 952BB1BE3060ED0900686092 /* DepositInterestType.swift */; };
 		952BB1C23060ED0900686092 /* CapitalizationPeriod.swift in Sources */ = {isa = PBXBuildFile; fileRef = 952BB1C13060ED0900686092 /* CapitalizationPeriod.swift */; };
 		952BB1C33060ED0900686092 /* CapitalizationPeriod.swift in Sources */ = {isa = PBXBuildFile; fileRef = 952BB1C13060ED0900686092 /* CapitalizationPeriod.swift */; };
+		952BB1C53060EE7B00686092 /* DepositsServiceTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 952BB1C43060EE7B00686092 /* DepositsServiceTests.swift */; };
 		9539C4222F93FC9D003A105C /* AnalyticsViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9539C4212F93FC9D003A105C /* AnalyticsViewModel.swift */; };
 		9539C4242F93FCB9003A105C /* AnalyticsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9539C4232F93FCB9003A105C /* AnalyticsView.swift */; };
 		953C6246305EFFDB00D5C07B /* HomeViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 953C6245305EFFDB00D5C07B /* HomeViewModel.swift */; };
@@ -116,6 +117,7 @@
 		9523DDAA2FBB85F400E24324 /* DepositsViewModelTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DepositsViewModelTests.swift; sourceTree = "<group>"; };
 		952BB1BE3060ED0900686092 /* DepositInterestType.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DepositInterestType.swift; sourceTree = "<group>"; };
 		952BB1C13060ED0900686092 /* CapitalizationPeriod.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CapitalizationPeriod.swift; sourceTree = "<group>"; };
+		952BB1C43060EE7B00686092 /* DepositsServiceTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DepositsServiceTests.swift; sourceTree = "<group>"; };
 		9539C4212F93FC9D003A105C /* AnalyticsViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AnalyticsViewModel.swift; sourceTree = "<group>"; };
 		9539C4232F93FCB9003A105C /* AnalyticsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AnalyticsView.swift; sourceTree = "<group>"; };
 		953C14A02F056E61003998D2 /* Base */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = Base; path = Base.lproj/Localizable.strings; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.plist; };
@@ -217,6 +219,7 @@
 				95DA000B2FD0000100000001 /* CSVImporterTests.swift */,
 				95DA00092FD0000100000001 /* CSVExporterTests.swift */,
 				953C6247305EFFF400D5C07B /* HomeViewModelTests.swift */,
+				952BB1C43060EE7B00686092 /* DepositsServiceTests.swift */,
 			);
 			path = InvestPortfolioTests;
 			sourceTree = "<group>";
@@ -508,6 +511,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				952BB1C53060EE7B00686092 /* DepositsServiceTests.swift in Sources */,
 				42FE55B393A3181535CBC9F8 /* SubscriptionRepositoryTests.swift in Sources */,
 				95CCEE182FC9886E00694936 /* AnalyticsViewModelTests.swift in Sources */,
 				95DA000C2FD0000100000001 /* CSVImporterTests.swift in Sources */,

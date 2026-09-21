@@ -63,9 +63,44 @@ final class DefaultDepositsService: DepositsService {
 
     private func income(for deposit: Deposit, until date: Date) -> Double {
         let end = max(deposit.openDate, date)
+        switch deposit.interestType {
+        case .simple:
+            return simpleIncome(for: deposit, until: end)
+        case .capitalized:
+            return capitalizedIncome(for: deposit, until: end)
+        }
+    }
+
+    private func simpleIncome(for deposit: Deposit, until end: Date) -> Double {
         let days = daysBetween(deposit.openDate - 1, end)
         let dailyRate = (deposit.annualInterestRate / 100.0) / 365.0
         return deposit.amount * dailyRate * Double(days)
+    }
+
+    // Начисляет проценты на каждой границе периода капитализации к телу вклада,
+    // затем считает простой процент на остатке (неполном периоде) до даты `end`.
+    private func capitalizedIncome(for deposit: Deposit, until end: Date) -> Double {
+        guard let period = deposit.capitalizationPeriod else {
+            return simpleIncome(for: deposit, until: end)
+        }
+        let dailyRate = (deposit.annualInterestRate / 100.0) / 365.0
+        var principal = deposit.amount
+        var periodStart = deposit.openDate
+        // Тот же сдвиг на 1 секунду, что и в simpleIncome — включает день открытия в счёт
+        // дней только для самого первого периода, дальше границы периодов считаются как есть.
+        var dayCountAnchor = deposit.openDate - 1
+
+        while let periodEnd = calendar.date(byAdding: period.dateComponents, to: periodStart),
+              periodEnd <= end {
+            let days = daysBetween(dayCountAnchor, periodEnd)
+            principal += principal * dailyRate * Double(days)
+            periodStart = periodEnd
+            dayCountAnchor = periodEnd
+        }
+
+        let remainingDays = daysBetween(dayCountAnchor, end)
+        let finalAmount = principal + principal * dailyRate * Double(remainingDays)
+        return finalAmount - deposit.amount
     }
 
     private func daysBetween(_ start: Date, _ end: Date) -> Int {
