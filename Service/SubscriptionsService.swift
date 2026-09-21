@@ -81,7 +81,7 @@ final class DefaultSubscriptionsService: SubscriptionsService {
         case .monthly:   return subscription.amount
         case .quarterly: return subscription.amount / 3.0
         case .yearly:    return subscription.amount / 12.0
-        case .oneTime:   return 0  // не повторяется
+        case .oneTime:   return 0  // doesn't repeat
         }
     }
 
@@ -91,7 +91,7 @@ final class DefaultSubscriptionsService: SubscriptionsService {
         case .monthly:   return subscription.amount * 12.0
         case .quarterly: return subscription.amount * 4.0
         case .yearly:    return subscription.amount
-        case .oneTime:   return 0  // не повторяется
+        case .oneTime:   return 0  // doesn't repeat
         }
     }
 

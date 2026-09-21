@@ -7,7 +7,7 @@
 
 import Foundation
 
-// Результат расчетов по вкладу
+// Result of a deposit's interest calculations
 struct DepositIncomeSummary: Equatable {
     let incomeToDate: Double
     let forecastIncomeToCloseDate: Double?
@@ -47,11 +47,11 @@ final class DefaultDepositsService: DepositsService {
     }
 
     func incomeSummary(for deposit: Deposit, asOf date: Date) -> DepositIncomeSummary {
-        // Для закрытых вкладов доход считается до даты закрытия, не до сегодня
+        // For closed deposits, income is calculated up to the close date, not today
         let cappedDate = deposit.closeDate.map { min(date, $0) } ?? date
         let incomeEarned = income(for: deposit, until: cappedDate)
 
-        // Прогноз показываем только если дата закрытия ещё не наступила
+        // Show the forecast only if the close date hasn't arrived yet
         let forecast: Double?
         if let close = deposit.closeDate, close > deposit.openDate, close > date {
             forecast = income(for: deposit, until: close)

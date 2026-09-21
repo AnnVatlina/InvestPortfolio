@@ -2,9 +2,9 @@
 //  DIContainer.swift
 //  InvestPortfolio
 //
-//  Центральный контейнер зависимостей.
-//  Единственное место, где знают о конкретных реализациях репозиториев.
-//  ViewModels получают только протоколы сервисов — не знают о SwiftData.
+//  Central dependency container.
+//  The only place that knows about concrete repository implementations.
+//  ViewModels only receive service protocols — they don't know about SwiftData.
 //
 
 import Foundation
@@ -48,8 +48,8 @@ final class DIContainer: ObservableObject {
 
     // MARK: - Preview
 
-    /// Изолированный контейнер для SwiftUI Preview и тестов.
-    /// Использует in-memory хранилище — данные не персистируются.
+    /// Isolated container for SwiftUI previews and tests.
+    /// Uses an in-memory store — data is not persisted.
     static let preview: DIContainer = {
         let config = ModelConfiguration(isStoredInMemoryOnly: true)
         let container = try! ModelContainer(

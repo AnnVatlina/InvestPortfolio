@@ -9,7 +9,7 @@ enum SubscriptionBillingCycle: String, CaseIterable, Codable, Equatable, Identif
     case monthly   = "monthly"
     case quarterly = "quarterly"
     case yearly    = "yearly"
-    case oneTime   = "oneTime"   // единоразовая покупка
+    case oneTime   = "oneTime"   // one-time purchase
 
     var id: String { rawValue }
 
