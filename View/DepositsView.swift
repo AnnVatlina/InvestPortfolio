@@ -54,7 +54,13 @@ struct DepositsView: View {
                         currency: formData.currency,
                         openDate: formData.openDate,
                         closeDate: formData.closeDate,
-                        annualInterestRate: formData.annualInterestRate
+                        annualInterestRate: formData.annualInterestRate,
+                        interestType: formData.interestType,
+                        capitalizationPeriod: formData.capitalizationPeriod,
+                        allowsReplenishment: formData.allowsReplenishment,
+                        allowsPartialWithdrawal: formData.allowsPartialWithdrawal,
+                        isRevocable: formData.isRevocable,
+                        earlyWithdrawalRate: formData.earlyWithdrawalRate
                     )
                 }
             }
@@ -70,7 +76,14 @@ struct DepositsView: View {
                         currency: formData.currency,
                         openDate: formData.openDate,
                         closeDate: formData.closeDate,
-                        annualInterestRate: formData.annualInterestRate
+                        annualInterestRate: formData.annualInterestRate,
+                        interestType: formData.interestType,
+                        capitalizationPeriod: formData.capitalizationPeriod,
+                        allowsReplenishment: formData.allowsReplenishment,
+                        allowsPartialWithdrawal: formData.allowsPartialWithdrawal,
+                        isRevocable: formData.isRevocable,
+                        earlyWithdrawalRate: formData.earlyWithdrawalRate,
+                        actualCloseDate: deposit.actualCloseDate
                     )
                 }
             }
@@ -275,6 +288,12 @@ struct DepositFormData {
     var openDate: Date
     var closeDate: Date?
     var annualInterestRate: Double
+    var interestType: DepositInterestType
+    var capitalizationPeriod: CapitalizationPeriod?
+    var allowsReplenishment: Bool
+    var allowsPartialWithdrawal: Bool
+    var isRevocable: Bool
+    var earlyWithdrawalRate: Double?
 }
 
 enum DepositFormMode {
@@ -298,6 +317,12 @@ private struct DepositFormSheet: View {
     @State private var hasCloseDate: Bool
     @State private var closeDate: Date
     @State private var interestText: String
+    @State private var interestType: DepositInterestType
+    @State private var capitalizationPeriod: CapitalizationPeriod
+    @State private var allowsReplenishment: Bool
+    @State private var allowsPartialWithdrawal: Bool
+    @State private var isIrrevocable: Bool
+    @State private var earlyWithdrawalRateText: String
     @State private var validationError: String?
 
     init(mode: DepositFormMode, onSave: @escaping (DepositFormData) -> Void) {
@@ -313,6 +338,12 @@ private struct DepositFormSheet: View {
             _hasCloseDate = State(initialValue: false)
             _closeDate = State(initialValue: Calendar.current.date(byAdding: .month, value: 6, to: Date()) ?? Date())
             _interestText = State(initialValue: "")
+            _interestType = State(initialValue: .simple)
+            _capitalizationPeriod = State(initialValue: .monthly)
+            _allowsReplenishment = State(initialValue: false)
+            _allowsPartialWithdrawal = State(initialValue: false)
+            _isIrrevocable = State(initialValue: false)
+            _earlyWithdrawalRateText = State(initialValue: "")
         case .edit(let deposit):
             _title = State(initialValue: deposit.title)
             _bankName = State(initialValue: deposit.bankName ?? "")
@@ -322,6 +353,27 @@ private struct DepositFormSheet: View {
             _hasCloseDate = State(initialValue: deposit.closeDate != nil)
             _closeDate = State(initialValue: deposit.closeDate ?? Calendar.current.date(byAdding: .month, value: 6, to: deposit.openDate) ?? Date())
             _interestText = State(initialValue: String(deposit.annualInterestRate))
+            _interestType = State(initialValue: deposit.interestType)
+            _capitalizationPeriod = State(initialValue: deposit.capitalizationPeriod ?? .monthly)
+            _allowsReplenishment = State(initialValue: deposit.allowsReplenishment)
+            _allowsPartialWithdrawal = State(initialValue: deposit.allowsPartialWithdrawal)
+            _isIrrevocable = State(initialValue: !deposit.isRevocable)
+            _earlyWithdrawalRateText = State(initialValue: deposit.earlyWithdrawalRate.map { String($0) } ?? "")
+        }
+    }
+
+    private func label(for type: DepositInterestType) -> String {
+        switch type {
+        case .simple: return LanguageBundle.string("deposits.interestType.simple")
+        case .capitalized: return LanguageBundle.string("deposits.interestType.capitalized")
+        }
+    }
+
+    private func label(for period: CapitalizationPeriod) -> String {
+        switch period {
+        case .monthly: return LanguageBundle.string("deposits.capitalizationPeriod.monthly")
+        case .quarterly: return LanguageBundle.string("deposits.capitalizationPeriod.quarterly")
+        case .yearly: return LanguageBundle.string("deposits.capitalizationPeriod.yearly")
         }
     }
 
@@ -367,6 +419,46 @@ private struct DepositFormSheet: View {
                     }
                 }
 
+                Section {
+                    Picker(LanguageBundle.string("deposits.field.interestType"), selection: $interestType.animation()) {
+                        ForEach(DepositInterestType.allCases) { type in
+                            Text(label(for: type)).tag(type)
+                        }
+                    }
+                    if interestType == .capitalized {
+                        Picker(LanguageBundle.string("deposits.field.capitalizationPeriod"), selection: $capitalizationPeriod) {
+                            ForEach(CapitalizationPeriod.allCases) { period in
+                                Text(label(for: period)).tag(period)
+                            }
+                        }
+                    }
+                } footer: {
+                    Text(LanguageBundle.string("deposits.section.interestType.footer"))
+                }
+
+                if hasCloseDate {
+                    Section {
+                        Toggle(LanguageBundle.string("deposits.field.allowsReplenishment"), isOn: $allowsReplenishment)
+                        Toggle(LanguageBundle.string("deposits.field.allowsPartialWithdrawal"), isOn: $allowsPartialWithdrawal)
+                    } footer: {
+                        Text(LanguageBundle.string("deposits.section.flexibility.footer"))
+                    }
+                }
+
+                Section {
+                    Toggle(LanguageBundle.string("deposits.field.irrevocable"), isOn: $isIrrevocable.animation())
+                    if isIrrevocable {
+                        HStack {
+                            TextField(LanguageBundle.string("deposits.field.earlyWithdrawalRate"), text: $earlyWithdrawalRateText)
+                                .keyboardType(.decimalPad)
+                            Text(LanguageBundle.string("common.percentSign"))
+                                .foregroundColor(.secondary)
+                        }
+                    }
+                } footer: {
+                    Text(LanguageBundle.string("deposits.section.revocability.footer"))
+                }
+
                 if let error = validationError {
                     Section {
                         Text(error)
@@ -395,6 +487,16 @@ private struct DepositFormSheet: View {
         }
         let amount = Double(amountText.replacingOccurrences(of: ",", with: ".")) ?? 0
         let interest = Double(interestText.replacingOccurrences(of: ",", with: ".")) ?? 0
+
+        var earlyWithdrawalRate: Double?
+        if isIrrevocable {
+            guard let rate = Double(earlyWithdrawalRateText.replacingOccurrences(of: ",", with: ".")), rate <= interest else {
+                validationError = LanguageBundle.string("deposits.error.earlyRateTooHigh")
+                return
+            }
+            earlyWithdrawalRate = rate
+        }
+
         let formData = DepositFormData(
             title: title.trimmingCharacters(in: .whitespacesAndNewlines),
             bankName: bankName.trimmingCharacters(in: .whitespacesAndNewlines),
@@ -402,7 +504,13 @@ private struct DepositFormSheet: View {
             currency: currency,
             openDate: openDate,
             closeDate: hasCloseDate ? closeDate : nil,
-            annualInterestRate: interest
+            annualInterestRate: interest,
+            interestType: interestType,
+            capitalizationPeriod: interestType == .capitalized ? capitalizationPeriod : nil,
+            allowsReplenishment: hasCloseDate ? allowsReplenishment : false,
+            allowsPartialWithdrawal: hasCloseDate ? allowsPartialWithdrawal : false,
+            isRevocable: !isIrrevocable,
+            earlyWithdrawalRate: earlyWithdrawalRate
         )
         onSave(formData)
         dismiss()
