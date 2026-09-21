@@ -156,6 +156,7 @@ private struct DepositRow: View {
     @Environment(\.locale) private var locale
 
     private var isClosed: Bool {
+        if deposit.actualCloseDate != nil { return true }
         guard let closeDate = deposit.closeDate else { return false }
         return closeDate <= Date()
     }

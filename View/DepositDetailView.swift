@@ -14,6 +14,7 @@ struct DepositDetailView: View {
     @State private var deposit: Deposit
     @State private var showEditSheet = false
     @State private var transactionSheetKind: TransactionKind? = nil
+    @State private var showCloseConfirm = false
     @Environment(\.locale) private var locale
 
     init(deposit: Deposit, depositsViewModel: DepositsViewModel, container: DIContainer) {
@@ -26,6 +27,7 @@ struct DepositDetailView: View {
     }
 
     private var isClosed: Bool {
+        if deposit.actualCloseDate != nil { return true }
         guard let closeDate = deposit.closeDate else { return false }
         return closeDate <= Date()
     }
@@ -102,10 +104,47 @@ struct DepositDetailView: View {
         } message: {
             Text(detailViewModel.errorMessage ?? "")
         }
+        .alert(LanguageBundle.string("deposits.detail.closeConfirm.title"), isPresented: $showCloseConfirm) {
+            Button(LanguageBundle.string("deposits.detail.closeConfirm.action"), role: .destructive) {
+                Task { await closeDepositNow() }
+            }
+            Button(LanguageBundle.string("common.cancel"), role: .cancel) {}
+        } message: {
+            let loss = detailViewModel.projectedEarlyClosureLoss()
+            if loss > 0 {
+                Text(String(format: LanguageBundle.string("deposits.detail.closeConfirm.penaltyMessage.format"), loss, deposit.currency.rawValue))
+            } else {
+                Text(LanguageBundle.string("deposits.detail.closeConfirm.message"))
+            }
+        }
     }
 
-    private var canAddTransactions: Bool {
+    private var isOpen: Bool {
         !isClosed && deposit.actualCloseDate == nil
+    }
+
+    private func closeDepositNow() async {
+        await depositsViewModel.updateDeposit(
+            id: deposit.id,
+            title: deposit.title,
+            bankName: deposit.bankName ?? "",
+            amount: deposit.amount,
+            currency: deposit.currency,
+            openDate: deposit.openDate,
+            closeDate: deposit.closeDate,
+            annualInterestRate: deposit.annualInterestRate,
+            interestType: deposit.interestType,
+            capitalizationPeriod: deposit.capitalizationPeriod,
+            allowsReplenishment: deposit.allowsReplenishment,
+            allowsPartialWithdrawal: deposit.allowsPartialWithdrawal,
+            isRevocable: deposit.isRevocable,
+            earlyWithdrawalRate: deposit.earlyWithdrawalRate,
+            actualCloseDate: Date()
+        )
+        if let refreshed = depositsViewModel.deposits.first(where: { $0.id == deposit.id }) {
+            deposit = refreshed
+            await detailViewModel.refresh(deposit: refreshed)
+        }
     }
 
     // MARK: - Header
@@ -136,6 +175,14 @@ struct DepositDetailView: View {
                 }
             }
             .accessibilityElement(children: .combine)
+
+            if isOpen {
+                Button(LanguageBundle.string("deposits.detail.closeAction")) {
+                    showCloseConfirm = true
+                }
+                .font(.caption)
+                .foregroundColor(.red)
+            }
         }
     }
 
@@ -214,13 +261,13 @@ struct DepositDetailView: View {
                 Text(LanguageBundle.string("deposits.detail.transactions.title"))
                     .font(.headline)
                 Spacer()
-                if canAddTransactions && deposit.allowsReplenishment {
+                if isOpen && deposit.allowsReplenishment {
                     Button(LanguageBundle.string("deposits.detail.addContribution.action")) {
                         transactionSheetKind = .contribution
                     }
                     .font(.caption)
                 }
-                if canAddTransactions && deposit.allowsPartialWithdrawal {
+                if isOpen && deposit.allowsPartialWithdrawal {
                     Button(LanguageBundle.string("deposits.detail.addWithdrawal.action")) {
                         transactionSheetKind = .withdrawal
                     }

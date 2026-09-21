@@ -55,6 +55,11 @@
 "deposits.detail.transactionAmount" = "Сумма";
 "deposits.detail.error.invalidAmount" = "Введите корректную сумму";
 "deposits.detail.error.withdrawalTooLarge" = "Нельзя снять больше текущего остатка";
+"deposits.detail.closeAction" = "Закрыть вклад";
+"deposits.detail.closeConfirm.title" = "Закрыть этот вклад?";
+"deposits.detail.closeConfirm.action" = "Закрыть";
+"deposits.detail.closeConfirm.message" = "Проценты перестанут начисляться начиная с сегодняшнего дня.";
+"deposits.detail.closeConfirm.penaltyMessage.format" = "Этот вклад безотзывный — закрытие сейчас вместо ожидания даты закрытия означает потерю %.2f %@ процентов. Продолжить?";
 "deposits.loading" = "Загрузка вкладов...";
 "deposits.empty" = "Пока нет вкладов";
 "deposits.rate.format" = "Ставка: %.2f%%";

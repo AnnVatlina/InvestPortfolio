@@ -76,6 +76,31 @@ final class DepositDetailViewModel: ObservableObject {
         await refresh(deposit: deposit)
     }
 
+    // MARK: - Early closure
+
+    /// Interest that would be forfeited if the deposit were closed right now instead of held
+    /// to term — zero unless it's irrevocable, has an early-withdrawal rate, and hasn't
+    /// reached its planned close date yet. Used to warn before confirming an early closure.
+    func projectedEarlyClosureLoss() -> Double {
+        let now = Date()
+        guard !deposit.isRevocable, deposit.earlyWithdrawalRate != nil,
+              let close = deposit.closeDate, close > now else { return 0 }
+
+        let normalIncome = service.incomeSummary(for: deposit, transactions: transactions, asOf: now).incomeToDate
+
+        let previewDeposit = Deposit(
+            id: deposit.id, title: deposit.title, bankName: deposit.bankName, amount: deposit.amount,
+            currency: deposit.currency, createdAt: deposit.createdAt, openDate: deposit.openDate,
+            closeDate: deposit.closeDate, annualInterestRate: deposit.annualInterestRate,
+            interestType: deposit.interestType, capitalizationPeriod: deposit.capitalizationPeriod,
+            allowsReplenishment: deposit.allowsReplenishment, allowsPartialWithdrawal: deposit.allowsPartialWithdrawal,
+            isRevocable: deposit.isRevocable, earlyWithdrawalRate: deposit.earlyWithdrawalRate, actualCloseDate: now
+        )
+        let penalizedIncome = service.incomeSummary(for: previewDeposit, transactions: transactions, asOf: now).incomeToDate
+
+        return max(0, normalIncome - penalizedIncome)
+    }
+
     // MARK: - Chart
 
     private func buildChartPoints() -> [DepositBalancePoint] {

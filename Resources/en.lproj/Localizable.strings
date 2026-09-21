@@ -55,6 +55,11 @@
 "deposits.detail.transactionAmount" = "Amount";
 "deposits.detail.error.invalidAmount" = "Enter a valid amount";
 "deposits.detail.error.withdrawalTooLarge" = "You can't withdraw more than the current balance";
+"deposits.detail.closeAction" = "Close Deposit";
+"deposits.detail.closeConfirm.title" = "Close this deposit?";
+"deposits.detail.closeConfirm.action" = "Close";
+"deposits.detail.closeConfirm.message" = "Interest will stop accruing as of today.";
+"deposits.detail.closeConfirm.penaltyMessage.format" = "This deposit is non-revocable — closing it now instead of waiting for the close date means losing %.2f %@ in interest. Continue?";
 "deposits.loading" = "Loading deposits...";
 "deposits.empty" = "No deposits yet";
 "deposits.rate.format" = "Rate: %.2f%%";
