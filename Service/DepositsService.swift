@@ -17,7 +17,7 @@ protocol DepositsService {
     func fetchAll() async throws -> [Deposit]
     func add(_ deposit: Deposit) async throws
     func delete(id: UUID) async throws
-    func update(id: UUID, title: String, bankName: String?, amount: Double, currency: DepositCurrency, openDate: Date, closeDate: Date?, annualInterestRate: Double, interestType: DepositInterestType, capitalizationPeriod: CapitalizationPeriod?, allowsReplenishment: Bool, allowsPartialWithdrawal: Bool) async throws
+    func update(id: UUID, title: String, bankName: String?, amount: Double, currency: DepositCurrency, openDate: Date, closeDate: Date?, annualInterestRate: Double, interestType: DepositInterestType, capitalizationPeriod: CapitalizationPeriod?, allowsReplenishment: Bool, allowsPartialWithdrawal: Bool, isRevocable: Bool, earlyWithdrawalRate: Double?, actualCloseDate: Date?) async throws
     func incomeSummary(for deposit: Deposit, transactions: [DepositTransaction], asOf date: Date) -> DepositIncomeSummary
 
     // MARK: - Transactions (contributions / partial withdrawals)
@@ -56,8 +56,8 @@ final class DefaultDepositsService: DepositsService {
         try await repository.delete(id: id)
     }
 
-    func update(id: UUID, title: String, bankName: String?, amount: Double, currency: DepositCurrency, openDate: Date, closeDate: Date?, annualInterestRate: Double, interestType: DepositInterestType, capitalizationPeriod: CapitalizationPeriod?, allowsReplenishment: Bool, allowsPartialWithdrawal: Bool) async throws {
-        try await repository.update(id: id, title: title, bankName: bankName, amount: amount, currency: currency, openDate: openDate, closeDate: closeDate, annualInterestRate: annualInterestRate, interestType: interestType, capitalizationPeriod: capitalizationPeriod, allowsReplenishment: allowsReplenishment, allowsPartialWithdrawal: allowsPartialWithdrawal)
+    func update(id: UUID, title: String, bankName: String?, amount: Double, currency: DepositCurrency, openDate: Date, closeDate: Date?, annualInterestRate: Double, interestType: DepositInterestType, capitalizationPeriod: CapitalizationPeriod?, allowsReplenishment: Bool, allowsPartialWithdrawal: Bool, isRevocable: Bool, earlyWithdrawalRate: Double?, actualCloseDate: Date?) async throws {
+        try await repository.update(id: id, title: title, bankName: bankName, amount: amount, currency: currency, openDate: openDate, closeDate: closeDate, annualInterestRate: annualInterestRate, interestType: interestType, capitalizationPeriod: capitalizationPeriod, allowsReplenishment: allowsReplenishment, allowsPartialWithdrawal: allowsPartialWithdrawal, isRevocable: isRevocable, earlyWithdrawalRate: earlyWithdrawalRate, actualCloseDate: actualCloseDate)
     }
 
     func transactions(forDepositId depositId: UUID) async throws -> [DepositTransaction] {
@@ -73,14 +73,32 @@ final class DefaultDepositsService: DepositsService {
     }
 
     func incomeSummary(for deposit: Deposit, transactions: [DepositTransaction], asOf date: Date) -> DepositIncomeSummary {
-        // For closed deposits, income is calculated up to the close date, not today
-        let cappedDate = deposit.closeDate.map { min(date, $0) } ?? date
-        let incomeEarned = income(for: deposit, transactions: transactions, until: cappedDate)
+        // For deposits reaching their planned close date, income is calculated up to that
+        // date, not today. An explicit actualCloseDate (the depositor closed it themselves,
+        // possibly early) takes precedence and caps income there instead.
+        let plannedCap = deposit.closeDate.map { min(date, $0) } ?? date
+        let cappedDate = deposit.actualCloseDate.map { min(date, $0) } ?? plannedCap
 
-        // Show the forecast only if the close date hasn't arrived yet
+        // An irrevocable deposit closed before its planned close date loses its agreed rate —
+        // the whole term is recalculated at the (lower) early-withdrawal rate instead.
+        let earlyWithdrawalPenaltyApplies: Bool = {
+            guard !deposit.isRevocable,
+                  let actualClose = deposit.actualCloseDate,
+                  let plannedClose = deposit.closeDate,
+                  actualClose < plannedClose,
+                  deposit.earlyWithdrawalRate != nil
+            else { return false }
+            return true
+        }()
+        let rateOverride = earlyWithdrawalPenaltyApplies ? deposit.earlyWithdrawalRate : nil
+
+        let incomeEarned = income(for: deposit, transactions: transactions, until: cappedDate, rateOverride: rateOverride)
+
+        // The forecast always assumes the deposit is held to its planned close date at the
+        // agreed rate — it's moot once the deposit has actually been closed.
         let forecast: Double?
-        if let close = deposit.closeDate, close > deposit.openDate, close > date {
-            forecast = income(for: deposit, transactions: transactions, until: close)
+        if deposit.actualCloseDate == nil, let close = deposit.closeDate, close > deposit.openDate, close > date {
+            forecast = income(for: deposit, transactions: transactions, until: close, rateOverride: nil)
         } else {
             forecast = nil
         }
@@ -105,9 +123,9 @@ final class DefaultDepositsService: DepositsService {
     // principal as they occur and folding accrued interest into the principal at each
     // capitalization boundary (for capitalized deposits). Reduces to the plain simple/
     // capitalized formulas when there are no transactions.
-    private func income(for deposit: Deposit, transactions: [DepositTransaction], until end: Date) -> Double {
+    private func income(for deposit: Deposit, transactions: [DepositTransaction], until end: Date, rateOverride: Double? = nil) -> Double {
         let end = max(deposit.openDate, end)
-        let dailyRate = (deposit.annualInterestRate / 100.0) / 365.0
+        let dailyRate = ((rateOverride ?? deposit.annualInterestRate) / 100.0) / 365.0
 
         var checkpoints: [Checkpoint] = transactions
             .filter { $0.date > deposit.openDate && $0.date <= end }

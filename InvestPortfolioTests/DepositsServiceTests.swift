@@ -27,7 +27,10 @@ private func makeDeposit(
     closeDate: Date? = nil,
     rate: Double = 12.0,
     interestType: DepositInterestType = .simple,
-    capitalizationPeriod: CapitalizationPeriod? = nil
+    capitalizationPeriod: CapitalizationPeriod? = nil,
+    isRevocable: Bool = true,
+    earlyWithdrawalRate: Double? = nil,
+    actualCloseDate: Date? = nil
 ) -> Deposit {
     Deposit(
         title: "T",
@@ -37,7 +40,10 @@ private func makeDeposit(
         closeDate: closeDate,
         annualInterestRate: rate,
         interestType: interestType,
-        capitalizationPeriod: capitalizationPeriod
+        capitalizationPeriod: capitalizationPeriod,
+        isRevocable: isRevocable,
+        earlyWithdrawalRate: earlyWithdrawalRate,
+        actualCloseDate: actualCloseDate
     )
 }
 
@@ -232,5 +238,92 @@ struct DepositsServiceTransactionsTests {
         try await service.deleteTransaction(id: transaction.id)
         let afterDelete = try await service.transactions(forDepositId: deposit.id)
         #expect(afterDelete.isEmpty)
+    }
+}
+
+// MARK: - Revocability / early withdrawal
+
+@Suite("DefaultDepositsService — revocability")
+struct DepositsServiceRevocabilityTests {
+
+    let service = DefaultDepositsService(repository: InMemoryDepositsRepository())
+
+    @Test("A revocable deposit closed early keeps its agreed rate")
+    func revocableClosedEarlyKeepsAgreedRate() {
+        let now = Date()
+        let openDate = Calendar.current.date(byAdding: .day, value: -100, to: now)!
+        let closeDate = Calendar.current.date(byAdding: .day, value: 100, to: now)!
+        let deposit = makeDeposit(amount: 100_000, openDate: openDate, closeDate: closeDate, rate: 12.0,
+                                   isRevocable: true, actualCloseDate: now)
+
+        let summary = service.incomeSummary(for: deposit, asOf: now)
+
+        let expected = 100_000 * (0.12 / 365.0) * 100
+        #expect(abs(summary.incomeToDate - expected) < 1.0)
+    }
+
+    @Test("An irrevocable deposit closed before term loses the agreed rate")
+    func irrevocableClosedEarlyUsesEarlyWithdrawalRate() {
+        let now = Date()
+        let openDate = Calendar.current.date(byAdding: .day, value: -100, to: now)!
+        let closeDate = Calendar.current.date(byAdding: .day, value: 100, to: now)!
+        let deposit = makeDeposit(amount: 100_000, openDate: openDate, closeDate: closeDate, rate: 12.0,
+                                   isRevocable: false, earlyWithdrawalRate: 1.0, actualCloseDate: now)
+
+        let summary = service.incomeSummary(for: deposit, asOf: now)
+
+        let expected = 100_000 * (0.01 / 365.0) * 100
+        #expect(abs(summary.incomeToDate - expected) < 1.0)
+    }
+
+    @Test("An irrevocable deposit closed on or after its planned close date keeps the agreed rate")
+    func irrevocableClosedOnTimeKeepsAgreedRate() {
+        let now = Date()
+        let openDate = Calendar.current.date(byAdding: .day, value: -100, to: now)!
+        let deposit = makeDeposit(amount: 100_000, openDate: openDate, closeDate: now, rate: 12.0,
+                                   isRevocable: false, earlyWithdrawalRate: 1.0, actualCloseDate: now)
+
+        let summary = service.incomeSummary(for: deposit, asOf: now)
+
+        let expected = 100_000 * (0.12 / 365.0) * 100
+        #expect(abs(summary.incomeToDate - expected) < 1.0)
+    }
+
+    @Test("An irrevocable deposit without an early-withdrawal rate falls back to the agreed rate")
+    func irrevocableWithoutEarlyRateFallsBackToAgreedRate() {
+        let now = Date()
+        let openDate = Calendar.current.date(byAdding: .day, value: -100, to: now)!
+        let closeDate = Calendar.current.date(byAdding: .day, value: 100, to: now)!
+        let deposit = makeDeposit(amount: 100_000, openDate: openDate, closeDate: closeDate, rate: 12.0,
+                                   isRevocable: false, earlyWithdrawalRate: nil, actualCloseDate: now)
+
+        let summary = service.incomeSummary(for: deposit, asOf: now)
+
+        let expected = 100_000 * (0.12 / 365.0) * 100
+        #expect(abs(summary.incomeToDate - expected) < 1.0)
+    }
+
+    @Test("A closed deposit never shows a forecast, even if closeDate is still in the future")
+    func closedDepositHasNoForecast() {
+        let now = Date()
+        let openDate = Calendar.current.date(byAdding: .day, value: -100, to: now)!
+        let closeDate = Calendar.current.date(byAdding: .day, value: 100, to: now)!
+        let deposit = makeDeposit(openDate: openDate, closeDate: closeDate, actualCloseDate: now)
+
+        let summary = service.incomeSummary(for: deposit, asOf: now)
+        #expect(summary.forecastIncomeToCloseDate == nil)
+    }
+
+    @Test("actualCloseDate caps income even when asOf is well after it")
+    func actualCloseDateCapsIncomeRegardlessOfAsOf() {
+        let now = Date()
+        let openDate = Calendar.current.date(byAdding: .day, value: -100, to: now)!
+        let actualClose = Calendar.current.date(byAdding: .day, value: -50, to: now)!
+        let deposit = makeDeposit(amount: 100_000, openDate: openDate, rate: 12.0, actualCloseDate: actualClose)
+
+        let summary = service.incomeSummary(for: deposit, asOf: now)
+
+        let expected = 100_000 * (0.12 / 365.0) * 50
+        #expect(abs(summary.incomeToDate - expected) < 1.0)
     }
 }

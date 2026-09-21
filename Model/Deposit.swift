@@ -32,6 +32,14 @@ final class Deposit {
     var allowsReplenishment: Bool = false
     var allowsPartialWithdrawal: Bool = false
 
+    // Whether the deposit can be closed before `closeDate` without losing interest.
+    // If false, closing before `closeDate` recalculates the whole term at earlyWithdrawalRate.
+    var isRevocable: Bool = true
+    var earlyWithdrawalRate: Double? = nil
+    // Set when the depositor actually closes the deposit — may be before, at, or (rarely,
+    // for backdated entry) after `closeDate`. Distinct from `closeDate`, which is the plan.
+    var actualCloseDate: Date? = nil
+
     /// Typed accessor — computed, not stored by SwiftData.
     var currency: DepositCurrency {
         get { DepositCurrency(rawValue: currencyRaw) ?? .RUB }
@@ -63,7 +71,10 @@ final class Deposit {
         interestType: DepositInterestType = .simple,
         capitalizationPeriod: CapitalizationPeriod? = nil,
         allowsReplenishment: Bool = false,
-        allowsPartialWithdrawal: Bool = false
+        allowsPartialWithdrawal: Bool = false,
+        isRevocable: Bool = true,
+        earlyWithdrawalRate: Double? = nil,
+        actualCloseDate: Date? = nil
     ) {
         self.id = id
         self.title = title
@@ -78,5 +89,8 @@ final class Deposit {
         self.capitalizationPeriodRaw = capitalizationPeriod?.rawValue
         self.allowsReplenishment = allowsReplenishment
         self.allowsPartialWithdrawal = allowsPartialWithdrawal
+        self.isRevocable = isRevocable
+        self.earlyWithdrawalRate = earlyWithdrawalRate
+        self.actualCloseDate = actualCloseDate
     }
 }
