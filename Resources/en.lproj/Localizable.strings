@@ -47,6 +47,14 @@
 "deposits.detail.transactions.title" = "Transaction History";
 "deposits.detail.transactions.empty" = "No transactions yet";
 "deposits.detail.transaction.balanceAfter.format" = "Balance: %.2f %@";
+"deposits.detail.addContribution.action" = "+ Add funds";
+"deposits.detail.addWithdrawal.action" = "− Withdraw";
+"deposits.detail.addContribution.title" = "Add Funds";
+"deposits.detail.addWithdrawal.title" = "Withdraw";
+"deposits.detail.transactionDate" = "Date";
+"deposits.detail.transactionAmount" = "Amount";
+"deposits.detail.error.invalidAmount" = "Enter a valid amount";
+"deposits.detail.error.withdrawalTooLarge" = "You can't withdraw more than the current balance";
 "deposits.loading" = "Loading deposits...";
 "deposits.empty" = "No deposits yet";
 "deposits.rate.format" = "Rate: %.2f%%";

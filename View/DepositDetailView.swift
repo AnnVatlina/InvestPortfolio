@@ -13,6 +13,7 @@ struct DepositDetailView: View {
     @StateObject private var detailViewModel: DepositDetailViewModel
     @State private var deposit: Deposit
     @State private var showEditSheet = false
+    @State private var transactionSheetKind: TransactionKind? = nil
     @Environment(\.locale) private var locale
 
     init(deposit: Deposit, depositsViewModel: DepositsViewModel, container: DIContainer) {
@@ -77,6 +78,34 @@ struct DepositDetailView: View {
                 }
             }
         }
+        .sheet(item: $transactionSheetKind) { kind in
+            AddTransactionSheet(
+                kind: kind,
+                openDate: deposit.openDate,
+                currency: deposit.currency.rawValue,
+                maxWithdrawal: detailViewModel.currentPrincipalBalance
+            ) { amount, date in
+                Task {
+                    do {
+                        try await detailViewModel.addTransaction(amount: amount, date: date)
+                    } catch {
+                        detailViewModel.errorMessage = error.localizedDescription
+                    }
+                }
+            }
+        }
+        .alert(LanguageBundle.string("common.error"), isPresented: Binding(
+            get: { detailViewModel.errorMessage != nil },
+            set: { if !$0 { detailViewModel.errorMessage = nil } }
+        )) {
+            Button(LanguageBundle.string("common.ok"), role: .cancel) { detailViewModel.errorMessage = nil }
+        } message: {
+            Text(detailViewModel.errorMessage ?? "")
+        }
+    }
+
+    private var canAddTransactions: Bool {
+        !isClosed && deposit.actualCloseDate == nil
     }
 
     // MARK: - Header
@@ -181,8 +210,23 @@ struct DepositDetailView: View {
 
     private var transactionsSection: some View {
         VStack(alignment: .leading, spacing: 8) {
-            Text(LanguageBundle.string("deposits.detail.transactions.title"))
-                .font(.headline)
+            HStack {
+                Text(LanguageBundle.string("deposits.detail.transactions.title"))
+                    .font(.headline)
+                Spacer()
+                if canAddTransactions && deposit.allowsReplenishment {
+                    Button(LanguageBundle.string("deposits.detail.addContribution.action")) {
+                        transactionSheetKind = .contribution
+                    }
+                    .font(.caption)
+                }
+                if canAddTransactions && deposit.allowsPartialWithdrawal {
+                    Button(LanguageBundle.string("deposits.detail.addWithdrawal.action")) {
+                        transactionSheetKind = .withdrawal
+                    }
+                    .font(.caption)
+                }
+            }
 
             if detailViewModel.transactions.isEmpty {
                 Text(LanguageBundle.string("deposits.detail.transactions.empty"))
@@ -219,5 +263,81 @@ struct DepositDetailView: View {
         }
         .padding(.vertical, 6)
         .accessibilityElement(children: .combine)
+    }
+}
+
+// MARK: - Add Transaction Sheet
+
+private enum TransactionKind: Identifiable, Equatable {
+    case contribution
+    case withdrawal
+    var id: Self { self }
+}
+
+private struct AddTransactionSheet: View {
+    let kind: TransactionKind
+    let openDate: Date
+    let currency: String
+    let maxWithdrawal: Double
+    let onSave: (Double, Date) -> Void
+
+    @Environment(\.dismiss) private var dismiss
+    @State private var date = Date()
+    @State private var amountText = ""
+    @State private var validationError: String?
+
+    private var title: String {
+        switch kind {
+        case .contribution: return LanguageBundle.string("deposits.detail.addContribution.title")
+        case .withdrawal: return LanguageBundle.string("deposits.detail.addWithdrawal.title")
+        }
+    }
+
+    var body: some View {
+        NavigationStack {
+            Form {
+                Section {
+                    DatePicker(LanguageBundle.string("deposits.detail.transactionDate"), selection: $date, in: openDate...Date(), displayedComponents: .date)
+                    HStack {
+                        TextField(LanguageBundle.string("deposits.detail.transactionAmount"), text: $amountText)
+                            .keyboardType(.decimalPad)
+                        Text(currency)
+                            .foregroundColor(.secondary)
+                    }
+                }
+
+                if let error = validationError {
+                    Section {
+                        Text(error)
+                            .foregroundColor(.red)
+                            .font(.caption)
+                    }
+                }
+            }
+            .navigationTitle(title)
+            .navigationBarTitleDisplayMode(.inline)
+            .toolbar {
+                ToolbarItem(placement: .cancellationAction) {
+                    Button(LanguageBundle.string("common.cancel")) { dismiss() }
+                }
+                ToolbarItem(placement: .confirmationAction) {
+                    Button(LanguageBundle.string("common.save")) { save() }
+                }
+            }
+        }
+    }
+
+    private func save() {
+        guard let amount = Double(amountText.replacingOccurrences(of: ",", with: ".")), amount > 0 else {
+            validationError = LanguageBundle.string("deposits.detail.error.invalidAmount")
+            return
+        }
+        if kind == .withdrawal, amount > maxWithdrawal {
+            validationError = LanguageBundle.string("deposits.detail.error.withdrawalTooLarge")
+            return
+        }
+        let signedAmount = kind == .contribution ? amount : -amount
+        onSave(signedAmount, date)
+        dismiss()
     }
 }

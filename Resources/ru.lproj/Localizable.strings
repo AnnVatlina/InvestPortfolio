@@ -47,6 +47,14 @@
 "deposits.detail.transactions.title" = "История операций";
 "deposits.detail.transactions.empty" = "Операций пока нет";
 "deposits.detail.transaction.balanceAfter.format" = "Остаток: %.2f %@";
+"deposits.detail.addContribution.action" = "+ Пополнить";
+"deposits.detail.addWithdrawal.action" = "− Снять";
+"deposits.detail.addContribution.title" = "Пополнение";
+"deposits.detail.addWithdrawal.title" = "Снятие";
+"deposits.detail.transactionDate" = "Дата";
+"deposits.detail.transactionAmount" = "Сумма";
+"deposits.detail.error.invalidAmount" = "Введите корректную сумму";
+"deposits.detail.error.withdrawalTooLarge" = "Нельзя снять больше текущего остатка";
 "deposits.loading" = "Загрузка вкладов...";
 "deposits.empty" = "Пока нет вкладов";
 "deposits.rate.format" = "Ставка: %.2f%%";

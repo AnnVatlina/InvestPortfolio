@@ -61,6 +61,21 @@ final class DepositDetailViewModel: ObservableObject {
         return result
     }
 
+    /// Principal on deposit right now (original amount plus all contributions/withdrawals so
+    /// far) — used to cap withdrawal amounts. Deliberately excludes accrued interest, which
+    /// isn't available to withdraw until the deposit is actually closed.
+    var currentPrincipalBalance: Double {
+        deposit.amount + transactions.reduce(0.0) { $0 + $1.amount }
+    }
+
+    // MARK: - Add transaction
+
+    func addTransaction(amount: Double, date: Date) async throws {
+        let transaction = DepositTransaction(depositId: deposit.id, date: date, amount: amount)
+        try await service.addTransaction(transaction)
+        await refresh(deposit: deposit)
+    }
+
     // MARK: - Chart
 
     private func buildChartPoints() -> [DepositBalancePoint] {
