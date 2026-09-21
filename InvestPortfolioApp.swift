@@ -33,7 +33,7 @@ struct InvestPortfolioApp: App {
         do {
             modelContainer = try ModelContainer(for: schema, configurations: config)
         } catch {
-            // Файл базы недоступен (напр. после смены Bundle ID) — удаляем и создаём заново.
+            // Store file is inaccessible (e.g. after a Bundle ID change) — delete and recreate it.
             try? FileManager.default.removeItem(at: storeURL)
             try? FileManager.default.removeItem(at: storeURL.appendingPathExtension("shm"))
             try? FileManager.default.removeItem(at: storeURL.appendingPathExtension("wal"))
@@ -81,7 +81,7 @@ struct InvestPortfolioApp: App {
                 .tint(.brand)
                 .environment(\.locale, Locale(identifier: localeIdentifier))
         }
-        // Передаём контейнер в среду SwiftUI (для @Query и @Environment(\.modelContext))
+        // Pass the container into the SwiftUI environment (for @Query and @Environment(\.modelContext))
         .modelContainer(container.modelContainer)
     }
 }

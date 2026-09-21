@@ -170,7 +170,7 @@ private struct DepositRow: View {
 
     var body: some View {
         VStack(alignment: .leading, spacing: 6) {
-            // Заголовок: название + статус
+            // Header: title + status
             HStack(alignment: .top) {
                 VStack(alignment: .leading, spacing: 2) {
                     Text(deposit.title)
@@ -183,7 +183,7 @@ private struct DepositRow: View {
                 }
                 Spacer()
                 VStack(alignment: .trailing, spacing: 4) {
-                    // Бейдж статуса
+                    // Status badge
                     Text(isClosed
                          ? LanguageBundle.string("deposits.status.closed")
                          : LanguageBundle.string("deposits.status.active"))
@@ -200,7 +200,7 @@ private struct DepositRow: View {
                 }
             }
 
-            // Сумма и даты
+            // Amount and dates
             HStack {
                 Text("\(deposit.amount, specifier: "%.0f") \(deposit.currency.rawValue)")
                     .fontWeight(.medium)
@@ -220,7 +220,7 @@ private struct DepositRow: View {
                 }
             }
 
-            // Прогресс срока (только для вкладов с датой закрытия)
+            // Term progress (only for deposits with a close date)
             if let closeDate = deposit.closeDate {
                 let total = closeDate.timeIntervalSince(deposit.openDate)
                 let elapsed = Date().timeIntervalSince(deposit.openDate)
@@ -229,9 +229,9 @@ private struct DepositRow: View {
                     .tint(isClosed ? .secondary : .brand)
             }
 
-            // Доход
+            // Income
             HStack(spacing: 16) {
-                // Для закрытых: "Заработано", для активных: "На сегодня"
+                // For closed deposits: "Earned", for active ones: "Today"
                 Label {
                     Text(String(format: LanguageBundle.string(isClosed
                                                ? "deposits.income.earned.format"

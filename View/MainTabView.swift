@@ -15,7 +15,7 @@ struct MainTabView: View {
         _ = locale // re-render on language change
         return TabView(selection: $selectedIndex) {
 
-            // 0: Главная
+            // 0: Home
             NavigationStack {
                 HomeTabView(container: container)
                     .navigationBarTitleDisplayMode(.inline)
@@ -24,21 +24,21 @@ struct MainTabView: View {
             .tabItem { Label("home.tab.title", systemImage: "house.fill") }
             .tag(0)
 
-            // 1: Вклады
+            // 1: Deposits
             NavigationStack {
                 DepositsView(container: container)
             }
             .tabItem { Label("deposits.title", systemImage: "banknote.fill") }
             .tag(1)
 
-            // 2: Подписки
+            // 2: Subscriptions
             NavigationStack {
                 SubscriptionsView(container: container)
             }
             .tabItem { Label("subscriptions.title", systemImage: "repeat.circle.fill") }
             .tag(2)
 
-            // 3: Аналитика
+            // 3: Analytics
             NavigationStack {
                 AnalyticsView(container: container)
                     .navigationTitle("analytics.title")
@@ -48,7 +48,7 @@ struct MainTabView: View {
 
         }
         .onAppear {
-            // Настройки переехали в тулбар дашборда — сохранённый индекс 4 больше невалиден
+            // Settings moved into the dashboard toolbar — a saved index of 4 is no longer valid
             if !(0...3).contains(selectedIndex) { selectedIndex = 0 }
         }
 
