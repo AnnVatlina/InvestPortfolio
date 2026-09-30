@@ -1,101 +1,129 @@
-# App Store Submission — Полный чеклист
+# App Store Submission — Полный чеклist
 
-## Статус готовности к модерации
+> Приложение уже опубликовано в App Store (на сегодня — 2 версии). Этот документ
+> описывает подготовку **очередного обновления** (с функциональностью вкладов из
+> #17–#24: капитализация, пополнение/снятие, отзывность, экран деталей с графиком),
+> а не первую публикацию — более ранняя версия этого файла была написана для v1.0
+> и ещё не отправленного приложения, что уже не так.
 
-| Блок | Статус |
-|------|--------|
-| Privacy Manifest (PrivacyInfo.xcprivacy) | ✅ |
-| Privacy Policy | ✅ |
-| HTTPS для всех запросов | ✅ |
-| Данные в Keychain | ✅ |
-| Debug-логирование убрано из APIClient.swift | ✅ |
-| Bundle ID зарегистрирован в Developer Portal | ⏳ сделать |
-| Privacy Policy опубликована по URL | ⏳ сделать |
-| Display name в Xcode изменён на Rentivo | ⏳ сделать |
+## Статус на основе реальных настроек Xcode-проекта
+
+Проверено через `GetTargetBuildSettings` — это факт, а не предположение:
+
+| Параметр | Значение | Статус |
+|---|---|---|
+| `PRODUCT_BUNDLE_IDENTIFIER` | `io.rentivo.app` | ✅ настроен |
+| `INFOPLIST_KEY_CFBundleDisplayName` | `Rentivo` | ✅ настроен |
+| `DEVELOPMENT_TEAM` | `SVVTWN6V74` | ✅ привязан |
+| `MARKETING_VERSION` | `1.1` | — см. ниже |
+| `CURRENT_PROJECT_VERSION` (build) | `6` | — см. ниже |
+| `IPHONEOS_DEPLOYMENT_TARGET` | `17.0` | ✅ (нужен для SwiftData) |
+| Privacy Manifest (`PrivacyInfo.xcprivacy`) | — | ✅ (проверено раньше, не менялось в этом релизе) |
+
+**Про версию/билд:** `1.1`/`6` — это то, что сейчас стоит в Xcode-проекте. Я не имею
+доступа к App Store Connect и не знаю, совпадает ли это с уже опубликованной версией
+или это уже следующий номер. **Перед архивацией проверьте в App Store Connect, какая
+версия сейчас live, и выставьте следующий номер** (например, если live-версия `1.1`,
+для этого релиза нужно `1.2`; build number должен быть строго больше предыдущего
+загруженного билда для той же версии).
+
+**Что я не могу проверить или сделать отсюда** (требует входа в Developer Portal /
+App Store Connect под вашим Apple ID):
+- зарегистрирован ли Bundle ID в Developer Portal (для уже опубликованного приложения — почти наверняка да)
+- опубликована ли Privacy Policy по публичному URL и вписана ли в App Store Connect
+- Distribution-сертификат и provisioning profile для архивации
+- сама загрузка архива и отправка на ревью
 
 ---
 
-## 1. App Store Connect — обязательные поля
+## 1. Что нового в этой версии (для раздела "What's New")
+
+Раньше в этом документе было написано "не нужно для v1.0" — теперь, когда это
+обновление уже опубликованного приложения, текст для "What's New" обязателен.
+Черновик (подробные формулировки — в `Docs/app-store-semantics.md`):
+
+**RU:**
+```
+Вклады стали умнее:
+• Капитализация процентов (ежемесячно/ежеквартально/ежегодно)
+• Пополнение и частичное снятие
+• Безотзывные вклады — с честным расчётом потерь при досрочном закрытии
+• Новый экран вклада: график роста и история операций
+```
+
+**EN:**
+```
+Deposits got smarter:
+• Compounding interest (monthly/quarterly/yearly)
+• Contributions and partial withdrawals
+• Non-revocable deposits — with an honest early-closure payoff estimate
+• New deposit screen: growth chart and transaction history
+```
+
+---
+
+## 2. App Store Connect — поля, которые могут понадобиться обновить
 
 ### Идентификаторы
-- **Bundle ID**: `io.rentivo.app`
-- **Version**: `1.0.0`
-- **Build Number**: `1`
-- **SKU**: уникальный внутренний идентификатор, например `rentivo-ios-1`
-- **Apple ID**: назначается автоматически при создании приложения
+- **Bundle ID**: `io.rentivo.app` (не меняется между версиями)
+- **Version**: следующий номер после текущего live (см. предупреждение выше)
+- **Build Number**: должен быть больше предыдущего загруженного для этой версии
 
-### Основная информация
-- **Название**: `Rentivo: Личные финансы` (RU) / `Rentivo: Finance Tracker` (EN) — до 30 символов
-- **Подзаголовок**: `Вклады, подписки, портфель` / `Deposits, Subs & Portfolio` — до 30 символов
-- **Категория**: Finance
-- **Дополнительная категория**: Productivity
-- **Возрастной рейтинг**: 4+
-
-### Ключевые слова (100 символов)
-```
-RU: вклады,подписки,финансы,бюджет,трекер,банк,расходы,доходы,портфель,инвестиции,депозит,расчёт
-EN: deposits,subscriptions,budget,finance,tracker,expenses,income,portfolio,investment,bank,savings
-```
-
-### Описания
-→ Полные тексты в `Docs/app-store-semantics.md`
+### Описания и ключевые слова
+→ Актуальный текст (с учётом вкладов) в `Docs/app-store-semantics.md`. Полное
+описание там уже обновлено под капитализацию/отзывность; название, подзаголовок и
+ключевые слова можно оставить прежними, если они уже работают (не требуют ревью при
+обновлении отдельно от Promotional Text — но сам текст описания ревью проходит).
 
 ### URL-ссылки
-- **Privacy Policy URL** — обязательно: нужен публичный URL, например:
-  `https://rentivo.io/privacy` или GitHub Pages с `Docs/privacy-policy.html`
-- **Support URL** — обязательно: сайт или форма поддержки
-- **Marketing URL** — опционально
+Если приложение уже публиковалось — Privacy Policy URL и Support URL уже должны
+быть в App Store Connect с предыдущего раза. Проверьте, что они ещё открываются
+(особенно если `Docs/privacy-policy.html` размещён не на постоянном хостинге).
 
 ---
 
-## 2. Скриншоты — требования Apple
+## 3. Скриншоты
 
-Скриншоты обязательны для каждого поддерживаемого типа устройств.
+В `Docs/screenshots/` уже есть 11 актуальных скриншотов приложения (сняты на
+симуляторе при подготовке `Docs/user-guide.md`), покрывающих онбординг, вклады
+(список/форма/детали с графиком), подписки, настройки и аналитику. **Но они сняты
+на iPhone 17 и не гарантированно совпадают с требуемым размером для App Store —
+перед загрузкой в App Store Connect пересними на симуляторе нужного устройства.**
 
-### Обязательные размеры (2025)
+### Обязательные размеры
 | Устройство | Размер | Обязательно |
 |------------|--------|-------------|
-| iPhone 6.9" (iPhone 16 Pro Max) | 1320×2868 px | ✅ Обязательно |
+| iPhone 6.9" (iPhone 16/17 Pro Max) | 1320×2868 px | ✅ обязательно |
 | iPhone 6.5" (iPhone 11 Pro Max) | 1242×2688 px | опционально |
-| iPad Pro 13" (если поддерживается) | 2064×2752 px | если iPad |
+| iPad Pro 13" (если поддерживается) | 2064×2752 px | если заявлен iPad |
 
-- Минимум **1 скриншот**, рекомендуется **5–10**
-- Форматы: PNG или JPEG, без закруглённых углов, без рамки устройства (Apple сама накладывает)
-- Текст на скриншотах должен совпадать с языком локали
+- Минимум 1 скриншот на нужный размер, рекомендуется 5–10
+- PNG/JPEG, без рамки устройства (Apple добавляет её сама), текст — на языке локали
+- Если обновляете существующий листинг, можно оставить старые скриншоты и добавить
+  1–2 новых, показывающих капитализацию/график вклада — необязательно менять весь набор
 
-### Рекомендуемые кадры для скриншотов
-1. **Главный экран** — Home с карточками вкладов и подписок
-2. **Вклады** — список с накопленным доходом и прогрессом
-3. **Подписки** — список с ближайшими платежами
-4. **Аналитика** — график доходов vs. расходов
-5. **Добавление вклада** — форма (демонстрирует простоту)
+### Рекомендуемые новые кадры (из текущего релиза)
+1. `deposits_list.png` — список с бейджами капитализации/отзывности
+2. `deposit_detail.png` — график роста и история операций
+3. `deposit_form_2.png` — форма с раскрытыми секциями (капитализация, пополнение, отзывность)
 
 ---
 
-## 3. Видео-превью (App Preview) — опционально
+## 4. Видео-превью (App Preview) — опционально, не менялось
 
-- Длительность: 15–30 секунд
-- Должно показывать реальный UI, снятый на устройстве или симуляторе
-- Не рекламный ролик — только демонстрация функционала
+- Длительность: 15–30 секунд, реальный UI, без рекламных вставок
 - Форматы: H.264 или HEVC
 
 ---
 
-## 4. Конфигурация версии
+## 5. Privacy — без изменений в этом релизе
 
-### Info.plist — обязательные ключи
-На iOS `NSUserNotificationsUsageDescription` не требуется — локальные уведомления через `UNUserNotificationCenter` работают без ключа в Info.plist.
+Функциональность вкладов (#17–#24) не добавляет новых прав доступа, сетевых вызовов
+или сбора данных — приложение остаётся полностью локальным. Разделы ниже не должны
+требовать правок в App Store Connect, но стоит перепроверить перед отправкой, что
+ответы там всё ещё соответствуют коду.
 
-### Capabilities (Xcode → Signing & Capabilities)
-- **Push Notifications** — нужен entitlement, если используются локальные уведомления через UNUserNotification (локальные не требуют сертификата, но entitlement нужен для remote в будущем)
-- **iCloud / CloudKit** — если планируется синхронизация (сейчас не используется → не нужен)
-- **Keychain Sharing** — не нужен (используется базовый Keychain без групп)
-
----
-
-## 5. Privacy — требования для модерации
-
-### PrivacyInfo.xcprivacy — текущее состояние (OK)
+### PrivacyInfo.xcprivacy — ожидаемое состояние
 ```xml
 NSPrivacyTracking: false
 NSPrivacyCollectedDataTypes: [] (пусто — данные не собираются)
@@ -104,18 +132,7 @@ NSPrivacyAccessedAPITypes:
   - NSPrivacyAccessedAPICategoryFileTimestamp → C617.1
 ```
 
-### Privacy Policy URL
-Политика конфиденциальности в `Docs/privacy-policy.html` готова.
-**Нужно**: опубликовать по публичному URL и вписать его в App Store Connect.
-
-Варианты хостинга:
-- GitHub Pages (бесплатно)
-- Netlify / Vercel (бесплатно)
-- Собственный домен `rentivo.io`
-
-### App Privacy "Nutrition Label" (App Store Connect)
-Отвечаем на вопросы в разделе "App Privacy":
-
+### App Privacy "Nutrition Label"
 | Категория данных | Собирается? | Ответ |
 |------------------|-------------|-------|
 | Contact Info | Нет | No |
@@ -127,61 +144,45 @@ NSPrivacyAccessedAPITypes:
 | Diagnostics | Нет | No |
 | Third-Party Advertising | Нет | No |
 
-> Ответ на "Data Linked to You" и "Data Used to Track You" — **No** для всего.
+> "Data Linked to You" и "Data Used to Track You" — **No** для всего.
 > Приложение полностью локальное — нет сети, нет сторонних API, данные никуда не передаются.
 
 ---
 
-## 6. Возрастной рейтинг — анкета Apple
+## 6. Возрастной рейтинг — без изменений
 
-| Вопрос | Ответ |
-|--------|-------|
-| Cartoon or Fantasy Violence | None |
-| Realistic Violence | None |
-| Sexual Content | None |
-| Nudity | None |
-| Profanity or Crude Humor | None |
-| Mature/Suggestive Themes | None |
-| Horror/Fear Themes | None |
-| Medical/Treatment Information | None |
-| Alcohol, Tobacco, Drugs | None |
-| Gambling | None |
-| Contests | None |
-| **Unrestricted Web Access** | **No** |
-| **User Generated Content** | **No** |
-
-**Итоговый рейтинг: 4+**
+Функциональность вкладов не меняет ответы анкеты. Итоговый рейтинг: **4+**.
 
 ---
 
-## 7. Что нужно сделать до публикации
+## 7. Технические требования сборки
 
-### КРИТИЧНО
+### Подписание (Signing)
+- **Team**: уже привязан (`SVVTWN6V74`) — проверьте, что выбран правильный аккаунт при архивации
+- **Provisioning Profile**: App Store Distribution
+- **Certificate**: Apple Distribution (не Development — сборка выше снята с `SDKROOT=iphonesimulator`/Debug, для архива нужна Release-конфигурация с дистрибутивным сертификатом)
 
-#### 7.1 Зарегистрировать Bundle ID в Developer Portal
-`io.rentivo.app` должен быть создан в Certificates, Identifiers & Profiles.
-Без этого архив не загрузится в App Store Connect.
+### Сборка для отправки
+1. В Xcode: **Product → Archive** (на Release-конфигурации, устройство "Any iOS Device")
+2. **Window → Organizer → Distribute App → App Store Connect → Upload**
+3. После загрузки — статус в App Store Connect → TestFlight, затем "Submit for Review"
 
-#### 7.2 Опубликовать Privacy Policy по публичному URL
-Файл `Docs/privacy-policy.html` готов — нужно разместить на хостинге.
-Варианты: GitHub Pages, Netlify, Vercel (все бесплатно).
+### Минимальный Deployment Target
+**iOS 17** (нужен для SwiftData) — не менялось.
 
-#### 7.3 Поменять Display Name в Xcode
-`Build Settings → INFOPLIST_KEY_CFBundleDisplayName` → `Rentivo`
+---
 
-#### 7.4 Поменять Bundle ID в Xcode
-`Build Settings → PRODUCT_BUNDLE_IDENTIFIER` → `io.rentivo.app`
+## 8. Дополнительные поля App Store Connect
 
-### ВАЖНО
+| Поле | Значение |
+|------|-----------|
+| What's New | текст из §1 выше |
+| Promotional Text | можно менять без ревью — см. `Docs/app-store-semantics.md` |
+| Copyright | `© 2026 Anna Vatlina` |
+| Developer name | Anna Vatlina |
+| Email для Apple Review | рабочий адрес |
 
-#### 7.5 Убедиться что email поддержки рабочий
-`privacy@rentivo.io` в политике конфиденциальности должен принимать письма.
-Support URL в App Store Connect тоже должен быть доступен.
-
-### РЕКОМЕНДУЕТСЯ
-
-#### 7.6 App Review Notes
-При отправке указать ревьюеру:
+### App Review Notes (если ревьюер попросит обойти онбординг)
 ```
 No login required to use the app.
 Tap "Start Fresh" on onboarding to access Deposits, Subscriptions and Analytics.
@@ -190,49 +191,14 @@ All core features are available without authentication.
 
 ---
 
-## 8. Технические требования сборки
+## 9. Чеклист перед отправкой этого обновления
 
-### Подписание (Signing)
-- **Team**: выбрать Apple Developer аккаунт
-- **Provisioning Profile**: App Store Distribution
-- **Certificate**: Apple Distribution (не Development)
-
-### Сборка для отправки
-1. В Xcode: Product → Archive
-2. Distribute App → App Store Connect → Upload
-3. После загрузки: проверить статус в App Store Connect → TestFlight или сразу на ревью
-
-### Минимальный Deployment Target
-Текущий: **iOS 17** (требуется SwiftData).
-iOS 17 охват ~85% устройств (2025) — приемлемо.
-
----
-
-## 9. Дополнительные материалы для App Store Connect
-
-| Поле | Заполнить |
-|------|-----------|
-| What's New (для обновлений) | не нужно для v1.0 |
-| Promotional Text | можно менять без ревью |
-| Copyright | `© 2026 Anna Vatlina` |
-| Developer name | Anna Vatlina |
-| Email для Apple Review | рабочий адрес |
-
----
-
-## 10. Чеклист перед отправкой
-
-- [ ] `INFOPLIST_KEY_CFBundleDisplayName` → `Rentivo` в Xcode Build Settings
-- [ ] `PRODUCT_BUNDLE_IDENTIFIER` → `io.rentivo.app` в Xcode Build Settings
-- [ ] Bundle ID `io.rentivo.app` зарегистрирован в Developer Portal
-- [ ] Distribution сертификат и provisioning profile созданы
-- [ ] Privacy Policy опубликована по публичному URL
-- [ ] URL политики вписан в App Store Connect
-- [ ] Support URL вписан в App Store Connect
-- [ ] App Privacy Nutrition Label заполнена (все поля — No)
-- [ ] Скриншоты загружены (минимум 1 для iPhone 6.9")
-- [ ] Описание и ключевые слова вписаны на всех поддерживаемых языках
-- [ ] App Review Notes написаны
-- [ ] Возрастной рейтинг выставлен (4+)
-- [ ] Copyright поле заполнено (`© 2026 Anna Vatlina`)
-- [ ] Архив собран через Product → Archive с Release конфигурацией
+- [ ] В App Store Connect проверен текущий live-номер версии → выставлен следующий `Version`/`Build` в Xcode (`MARKETING_VERSION`/`CURRENT_PROJECT_VERSION`), больше `1.1`/`6`
+- [ ] Текст "What's New" на RU и EN вписан (см. §1)
+- [ ] Описание в App Store Connect обновлено под капитализацию/отзывность (текст готов в `Docs/app-store-semantics.md`)
+- [ ] Privacy Policy URL и Support URL из предыдущей публикации всё ещё доступны
+- [ ] 1–2 новых скриншота добавлены (пересняты в правильном размере устройства, не напрямую из `Docs/screenshots/`)
+- [ ] App Privacy Nutrition Label — без изменений, но перепроверена
+- [ ] Возрастной рейтинг — без изменений (4+)
+- [ ] Archive собран через Product → Archive с Release-конфигурацией и Distribution-сертификатом
+- [ ] Загружен через Organizer → Distribute App → App Store Connect
