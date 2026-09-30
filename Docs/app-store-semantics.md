@@ -55,15 +55,18 @@ Rentivo — всё о ваших деньгах в одном приложени
 
 💰 ВКЛАДЫ
 • Добавляйте банковские вклады с процентной ставкой и сроком
-• Приложение само считает накопленный и прогнозируемый доход
+• Простой процент или капитализация (ежемесячно/ежеквартально/ежегодно) — как в реальном банке
+• Пополнение и частичное снятие, если вклад это позволяет
+• Безотзывные вклады: приложение честно посчитает, сколько вы потеряете при досрочном закрытии
+• Приложение само считает накопленный и прогнозируемый доход, показывает график роста
 • Уведомление за 7 дней до окончания вклада — не пропустите продление
 • Поддержка USD, EUR, RUB, BYN, GEL и других валют
 
 🔁 ПОДПИСКИ
 • Отслеживайте Netflix, Spotify, iCloud и любые другие расходы
 • Ежемесячные и годовые итоги по каждой валюте
-• Фильтры: активные, отменённые, разовые платежи
-• Уведомление за день до списания — никаких сюрпризов
+• Фильтры: активные, отменённые, оплаченные разовые платежи
+• Уведомление в день списания — никаких сюрпризов
 
 📊 АНАЛИТИКА
 • Графики дохода и расходов по месяцам
@@ -84,15 +87,18 @@ Rentivo — all your money, one app.
 
 💰 DEPOSITS
 • Add bank deposits with interest rate and term
-• Auto-calculates earned and projected income
+• Simple interest or compounding (monthly/quarterly/yearly) — just like a real bank
+• Contributions and partial withdrawals, when the deposit allows it
+• Non-revocable deposits: see exactly how much you'd lose by closing early
+• Auto-calculates earned and projected income, with a growth chart
 • 7-day notification before deposit expires
 • Supports USD, EUR, RUB, GEL and more
 
 🔁 SUBSCRIPTIONS
 • Track Netflix, Spotify, iCloud and any recurring cost
 • Monthly and annual totals per currency
-• Filter: active, cancelled, one-time payments
-• 1-day payment reminder — no surprise charges
+• Filter: active, cancelled, one-time purchases already paid
+• Payment-day reminder — no surprise charges
 
 📊 ANALYTICS
 • Monthly income & expense charts

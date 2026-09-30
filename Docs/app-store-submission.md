@@ -128,7 +128,7 @@ NSPrivacyAccessedAPITypes:
 | Third-Party Advertising | Нет | No |
 
 > Ответ на "Data Linked to You" и "Data Used to Track You" — **No** для всего.
-> Tradernet API — опциональная фича, данные передаются пользователем напрямую в Tradernet.
+> Приложение полностью локальное — нет сети, нет сторонних API, данные никуда не передаются.
 
 ---
 
