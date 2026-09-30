@@ -1,680 +1,573 @@
-# InvestPortfolio — Architecture Design
+# InvestPortfolio — Архитектура
 
-> Версия: 1.0 | 2026-04-04
-> Стек: SwiftUI + SwiftData + Spring Boot proxy + async/await
+> Версия: 2.0 | 2026-09-30
+> Стек: SwiftUI + SwiftData + async/await (Swift Testing для тестов)
+> **Важно:** приложение полностью локальное — нет сети, нет backend, нет авторизации.
+> Более ранняя версия этого документа описывала план с Tradernet/Spring Boot proxy/портфелем
+> акций — от этого плана отказались до того, как появился текущий код; см. историю коммитов
+> `cleanup/remove-networking` и `cleanup/remove-broker-api`. Всё нижеописанное соответствует
+> реальному коду в репозитории на дату версии документа.
 
 ---
 
-## 1. Общая схема слоёв
+## 1. Что делает приложение
+
+Личные финансы: учёт банковских **вкладов** (`Deposit`), регулярных **подписок**
+(`Subscription`) и **аналитика** доходов/расходов по ним. Есть два домашних виджета
+(iOS Home Screen) и CSV-экспорт/импорт для бэкапа/переноса данных. Никакой синхронизации
+между устройствами нет — данные живут в SwiftData-хранилище на устройстве (плюс App Group
+для доступа из виджетов).
+
+---
+
+## 2. Слои
 
 ```
 ┌─────────────────────────────────────────────────────────────┐
 │                        SwiftUI Views                        │
-│          (только отображение, zero business logic)          │
-└───────────────────────────┬─────────────────────────────────┘
+│   DepositsView, SubscriptionsView, AnalyticsView, HomeTabView│
+└───────────────────────────┬───────────────────────────────---┘
                             │  @StateObject / @EnvironmentObject
 ┌───────────────────────────▼─────────────────────────────────┐
 │                        ViewModels                           │
-│          @MainActor, ObservableObject                       │
-│          Координирует UI-состояние, вызывает сервисы        │
-└────────────────┬──────────────────────┬─────────────────────┘
-                 │                      │
-   ┌─────────────▼────────┐  ┌──────────▼──────────────────┐
-   │   Local Services     │  │    Remote Services           │
-   │  (бизнес-логика,     │  │   (рыночные данные,          │
-   │   расчёты, CRUD)     │  │    котировки, мета-данные)   │
-   └─────────────┬────────┘  └──────────┬──────────────────┘
-                 │                      │
-   ┌─────────────▼────────┐  ┌──────────▼──────────────────┐
-   │  Local Repositories  │  │  Remote Repositories         │
-   │  (протоколы)         │  │  (протоколы)                 │
-   └─────────────┬────────┘  └──────────┬──────────────────┘
-                 │                      │
-   ┌─────────────▼────────┐  ┌──────────▼──────────────────┐
-   │     SwiftData        │  │   Spring Boot Proxy          │
-   │  (offline-first)     │  │   (рыночные данные, кеш,     │
-   │                      │  │    авторизация с API-ключами)│
-   └─────────────────────-┘  └─────────────────────────────┘
+│   @MainActor, ObservableObject — состояние экрана,          │
+│   валидация форм, вызовы сервисов                           │
+└───────────────────────────┬───────────────────────────────---┘
+                            │  протоколы сервисов
+┌───────────────────────────▼─────────────────────────────────┐
+│                          Services                           │
+│   DepositsService, SubscriptionsService — бизнес-логика,    │
+│   расчёты (проценты по вкладам, даты платежей подписок)     │
+└───────────────────────────┬───────────────────────────────---┘
+                            │  протоколы репозиториев
+┌───────────────────────────▼─────────────────────────────────┐
+│                        Repositories                         │
+│   DepositsRepository, SubscriptionsRepository — протоколы;  │
+│   SwiftData (prod) / InMemory (тесты, previews)             │
+└───────────────────────────┬───────────────────────────────---┘
+                            │
+┌───────────────────────────▼─────────────────────────────────┐
+│                          SwiftData                           │
+│   ModelContainer в App Group (общий с виджетами)             │
+└───────────────────────────────────────────────────────────---┘
 ```
 
-**Ключевые принципы:**
-- ViewModels не знают об SwiftData / URLSession — только о протоколах сервисов
-- Сервисы не знают о конкретных реализациях репозиториев — только о протоколах
-- Замена SwiftData → REST = замена одной реализации репозитория, ничего больше
+**Ключевые принципы (соблюдаются в реальном коде):**
+- ViewModel не знают про SwiftData — только про протоколы сервисов (`any DepositsService` и т.д.)
+- Сервисы не знают про SwiftData напрямую — только про протоколы репозиториев
+- Каждый репозиторий существует в двух реализациях: `SwiftData*Repository` (production,
+  `@ModelActor`) и `InMemory*Repository` (тесты/превью)
+- Единственное место, которое знает про конкретные реализации — `DIContainer`
 
 ---
 
-## 2. Разделение данных: Local vs Remote
+## 3. Модели данных (SwiftData)
 
-| Тип данных | Источник | Где хранится |
-|------------|----------|-------------|
-| Транзакции | Пользователь / CSV / Tradernet | SwiftData (offline-first) |
-| Вклады | Пользователь | SwiftData |
-| Подписки | Пользователь | SwiftData |
-| Активы (метаданные) | Spring Boot proxy | SwiftData (кеш) |
-| Котировки текущие | Spring Boot proxy | NSCache / SwiftData (TTL 5 мин) |
-| Исторические цены | Spring Boot proxy | SwiftData (кеш) |
-| Дивиденды | Пользователь + proxy | SwiftData |
+| Модель | Файл(ы) | Назначение |
+|---|---|---|
+| `Deposit` | `Model/Deposit.swift` | Банковский вклад |
+| `DepositInterestType` | `Model/DepositInterestType.swift` | `.simple` / `.capitalized` |
+| `CapitalizationPeriod` | `Model/CapitalizationPeriod.swift` | `.monthly` / `.quarterly` / `.yearly` |
+| `DepositTransaction` | `Model/DepositTransaction.swift` | Пополнение/снятие по вкладу (знаковая сумма) |
+| `Subscription` | `Model/AppSchema.swift` (хранимые свойства + `@Model`), `Model/Subscription.swift` (бизнес-логика: `nextPaymentDate`, `advance`) | Регулярная/разовая подписка |
+| `SubscriptionBillingCycle` | `Model/SubscriptionBillingCycle.swift` | `.weekly/.monthly/.quarterly/.yearly/.oneTime` |
+| `DepositCurrency` | `Model/DepositCurrency.swift` | Общий enum валюты для вкладов и подписок |
+| `Settings` | `Model/Settings.swift` | Выбранные валюты, локаль, дата последней синхронизации (поле есть, но не используется — sync отсутствует) |
 
----
+> `AppSchema.swift` — не про версионирование схемы, это просто файл, где живёт сам
+> `@Model final class Subscription` со всеми `@Model`-полями. Комментарий в файле
+> напоминает: если меняешь хранимые свойства — подумай про lightweight-миграцию
+> (задавай default-значения прямо в объявлении, как уже сделано для `Deposit`).
 
-## 3. Repository Protocol Pattern
-
-### Правило: каждый репозиторий — это протокол
+### `Deposit` — актуальный набор полей
 
 ```swift
-// Пример: локальный репозиторий транзакций
-protocol TransactionRepository: Sendable {
-    func fetchAll() async throws -> [Transaction]
-    func fetch(assetId: UUID) async throws -> [Transaction]
-    func fetch(from: Date, to: Date) async throws -> [Transaction]
-    func save(_ transaction: Transaction) async throws
+@Model
+final class Deposit {
+    var id: UUID
+    var title: String
+    var bankName: String?
+    var amount: Double
+    var currencyRaw: String            // typed-доступ через `currency`
+    var createdAt: Date
+    var openDate: Date
+    var closeDate: Date?               // плановая дата закрытия
+    var annualInterestRate: Double
+
+    // Добавлено при расширении функциональности вкладов (см. §9) — у всех новых
+    // хранимых полей есть значения по умолчанию в объявлении, чтобы SwiftData сделала
+    // lightweight-миграцию автоматически, без VersionedSchema/SchemaMigrationPlan.
+    var interestTypeRaw: String = DepositInterestType.simple.rawValue
+    var capitalizationPeriodRaw: String? = nil
+    var allowsReplenishment: Bool = false
+    var allowsPartialWithdrawal: Bool = false
+    var isRevocable: Bool = true
+    var earlyWithdrawalRate: Double? = nil
+    var actualCloseDate: Date? = nil   // фактическая дата закрытия (может быть раньше closeDate)
+}
+```
+
+`currencyRaw`/`interestTypeRaw`/`capitalizationPeriodRaw` хранятся как `String`, а не
+как сам enum — это обходит баг SwiftData с ленивой загрузкой кастомных enum-полей
+(комментарий в коде указывает на iOS 26). Typed-доступ даёт вычисляемое свойство
+(`currency`, `interestType`, `capitalizationPeriod`) поверх `*Raw`-поля.
+
+`DepositTransaction` — отдельная модель, не relationship на `Deposit` (в проекте
+relationships не используются вообще — всё через `UUID`-поля вроде `depositId`,
+по аналогии с тем, как остальные модели ссылаются друг на друга):
+
+```swift
+@Model
+final class DepositTransaction {
+    var id: UUID
+    var depositId: UUID
+    var date: Date
+    var amount: Double   // положительная — пополнение, отрицательная — снятие
+}
+```
+
+---
+
+## 4. Repository Protocol Pattern
+
+Пример реального кода — `DepositsRepository` (в `Model/DepositsRepository.swift`, да, репозитории
+лежат в группе `Model`, не в отдельной группе `Repository`):
+
+```swift
+protocol DepositsRepository {
+    func fetchAll() async throws -> [Deposit]
+    func add(_ deposit: Deposit) async throws
     func delete(id: UUID) async throws
-    func deleteAll() async throws
+    func update(id: UUID, title: String, bankName: String?, amount: Double,
+                 currency: DepositCurrency, openDate: Date, closeDate: Date?,
+                 annualInterestRate: Double, interestType: DepositInterestType,
+                 capitalizationPeriod: CapitalizationPeriod?, allowsReplenishment: Bool,
+                 allowsPartialWithdrawal: Bool, isRevocable: Bool,
+                 earlyWithdrawalRate: Double?, actualCloseDate: Date?) async throws
+
+    func transactions(forDepositId depositId: UUID) async throws -> [DepositTransaction]
+    func fetchAllTransactions() async throws -> [DepositTransaction]
+    func addTransaction(_ transaction: DepositTransaction) async throws
+    func deleteTransaction(id: UUID) async throws
 }
 
-// Реализация 1: SwiftData (production)
 @ModelActor
-actor SwiftDataTransactionRepository: TransactionRepository {
-    func fetchAll() async throws -> [Transaction] {
-        try modelContext.fetch(FetchDescriptor<Transaction>(
-            sortBy: [SortDescriptor(\.date, order: .reverse)]
+actor SwiftDataDepositsRepository: @preconcurrency DepositsRepository {
+    func fetchAll() async throws -> [Deposit] {
+        try modelContext.fetch(FetchDescriptor<Deposit>(
+            sortBy: [SortDescriptor(\.createdAt, order: .reverse)]
         ))
     }
-    func save(_ transaction: Transaction) async throws {
-        modelContext.insert(transaction)
+    func add(_ deposit: Deposit) async throws {
+        modelContext.insert(deposit)
         try modelContext.save()
     }
     // ...
 }
 
-// Реализация 2: In-Memory (тесты / Preview)
-final class InMemoryTransactionRepository: TransactionRepository {
-    private var store: [Transaction] = []
-    func fetchAll() async throws -> [Transaction] { store }
-    func save(_ t: Transaction) async throws { store.append(t) }
-    // ...
-}
-
-// Реализация 3 (будущее): REST API
-final class RESTTransactionRepository: TransactionRepository {
-    private let client: APIClient
-    func fetchAll() async throws -> [Transaction] {
-        try await client.get("/transactions")
-    }
+final class InMemoryDepositsRepository: DepositsRepository {
+    private var deposits: [Deposit] = []
+    private var depositTransactions: [DepositTransaction] = []
     // ...
 }
 ```
 
-### Репозитории рыночных данных (Remote)
+`update(...)` принимает все поля явно (не сам объект `Deposit`) — это сознательный
+выбор с самого начала проекта: репозиторий не должен угадывать, какие поля менялись.
+При добавлении нового поля в `Deposit` новый параметр обычно добавляется в конец
+сигнатуры `update` (и на уровне `DepositsService`, и на уровне `DepositsViewModel`) —
+а на уровне ViewModel ему обычно дают default-значение, чтобы существующие вызовы
+(из View, из тестов) не требовали правок.
 
-```swift
-protocol MarketDataRepository: Sendable {
-    func fetchQuote(ticker: String) async throws -> QuoteDTO
-    func fetchQuotes(tickers: [String]) async throws -> [QuoteDTO]
-    func fetchHistoricalPrices(
-        ticker: String,
-        from: Date,
-        to: Date,
-        interval: PriceInterval
-    ) async throws -> [PricePointDTO]
-    func searchAssets(query: String) async throws -> [AssetSearchResultDTO]
-}
-
-// Реализация через Spring Boot proxy
-final class SpringBootMarketDataRepository: MarketDataRepository {
-    private let client: MarketAPIClient
-
-    func fetchQuote(ticker: String) async throws -> QuoteDTO {
-        try await client.get("/market/quote/\(ticker)")
-    }
-    func fetchQuotes(tickers: [String]) async throws -> [QuoteDTO] {
-        try await client.post("/market/quotes", body: QuotesRequest(tickers: tickers))
-    }
-    func fetchHistoricalPrices(...) async throws -> [PricePointDTO] {
-        try await client.get("/market/history/\(ticker)", params: [...])
-    }
-}
-
-// Реализация-заглушка для тестов
-final class MockMarketDataRepository: MarketDataRepository {
-    var quotesMap: [String: QuoteDTO] = [:]
-    func fetchQuote(ticker: String) async throws -> QuoteDTO {
-        guard let q = quotesMap[ticker] else { throw MarketError.notFound }
-        return q
-    }
-}
-```
+`SubscriptionsRepository` в `Model/SubscriptionsRepository.swift` построен по тому же
+шаблону (протокол + `SwiftDataSubscriptionsRepository` + `InMemorySubscriptionsRepository`).
 
 ---
 
-## 4. Service Layer
+## 5. Service Layer
 
-Сервис содержит бизнес-логику и комбинирует данные из нескольких репозиториев.
+Сервисы — единственное место с бизнес-логикой. `DepositsService`
+(`Service/DepositsService.swift`) считает доход по вкладу:
 
 ```swift
-// Портфель: считает позиции из транзакций + обогащает текущими ценами
-protocol PortfolioService: Sendable {
-    func buildPortfolio() async throws -> Portfolio
-    func position(for ticker: String) async throws -> PortfolioPosition?
-    func refreshPrices() async throws
+protocol DepositsService {
+    func fetchAll() async throws -> [Deposit]
+    func add(_ deposit: Deposit) async throws
+    func delete(id: UUID) async throws
+    func update(...) async throws
+    func incomeSummary(for deposit: Deposit, transactions: [DepositTransaction], asOf date: Date) -> DepositIncomeSummary
+
+    func transactions(forDepositId depositId: UUID) async throws -> [DepositTransaction]
+    func fetchAllTransactions() async throws -> [DepositTransaction]
+    func addTransaction(_ transaction: DepositTransaction) async throws
+    func deleteTransaction(id: UUID) async throws
 }
 
-final class DefaultPortfolioService: PortfolioService {
-    private let transactionRepo: any TransactionRepository
-    private let marketRepo: any MarketDataRepository
-    private let priceCache: PriceCache          // NSCache-обёртка, TTL 5 мин
-
-    func buildPortfolio() async throws -> Portfolio {
-        // 1. Загружаем транзакции локально (offline-first)
-        let transactions = try await transactionRepo.fetchAll()
-
-        // 2. Считаем позиции (средняя цена, количество) — pure function
-        let positions = PortfolioCalculator.positions(from: transactions)
-
-        // 3. Обогащаем текущими ценами (network, с fallback на кеш)
-        let tickers = positions.map(\.ticker)
-        let quotes = try await fetchQuotesCached(tickers: tickers)
-
-        // 4. Возвращаем готовый портфель
-        return Portfolio(positions: positions, quotes: quotes)
-    }
-
-    private func fetchQuotesCached(tickers: [String]) async throws -> [String: QuoteDTO] {
-        let stale = tickers.filter { priceCache.isExpired($0) }
-        if !stale.isEmpty {
-            let fresh = try await marketRepo.fetchQuotes(tickers: stale)
-            fresh.forEach { priceCache.set($0, for: $0.ticker) }
-        }
-        return Dictionary(tickers.compactMap { t in
-            priceCache.get(t).map { (t, $0) }
-        }, uniquingKeysWith: { $1 })
+extension DepositsService {
+    // Удобный оверлоад для мест, где история операций не нужна/не загружена.
+    func incomeSummary(for deposit: Deposit, asOf date: Date) -> DepositIncomeSummary {
+        incomeSummary(for: deposit, transactions: [], asOf: date)
     }
 }
 ```
 
-### Чистые функции — PortfolioCalculator
+### Расчёт дохода — единый алгоритм на все случаи
+
+`DefaultDepositsService.income(for:transactions:until:rateOverride:)` — одна функция,
+которая покрывает: простой процент, капитализацию (помесячно/поквартально/погодично),
+пополнения/снятия и досрочное закрытие безотзывного вклада по пониженной ставке.
+Идея: пройти по хронологически отсортированным «чекпоинтам» (границы периодов
+капитализации + даты транзакций), на каждом — либо капитализировать накопленные
+проценты в тело вклада, либо применить пополнение/снятие к телу.
 
 ```swift
-// Не зависит от SwiftData / API — легко тестировать
-enum PortfolioCalculator {
+private enum Checkpoint {
+    case capitalization(Date)
+    case transaction(Date, amount: Double)
+}
 
-    // Позиции из транзакций (средневзвешенная цена)
-    static func positions(from transactions: [Transaction]) -> [PortfolioPosition] {
-        var grouped = [String: [Transaction]]()
-        for t in transactions { grouped[t.ticker, default: []].append(t) }
-
-        return grouped.compactMap { ticker, txs -> PortfolioPosition? in
-            let buys  = txs.filter { $0.type == .buy  }
-            let sells = txs.filter { $0.type == .sell }
-            let qty   = buys.reduce(0) { $0 + $1.quantity }
-                      - sells.reduce(0) { $0 + $1.quantity }
-            guard qty > 0 else { return nil }
-
-            let totalCost = buys.reduce(0) { $0 + $1.quantity * $1.price + $1.fee }
-            let avgPrice  = totalCost / buys.reduce(0) { $0 + $1.quantity }
-
-            return PortfolioPosition(ticker: ticker, quantity: qty, avgPrice: avgPrice)
-        }
-    }
-
-    // XIRR (внутренняя норма доходности)
-    static func xirr(cashFlows: [(date: Date, amount: Double)]) -> Double? {
-        // Newton-Raphson итерация
-        // ...
-    }
+private func income(for deposit: Deposit, transactions: [DepositTransaction],
+                     until end: Date, rateOverride: Double? = nil) -> Double {
+    let dailyRate = ((rateOverride ?? deposit.annualInterestRate) / 100.0) / 365.0
+    // ... собрать чекпоинты, пройти по ним, капитализируя/применяя транзакции ...
 }
 ```
+
+`incomeSummary(...)`:
+- ограничивает «доход на сегодня» датой `actualCloseDate` (если вклад закрыт
+  вручную) или плановой `closeDate` (если она уже наступила)
+- для безотзывного вклада, закрытого раньше `closeDate`, пересчитывает весь доход
+  по `earlyWithdrawalRate` через `rateOverride` — без дублирования логики капитализации
+- прогноз (`forecastIncomeToCloseDate`) всегда считается по обычной ставке и `nil`,
+  если вклад уже закрыт
+
+`SubscriptionsService` (`Service/SubscriptionsService.swift`) проще — считает
+`monthlyCost`/`annualCost` по типу цикла оплаты и суммирует активные подписки в валюте.
 
 ---
 
-## 5. Dependency Injection через DIContainer
+## 6. Dependency Injection — `DIContainer`
+
+Реальный код (`Service/DIContainer.swift`):
 
 ```swift
-// Единственное место, где знают о конкретных реализациях
-@MainActor
 final class DIContainer: ObservableObject {
     let modelContainer: ModelContainer
-    private let marketRepo: any MarketDataRepository
-    private let priceCache = PriceCache()
 
-    init(modelContainer: ModelContainer, isPreview: Bool = false) {
+    init(modelContainer: ModelContainer) {
         self.modelContainer = modelContainer
-        if isPreview {
-            self.marketRepo = MockMarketDataRepository()
-        } else {
-            let client = MarketAPIClient(baseURL: Config.springBootBaseURL)
-            self.marketRepo = SpringBootMarketDataRepository(client: client)
-        }
-    }
-
-    // MARK: - ViewModels (фабричные методы)
-
-    func makePortfolioViewModel() -> PortfolioViewModel {
-        PortfolioViewModel(service: makePortfolioService())
-    }
-
-    func makeDepositsViewModel() -> DepositsViewModel {
-        DepositsViewModel(service: makeDepositsService())
-    }
-
-    // MARK: - Services
-
-    func makePortfolioService() -> any PortfolioService {
-        DefaultPortfolioService(
-            transactionRepo: SwiftDataTransactionRepository(modelContainer: modelContainer),
-            marketRepo: marketRepo,
-            priceCache: priceCache
-        )
     }
 
     func makeDepositsService() -> any DepositsService {
-        DefaultDepositsService(
-            repository: SwiftDataDepositsRepository(modelContainer: modelContainer)
-        )
+        DefaultDepositsService(repository: SwiftDataDepositsRepository(modelContainer: modelContainer))
     }
 
-    // MARK: - Preview container (статический)
+    func makeSubscriptionsService() -> any SubscriptionsService {
+        DefaultSubscriptionsService(repository: SwiftDataSubscriptionsRepository(modelContainer: modelContainer))
+    }
 
+    /// Удаляет все вклады и подписки (используется экраном сброса в Настройках).
+    func resetAllData() async throws { ... }
+
+    /// In-memory контейнер для SwiftUI Preview и тестов.
     static let preview: DIContainer = {
         let config = ModelConfiguration(isStoredInMemoryOnly: true)
         let container = try! ModelContainer(
-            for: Transaction.self, Asset.self, Deposit.self,
-                Subscription.self, Dividend.self, Settings.self,
+            for: Deposit.self, DepositTransaction.self, Settings.self, Subscription.self,
             configurations: config
         )
-        return DIContainer(modelContainer: container, isPreview: true)
+        return DIContainer(modelContainer: container)
     }()
 }
 ```
 
-### Подключение в App
+Никаких `isPreview`-флагов, никакого `marketRepo`, никакого `PriceCache` — контейнер
+знает только про SwiftData. `ViewModel`ы создаются в `init(container:)` конкретного
+View (`DepositsView.init(container:)` и т.п.) и хранятся как `@StateObject`.
 
-```swift
-@main
-struct InvestPortfolioApp: App {
-    @StateObject private var container: DIContainer
-
-    init() {
-        let mc = try! ModelContainer(
-            for: Transaction.self, Asset.self, Deposit.self,
-                Subscription.self, Dividend.self, CashOperation.self,
-                PortfolioPosition.self, Settings.self
-        )
-        _container = StateObject(wrappedValue: DIContainer(modelContainer: mc))
-    }
-
-    var body: some Scene {
-        WindowGroup {
-            RootView()
-                .environmentObject(container)
-        }
-        .modelContainer(container.modelContainer)
-    }
-}
-```
-
-### Использование в View
-
-```swift
-struct PortfolioView: View {
-    // Вариант А: ViewModel создаётся из контейнера один раз
-    @StateObject private var vm: PortfolioViewModel
-
-    init(container: DIContainer) {
-        _vm = StateObject(wrappedValue: container.makePortfolioViewModel())
-    }
-
-    var body: some View { ... }
-}
-
-// Вариант Б: через EnvironmentObject (если ViewModel живёт долго)
-struct DepositsView: View {
-    @EnvironmentObject private var container: DIContainer
-    @StateObject private var vm: DepositsViewModel
-
-    init() {
-        // lazy init через onAppear или через container в init
-    }
-}
-```
+**Важно при добавлении новой `@Model` модели:** она должна попасть в список схемы
+в трёх местах одновременно, иначе что-то из трёх не увидит новую таблицу:
+1. `InvestPortfolioApp.swift` — `Schema([...])` основного приложения
+2. `DIContainer.preview` — `ModelContainer(for: ...)` для тестов/превью
+3. `InvestPortfolioWidgets/SharedModelContainer.swift` — `Schema([...])` виджетов
 
 ---
 
-## 6. Spring Boot Proxy — Интеграция
+## 7. Виджеты (App Group)
 
-### Зачем прокси
-- API-ключи к платным провайдерам (Alpha Vantage, Finnhub) **не попадают в приложение**
-- Кеширование котировок на сервере → меньше запросов к провайдеру
-- Нормализация данных под формат iOS-приложения
-- Возможность добавить облачный sync в будущем
-
-### Эндпоинты Spring Boot (ожидаемый контракт)
-
-```
-GET  /market/quote/{ticker}              → QuoteDTO
-POST /market/quotes                      → [QuoteDTO]   (body: { tickers: [...] })
-GET  /market/history/{ticker}?from=&to=&interval=  → [PricePointDTO]
-GET  /market/search?q={query}            → [AssetSearchResultDTO]
-GET  /market/asset/{ticker}              → AssetMetaDTO
-```
-
-### Клиент для Spring Boot
+`InvestPortfolioWidgets` — отдельное расширение (widget extension), читающее тот же
+SwiftData-стор через App Group `group.io.rentivo.app`:
 
 ```swift
-final class MarketAPIClient: Sendable {
-    private let baseURL: URL
-    private let session: URLSession
-
-    // Универсальный метод с автодекодингом
-    func get<T: Decodable>(_ path: String, params: [String: String] = [:]) async throws -> T {
-        var components = URLComponents(url: baseURL.appendingPathComponent(path), resolvingAgainstBaseURL: true)!
-        if !params.isEmpty {
-            components.queryItems = params.map { URLQueryItem(name: $0.key, value: $0.value) }
-        }
-        let (data, response) = try await session.data(from: components.url!)
-        try validate(response)
-        return try JSONDecoder.iso8601.decode(T.self, from: data)
-    }
-
-    func post<Body: Encodable, Response: Decodable>(_ path: String, body: Body) async throws -> Response {
-        var request = URLRequest(url: baseURL.appendingPathComponent(path))
-        request.httpMethod = "POST"
-        request.setValue("application/json", forHTTPHeaderField: "Content-Type")
-        request.httpBody = try JSONEncoder().encode(body)
-        let (data, response) = try await session.data(for: request)
-        try validate(response)
-        return try JSONDecoder.iso8601.decode(Response.self, from: data)
-    }
-
-    private func validate(_ response: URLResponse) throws {
-        guard let http = response as? HTTPURLResponse else { return }
-        switch http.statusCode {
-        case 200...299: break
-        case 401: throw APIError.unauthorized
-        case 429: throw APIError.rateLimited
-        default: throw APIError.httpError(statusCode: http.statusCode)
-        }
+// InvestPortfolioWidgets/SharedModelContainer.swift
+enum SharedModelContainer {
+    static func make() -> ModelContainer? {
+        guard let groupURL = FileManager.default.containerURL(
+            forSecurityApplicationGroupIdentifier: "group.io.rentivo.app"
+        ) else { return nil }
+        let schema = Schema([Deposit.self, DepositTransaction.self, Settings.self, Subscription.self])
+        return try? ModelContainer(for: schema, configurations: ModelConfiguration(url: storeURL))
     }
 }
 ```
 
-### DTO структуры (iOS сторона)
+Виджет только читает (`DepositsWidget.swift`, `SubscriptionsWidget.swift`) — никогда
+не пишет в стор. Логика «что показать» (открытые вклады, ближайшие платежи) переиспользует
+те же чистые функции из `Model/HomeQueries.swift`, что и `HomeViewModel` в основном
+приложении — см. §9, чтобы определение «открытый вклад» не разошлось между таргетами.
 
-```swift
-struct QuoteDTO: Decodable, Sendable {
-    let ticker: String
-    let price: Double
-    let change: Double          // абсолютное изменение за день
-    let changePercent: Double   // % изменение за день
-    let currency: String
-    let updatedAt: Date
-}
-
-struct PricePointDTO: Decodable, Sendable {
-    let date: Date
-    let open: Double
-    let high: Double
-    let low: Double
-    let close: Double
-    let volume: Int?
-}
-
-struct AssetSearchResultDTO: Decodable, Identifiable, Sendable {
-    let ticker: String
-    let name: String
-    let type: String
-    let exchange: String
-    let currency: String
-    var id: String { ticker }
-}
-
-enum PriceInterval: String {
-    case day = "1d"
-    case week = "1w"
-    case month = "1mo"
-}
-```
+Приложение и виджет имеют независимые `.strings`-ресурсы
+(`Resources/Localizable.strings/*` и `InvestPortfolioWidgets/Localizable.strings/*`) —
+при добавлении строки, которая нужна и там, и там, её придётся продублировать в оба
+набора файлов.
 
 ---
 
-## 7. Offline-First: стратегия кеширования
+## 8. Онбординг и демо-данные
 
 ```
-Запрос данных:
-┌──────────────────────────────────────────────┐
-│ 1. Есть локальные данные в SwiftData?         │
-│    ДА → вернуть немедленно (stale-while-reval)│
-│    НЕТ → перейти к п.2                       │
-├──────────────────────────────────────────────┤
-│ 2. Есть интернет?                            │
-│    ДА → загрузить из Spring Boot, сохранить  │
-│         в SwiftData, вернуть свежие          │
-│    НЕТ → вернуть ошибку с флагом isOffline   │
-└──────────────────────────────────────────────┘
+InvestPortfolioApp → RootView
+                        ├── MainTabView (всегда)
+                        └── fullScreenCover: OnboardingView
+                              (пока !App_HasCompletedOnboarding)
 ```
+
+`OnboardingView` — два пути: «Попробовать с примером данных» (грузит
+`SampleDataService.load(into:)`, который просто добавляет заготовленные `Deposit`/
+`Subscription` через обычные сервисы) или «Начать с чистого листа» (просто ставит
+флаг заполнения онбординга).
+
+---
+
+## 9. Home и Analytics — общая логика между экраном и виджетом
+
+`Model/HomeQueries.swift` — чистые `extension Array where Element == Deposit/Subscription`
+без зависимостей от SwiftData/сервисов, специально чтобы одно и то же определение
+«открытый вклад»/«ближайший платёж» использовалось и в `HomeViewModel` (внутри приложения),
+и в виджетах (отдельный процесс, свой `ModelContainer`) без риска, что они разойдутся:
 
 ```swift
-// PriceCache — лёгкий NSCache для котировок в памяти
-final class PriceCache: @unchecked Sendable {
-    private let cache = NSCache<NSString, CacheEntry>()
-    private let ttl: TimeInterval
+extension Array where Element == Deposit {
+    var openSortedByCloseDate: [Deposit] { ... }
+}
+extension Array where Element == Subscription {
+    func nearestUpcoming(limit: Int = 5) -> [Subscription] { ... }
+}
+```
 
-    init(ttl: TimeInterval = 300) { // 5 минут
-        self.ttl = ttl
-        cache.countLimit = 500
-    }
+`AnalyticsViewModel` считает доход/расход **по месяцам** для выбранного года и валюты,
+разбивая депозитный доход на помесячные срезы через два вызова
+`depositsService.incomeSummary(asOf:)` (на конец месяца и на день перед его началом,
+разница — доход за месяц) — это тот же приём, которым сам `DepositDetailViewModel`
+строит точки графика роста вклада (см. следующий пункт).
 
-    func get(_ ticker: String) -> QuoteDTO? {
-        guard let entry = cache.object(forKey: ticker as NSString),
-              Date().timeIntervalSince(entry.timestamp) < ttl
-        else { return nil }
-        return entry.quote
-    }
+---
 
-    func set(_ quote: QuoteDTO, for ticker: String) {
-        cache.setObject(CacheEntry(quote: quote, timestamp: Date()), forKey: ticker as NSString)
-    }
+## 10. Вклады — модельная фича проекта (эпик #24)
 
-    func isExpired(_ ticker: String) -> Bool { get(ticker) == nil }
+Самая развитая по слоям часть приложения — вклады с капитализацией, пополнением/снятием
+и отзывностью, реализованная в GitHub-issues #17–#24 на ветке `feature/deposit-types`:
 
-    private final class CacheEntry: NSObject {
-        let quote: QuoteDTO
-        let timestamp: Date
-        init(quote: QuoteDTO, timestamp: Date) {
-            self.quote = quote; self.timestamp = timestamp
-        }
+- **#17** — `DepositInterestType`/`CapitalizationPeriod` на модели `Deposit`
+- **#18** — расчёт дохода с капитализацией в `DefaultDepositsService`
+- **#19** — `DepositTransaction` (пополнения/снятия) + CRUD в репозитории/сервисе
+- **#20** — `isRevocable`/`earlyWithdrawalRate`/`actualCloseDate`, штраф за досрочное закрытие
+- **#21** — адаптивная форма (`DepositFormSheet` в `View/DepositsView.swift`) с прогрессивным
+  раскрытием секций под выбранный тип вклада
+- **#22** — `DepositDetailView`/`DepositDetailViewModel` (`View/DepositDetailView.swift`,
+  `ViewModel/DepositDetailViewModel.swift`): экран деталей с графиком роста (Swift Charts),
+  историей операций, кнопками пополнения/снятия и досрочного закрытия
+- **#23** — CSV-колонки для новых полей вклада + отдельный CSV-формат для
+  `DepositTransaction` (см. §11)
+
+`DepositDetailViewModel` строит точки графика, вызывая `incomeSummary` в наборе дат
+(границы капитализации/транзакций/сегодня/плановая дата закрытия) и складывая
+`amount + netTransactions(до даты) + incomeToDate` — без отдельной «формулы для графика»,
+поверх той же точки входа, что и всё остальное.
+
+---
+
+## 11. CSV Import/Export
+
+`Service/CSVExporter.swift` / `Service/CSVImporter.swift` — RFC 4180, без внешних
+зависимостей. Три независимых формата (экспортируются/импортируются по отдельности
+из экрана «Настройки → Данные», `View/SettingsView.swift`):
+
+| Формат | Заголовок |
+|---|---|
+| Вклады | `ID,Title,Bank,Amount,Currency,OpenDate,CloseDate,AnnualRate%,CreatedAt,InterestType,CapitalizationPeriod,AllowsReplenishment,AllowsPartialWithdrawal,IsRevocable,EarlyWithdrawalRate` |
+| Подписки | `ID,Title,Category,Amount,Currency,BillingCycle,StartDate,EndDate,IsActive,CreatedAt` |
+| Операции по вкладам | `ID,DepositID,Date,Amount` |
+
+Колонки `InterestType`…`EarlyWithdrawalRate` были добавлены позже (#23) **в конец**
+строки вкладов и опциональны при импорте: если их меньше, чем в текущем формате,
+недостающие получают те же default-значения, что и сам `Deposit.init` (простой процент,
+без капитализации, не пополняемый, отзывный). Это единственный способ, которым CSV
+сохраняет обратную совместимость — миграций формата файла нет, только «столбец не нашли
+→ подставили значение по умолчанию».
+
+Известные ограничения (задокументированы тестами, не фиксятся специально):
+- Заголовок/название с буквальным переводом строки внутри ломает построчный парсинг
+  (строка теряется, остальные — нет)
+- У подписок нет колонки `iconName` — кастомная иконка не переживает экспорт/импорт
+
+---
+
+## 12. Локализация — `LanguageBundle`
+
+Переключение языка **внутри приложения** (не следуя системному языку устройства)
+реализовано подменой класса `Bundle.main`:
+
+```swift
+final class LanguageBundle: Bundle, @unchecked Sendable {
+    static func activate() { object_setClass(Bundle.main, LanguageBundle.self) }
+    static func set(languageCode: String) { /* подставить .lproj для нового языка */ }
+    static func string(_ key: String) -> String { /* для String, не Text */ }
+
+    override func localizedString(forKey key: String, value: String?, table: String?) -> String {
+        // если выбран не системный язык — отдать строку из его .lproj
     }
 }
 ```
 
----
+`LanguageBundle.activate()` — самый первый вызов в `InvestPortfolioApp.init()`, до
+любого чтения локализованной строки. `Text("key")`/`Label`/`.navigationTitle` работают
+через этот механизм автоматически; но **`String(localized:)` этот оверрайд не видит**
+(использует другой, более новый путь резолва) — поэтому везде, где нужен `String`,
+а не `Text`, используется `LanguageBundle.string("key")`, а не `String(localized:)`.
 
-## 8. Конкурентность и безопасность
-
-| Слой | Изоляция | Причина |
-|------|----------|---------|
-| ViewModels | `@MainActor` | Обновляют `@Published` — только main thread |
-| SwiftData Repositories | `@ModelActor` | ModelContext не Sendable |
-| Services | `Sendable` протоколы | Могут вызываться из любого контекста |
-| APIClient / MarketClient | `final + Sendable` | URLSession уже Sendable |
-| PriceCache | `@unchecked Sendable` + NSCache | Потокобезопасен внутри |
-
-```swift
-// Правильный паттерн: ViewModel запускает Task и получает результат на main thread
-@MainActor
-final class PortfolioViewModel: ObservableObject {
-    @Published var portfolio: Portfolio?
-    @Published var isLoading = false
-    @Published var error: String?
-
-    private let service: any PortfolioService
-
-    func load() async {
-        isLoading = true
-        error = nil
-        defer { isLoading = false }
-
-        do {
-            portfolio = try await service.buildPortfolio()
-        } catch {
-            self.error = error.localizedDescription
-        }
-    }
-
-    func refresh() {
-        Task { await load() }  // Task наследует @MainActor контекст
-    }
-}
-```
+Три набора строк на ru/en/Base в `Resources/Localizable.strings/{ru,en,Base}.lproj` —
+формат `.strings` (`"key" = "value";`), не String Catalog (`.xcstrings`).
 
 ---
 
-## 9. Путь миграции SwiftData → REST API
+## 13. Конкурентность
 
-Именно для этого и нужен паттерн Repository:
+| Слой | Изоляция | Почему |
+|---|---|---|
+| ViewModels | `@MainActor` | Обновляют `@Published`, должны быть на main thread |
+| SwiftData-репозитории | `@ModelActor` | `ModelContext` не `Sendable` |
+| In-memory репозитории | обычный класс | Используются только из `@MainActor`-тестов/ViewModel, изоляция не нужна |
+| `DefaultDepositsService`/`DefaultSubscriptionsService` | обычный класс, синхронные вычисления + `await` на репозиторий | Чистые расчёты (`incomeSummary`, `monthlyCost`) не требуют актора — работают с уже переданными значениями |
 
-```
-Шаг 1 (сейчас):
-  PortfolioService ← SwiftDataTransactionRepository
-
-Шаг 2 (добавить облачный sync):
-  PortfolioService ← HybridTransactionRepository
-                         ├── SwiftDataTransactionRepository (local write)
-                         └── RESTTransactionRepository     (remote sync)
-
-Шаг 3 (полный переезд на REST):
-  PortfolioService ← RESTTransactionRepository
-```
-
-```swift
-// HybridTransactionRepository — write-through cache
-final class HybridTransactionRepository: TransactionRepository {
-    private let local: any TransactionRepository
-    private let remote: any TransactionRepository
-
-    func save(_ transaction: Transaction) async throws {
-        // Сначала локально (мгновенно для UI)
-        try await local.save(transaction)
-        // Потом синхронизируем (в фоне, с retry)
-        Task.detached(priority: .background) {
-            try? await self.remote.save(transaction)
-        }
-    }
-
-    func fetchAll() async throws -> [Transaction] {
-        // Офлайн-first: сначала локальные
-        let local = try await local.fetchAll()
-        // Фоновое обновление
-        Task.detached(priority: .background) {
-            if let remote = try? await self.remote.fetchAll() {
-                try? await self.sync(remote: remote)
-            }
-        }
-        return local
-    }
-}
-```
+Паттерн ViewModel: `func load() async { ... }`, вызывается из `.task { await vm.load() }`
+во View — никаких `Task.detached`, никакого ручного управления потоками.
 
 ---
 
-## 10. Конфигурация (Config.swift)
+## 14. Тестирование
 
-```swift
-enum Config {
-    // Spring Boot proxy URL
-    #if DEBUG
-    static let springBootBaseURL = URL(string: "http://localhost:8080/api")!
-    #else
-    static let springBootBaseURL = URL(string: "https://your-server.com/api")!
-    #endif
-
-    // Tradernet
-    static let tradernetBaseURL = URL(string: "https://tradernet.ru/api")!
-
-    // Cache TTLs
-    static let quoteCacheTTL: TimeInterval = 300       // 5 мин
-    static let historyCacheTTL: TimeInterval = 3600    // 1 час
-    static let assetMetaCacheTTL: TimeInterval = 86400 // 24 часа
-}
-```
+- Framework: **Swift Testing** (`import Testing`, `@Test`, `@Suite`, `#expect`) — не XCTest,
+  кроме там, где XCUIAutomation могла бы понадобиться для UI-тестов (их пока нет)
+- Юнит-тесты сервисов/репозиториев всегда идут через `InMemory*Repository`, а не мокают
+  протокол вручную — так тестируется весь путь service → repository целиком
+- `DepositsServiceTests.swift` — самый крупный набор: простой/капитализированный процент,
+  транзакции, отзывность/штраф за досрочное закрытие, каждый сценарий — через точное
+  значение (руками посчитанная формула) или отношение («с капитализацией доход больше»)
+- CSV-тесты (`CSVExporterTests`/`CSVImporterTests`) всегда проверяют round-trip
+  (export → import → сравнить с оригиналом), а не только форматирование
+- Для UI-изменений (SwiftUI-экраны) юнит-тестов нет — проверка делается вручную через
+  симулятор (см. историю правок вкладов — там баг с бейджем «Активен»/«Закрыт» после
+  досрочного закрытия был найден именно так, юнит-тестами такое не поймать, так как это
+  чисто View-логика)
 
 ---
 
-## 11. Структура файлов (целевая)
+## 15. Структура файлов (реальная, не целевая)
 
 ```
-InvestPortfolio/
-├── App/
-│   ├── InvestPortfolioApp.swift
-│   ├── DIContainer.swift          ← Dependency Injection
-│   └── Config.swift               ← Конфигурация
+InvestPortfolio/                          ← корень Xcode-проекта (сам таргет приложения)
+├── InvestPortfolioApp.swift              ← @main, Schema(...), sharedStoreURL()
+├── PrivacyInfo.xcprivacy
+├── InvestPortfolio.entitlements          ← App Group
 │
-├── Model/                         ← @Model классы (SwiftData)
-│   ├── Asset.swift
-│   ├── Transaction.swift
-│   ├── Dividend.swift
+├── Model/                                ← @Model классы + протоколы репозиториев + чистые extensions
 │   ├── Deposit.swift
-│   ├── Subscription.swift
-│   ├── CashOperation.swift
+│   ├── DepositInterestType.swift
+│   ├── CapitalizationPeriod.swift
+│   ├── DepositTransaction.swift
+│   ├── DepositsRepository.swift          ← протокол + SwiftData + InMemory
+│   ├── DepositCurrency.swift
+│   ├── Subscription.swift                ← бизнес-логика (nextPaymentDate, advance)
+│   ├── SubscriptionBillingCycle.swift
+│   ├── SubscriptionsRepository.swift     ← протокол + SwiftData + InMemory
+│   ├── AppSchema.swift                   ← @Model final class Subscription (хранимые поля)
+│   ├── HomeQueries.swift                 ← чистые extensions, общие с виджетом
 │   └── Settings.swift
 │
-├── Repository/                    ← Протоколы + реализации
-│   ├── TransactionRepository.swift
-│   ├── AssetRepository.swift
-│   ├── DividendRepository.swift
-│   ├── DepositRepository.swift
-│   └── SubscriptionRepository.swift
-│
-├── APIClient/                     ← Сетевой слой
-│   ├── MarketAPIClient.swift      ← Spring Boot proxy
-│   ├── TradernetAPIClient.swift   ← Tradernet
-│   ├── DTOs/
-│   │   ├── MarketDTOs.swift
-│   │   └── TradernetDTOs.swift
-│   └── APIError.swift
-│
-├── Service/                       ← Бизнес-логика
-│   ├── PortfolioService.swift
-│   ├── TransactionService.swift
-│   ├── MarketDataService.swift    ← обёртка над репозиторием + PriceCache
+├── Service/                              ← бизнес-логика + инфраструктура
 │   ├── DepositsService.swift
 │   ├── SubscriptionsService.swift
-│   ├── DividendService.swift
-│   ├── NetWorthService.swift
-│   ├── KeychainService.swift
-│   └── PortfolioCalculator.swift  ← pure functions, легко тестировать
+│   ├── DIContainer.swift
+│   ├── LanguageBundle.swift
+│   ├── CSVExporter.swift
+│   ├── CSVImporter.swift
+│   ├── SampleDataService.swift
+│   └── RootView.swift
 │
 ├── ViewModel/
-│   ├── DashboardViewModel.swift
-│   ├── PortfolioViewModel.swift
-│   ├── TransactionsViewModel.swift
 │   ├── DepositsViewModel.swift
+│   ├── DepositDetailViewModel.swift
 │   ├── SubscriptionsViewModel.swift
 │   ├── AnalyticsViewModel.swift
-│   └── AuthViewModel.swift
+│   └── HomeViewModel.swift
 │
 ├── View/
-│   ├── Dashboard/
-│   ├── Portfolio/
-│   ├── Transactions/
-│   ├── Deposits/
-│   ├── Subscriptions/
-│   ├── Analytics/
-│   ├── Settings/
-│   └── Shared/                    ← LandingCard, LoadingView, ErrorView...
+│   ├── MainTabView.swift
+│   ├── HomeTabView.swift
+│   ├── DepositsView.swift                ← список + DepositFormSheet + DepositRow
+│   ├── DepositDetailView.swift           ← экран деталей, график, история операций
+│   ├── SubscriptionsView.swift
+│   ├── AnalyticsView.swift
+│   ├── SettingsView.swift                ← язык, валюты, импорт/экспорт, сброс данных
+│   ├── OnboardingView.swift
+│   ├── Color+Brand.swift
+│   └── Color+TertiaryLabel.swift
 │
-└── Resources/
-    └── Localizable.strings/
+├── Assets.xcassets
+│
+├── Resources/
+│   └── Localizable.strings/{Base,ru,en}.lproj
+│
+├── InvestPortfolioWidgets/               ← отдельный таргет (widget extension)
+│   ├── InvestPortfolioWidgetsBundle.swift
+│   ├── SharedModelContainer.swift        ← App Group ModelContainer, read-only
+│   ├── DepositsWidget.swift
+│   ├── SubscriptionsWidget.swift
+│   ├── InvestPortfolioWidgetsExtension.entitlements  ← тот же App Group
+│   ├── Info.plist
+│   ├── Assets.xcassets
+│   └── Localizable.strings/{Base,ru,en}.lproj   ← свой набор строк, отдельный от приложения
+│
+└── InvestPortfolioTests/                 ← отдельный таргет (юнит-тесты, Swift Testing)
+    ├── DepositsServiceTests.swift
+    ├── DepositsViewModelTests.swift
+    ├── DepositDetailViewModelTests.swift
+    ├── SubscriptionServiceTests.swift
+    ├── SubscriptionRepositoryTests.swift
+    ├── SubscriptionViewModelTests.swift
+    ├── AnalyticsViewModelTests.swift
+    ├── HomeViewModelTests.swift
+    ├── CSVExporterTests.swift
+    └── CSVImporterTests.swift
 ```
 
 ---
 
-## 12. Checklist перед началом каждой фазы
+## 16. Чеклист перед добавлением новой фичи
 
-- [ ] Все новые `@Model` добавлены в `ModelContainer` в App
-- [ ] Для каждого репозитория есть протокол + SwiftData + InMemory реализации
-- [ ] ViewModels получают сервисы через `DIContainer`, не создают сами
-- [ ] Сервисы принимают протоколы репозиториев, не конкретные классы
-- [ ] Новые DTO структуры помечены `Sendable`
-- [ ] Preview-контейнер использует `InMemory` реализации
+- [ ] Новая `@Model` модель добавлена в **три** места со схемой (см. §6): `InvestPortfolioApp.swift`,
+      `DIContainer.preview`, `InvestPortfolioWidgets/SharedModelContainer.swift`
+- [ ] У всех новых хранимых свойств есть значения по умолчанию в объявлении — для
+      автоматической lightweight-миграции без ручного `VersionedSchema`
+- [ ] Для нового репозитория есть и протокол, и SwiftData-реализация, и InMemory-реализация
+- [ ] `update(...)` в репозитории/сервисе/ViewModel принимает новые поля явно; новым
+      параметрам во View-слое (ViewModel) стоит давать значения по умолчанию, чтобы не
+      ломать существующие вызовы
+- [ ] Новые комментарии в коде — на английском (см. память проекта `feedback-comments-in-english`)
+- [ ] Новые строки — во все три `.strings`-файла (`ru`/`en`/`Base`), и в отдельный набор
+      виджетов, если строка нужна и там
+- [ ] Если фича меняет CSV-формат — новые колонки только в конец строки, импорт обязан
+      остаться обратно совместим со старым числом колонок (см. §11)
+- [ ] Для UI-изменений — нет юнит-тестов на SwiftUI-код в этом проекте; проверка руками
+      через симулятор (Xcode MCP device-interaction) перед тем, как считать фичу готовой
