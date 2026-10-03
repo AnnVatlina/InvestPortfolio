@@ -6,6 +6,7 @@
 
 import SwiftUI
 import SwiftData
+import UserNotifications
 
 @main
 struct InvestPortfolioApp: App {
@@ -13,7 +14,13 @@ struct InvestPortfolioApp: App {
     @StateObject private var container: DIContainer
     @AppStorage("App_LocaleIdentifier") private var localeIdentifier: String = Locale.current.identifier
 
+    // Held statically so it outlives this struct's init and stays the strong owner behind
+    // UNUserNotificationCenter's weak `delegate` property for the lifetime of the process.
+    private static let notificationDelegate = NotificationDelegate()
+
     init() {
+        UNUserNotificationCenter.current().delegate = Self.notificationDelegate
+
         // Install bundle override BEFORE any localized string is read.
         // Falls back to device language so first-launch strings match the system language.
         LanguageBundle.activate()

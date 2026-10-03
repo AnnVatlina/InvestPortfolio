@@ -56,6 +56,7 @@
 		95AD90842F8252960064CD19 /* SubscriptionsService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 95AD90832F8252960064CD19 /* SubscriptionsService.swift */; };
 		95AD90862F8252A50064CD19 /* SubscriptionsViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 95AD90852F8252A50064CD19 /* SubscriptionsViewModel.swift */; };
 		95AD90882F8252CA0064CD19 /* SubscriptionsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 95AD90872F8252CA0064CD19 /* SubscriptionsView.swift */; };
+		95BDABCF3070E1B200423EA3 /* NotificationDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 95BDABCE3070E1B200423EA3 /* NotificationDelegate.swift */; };
 		95CCEE182FC9886E00694936 /* AnalyticsViewModelTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 95CCEE172FC9886E00694936 /* AnalyticsViewModelTests.swift */; };
 		95D967FA2F04193400079C66 /* HomeTabView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 95D967F92F04193400079C66 /* HomeTabView.swift */; };
 		95D967FE2F04193500079C66 /* Color+TertiaryLabel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 95D967FD2F04193500079C66 /* Color+TertiaryLabel.swift */; };
@@ -151,6 +152,7 @@
 		95AD90832F8252960064CD19 /* SubscriptionsService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SubscriptionsService.swift; sourceTree = "<group>"; };
 		95AD90852F8252A50064CD19 /* SubscriptionsViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SubscriptionsViewModel.swift; sourceTree = "<group>"; };
 		95AD90872F8252CA0064CD19 /* SubscriptionsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SubscriptionsView.swift; sourceTree = "<group>"; };
+		95BDABCE3070E1B200423EA3 /* NotificationDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NotificationDelegate.swift; sourceTree = "<group>"; };
 		95CCEE172FC9886E00694936 /* AnalyticsViewModelTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AnalyticsViewModelTests.swift; sourceTree = "<group>"; };
 		95D967F92F04193400079C66 /* HomeTabView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomeTabView.swift; sourceTree = "<group>"; };
 		95D967FD2F04193500079C66 /* Color+TertiaryLabel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Color+TertiaryLabel.swift"; sourceTree = "<group>"; };
@@ -280,6 +282,7 @@
 				95A86BD32F82BDF8009B94CF /* CSVExporter.swift */,
 				95E87C1E2F9493A600E238D5 /* CSVImporter.swift */,
 				95E87C202F94A27D00E238D5 /* SampleDataService.swift */,
+				95BDABCE3070E1B200423EA3 /* NotificationDelegate.swift */,
 			);
 			path = Service;
 			sourceTree = "<group>";
@@ -493,6 +496,7 @@
 				F8045D927570703468F14EEE /* InvestPortfolioApp.swift in Sources */,
 				95AD90882F8252CA0064CD19 /* SubscriptionsView.swift in Sources */,
 				950800032F04064E0041AD54 /* DepositsView.swift in Sources */,
+				95BDABCF3070E1B200423EA3 /* NotificationDelegate.swift in Sources */,
 				950800132F040B6C0041AD54 /* RootView.swift in Sources */,
 				95E87C212F94A27D00E238D5 /* SampleDataService.swift in Sources */,
 				952BB1EC3060F87900686092 /* DepositDetailViewModel.swift in Sources */,
