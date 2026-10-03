@@ -33,6 +33,7 @@ final class DepositsViewModel: ObservableObject {
             let all = try await service.fetchAll()
             deposits = sorted(all)
             recomputeIncomes()
+            rescheduleAllCloseNotifications()
         } catch {
             if deposits.isEmpty {
                 errorMessage = error.localizedDescription
@@ -175,20 +176,16 @@ final class DepositsViewModel: ObservableObject {
     // MARK: - Notifications
 
     private func scheduleCloseNotification(depositId: UUID, title: String, closeDate: Date) {
-        let notificationDate = Calendar.current.date(byAdding: .day, value: -7, to: closeDate)
-        guard let fireDate = notificationDate, fireDate > Date() else { return }
+        let notifTitle = LanguageBundle.string("deposits.notification.title")
+        let bodyFormat = LanguageBundle.string("deposits.notification.body.format")
+        guard let request = Self.closeNotificationRequest(
+            depositId: depositId, title: title, closeDate: closeDate,
+            notifTitle: notifTitle, bodyFormat: bodyFormat
+        ) else { return }
 
         let center = UNUserNotificationCenter.current()
         center.requestAuthorization(options: [.alert, .sound]) { granted, _ in
             guard granted else { return }
-            let content = UNMutableNotificationContent()
-            content.title = LanguageBundle.string("deposits.notification.title")
-            content.body = String(format: LanguageBundle.string("deposits.notification.body.format"), title)
-            content.sound = .default
-
-            let components = Calendar.current.dateComponents([.year, .month, .day, .hour, .minute], from: fireDate)
-            let trigger = UNCalendarNotificationTrigger(dateMatching: components, repeats: false)
-            let request = UNNotificationRequest(identifier: "deposit-\(depositId.uuidString)", content: content, trigger: trigger)
             center.add(request)
         }
     }
@@ -196,6 +193,47 @@ final class DepositsViewModel: ObservableObject {
     private func cancelCloseNotification(depositId: UUID) {
         UNUserNotificationCenter.current()
             .removePendingNotificationRequests(withIdentifiers: ["deposit-\(depositId.uuidString)"])
+    }
+
+    /// Reschedules close-date reminders for every currently loaded deposit, clearing stale
+    /// `deposit-*` requests first. Runs on every `load()` so deposits created outside
+    /// `addDeposit`/`updateDeposit` — demo data and CSV import, which both call the service
+    /// directly — still get a reminder the next time the Deposits tab opens, the same way
+    /// `SubscriptionsViewModel.rescheduleAllNotifications()` already self-heals subscriptions.
+    private func rescheduleAllCloseNotifications() {
+        let notifTitle = LanguageBundle.string("deposits.notification.title")
+        let bodyFormat = LanguageBundle.string("deposits.notification.body.format")
+        let requests: [UNNotificationRequest] = deposits.compactMap { deposit in
+            guard deposit.actualCloseDate == nil, let closeDate = deposit.closeDate else { return nil }
+            return Self.closeNotificationRequest(
+                depositId: deposit.id, title: deposit.title, closeDate: closeDate,
+                notifTitle: notifTitle, bodyFormat: bodyFormat
+            )
+        }
+
+        let center = UNUserNotificationCenter.current()
+        center.requestAuthorization(options: [.alert, .sound]) { granted, _ in
+            guard granted else { return }
+            center.getPendingNotificationRequests { pending in
+                let staleIds = pending.map(\.identifier).filter { $0.hasPrefix("deposit-") }
+                center.removePendingNotificationRequests(withIdentifiers: staleIds)
+                for request in requests { center.add(request) }
+            }
+        }
+    }
+
+    private static func closeNotificationRequest(
+        depositId: UUID, title: String, closeDate: Date, notifTitle: String, bodyFormat: String
+    ) -> UNNotificationRequest? {
+        guard let fireDate = Calendar.current.date(byAdding: .day, value: -7, to: closeDate),
+              fireDate > Date() else { return nil }
+        let content = UNMutableNotificationContent()
+        content.title = notifTitle
+        content.body = String(format: bodyFormat, title)
+        content.sound = .default
+        let components = Calendar.current.dateComponents([.year, .month, .day, .hour, .minute], from: fireDate)
+        let trigger = UNCalendarNotificationTrigger(dateMatching: components, repeats: false)
+        return UNNotificationRequest(identifier: "deposit-\(depositId.uuidString)", content: content, trigger: trigger)
     }
 
     // MARK: - Private
