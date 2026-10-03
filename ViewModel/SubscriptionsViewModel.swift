@@ -188,8 +188,7 @@ final class SubscriptionsViewModel: ObservableObject {
             try await service.add(sub)
             WidgetCenter.shared.reloadAllTimelines()
             await load()
-            if billingCycle.isRecurring,
-               let added = subscriptions.first(where: { $0.id == sub.id }) {
+            if let added = subscriptions.first(where: { $0.id == sub.id }) {
                 scheduleNotifications(for: added)
             }
         } catch {
@@ -237,7 +236,7 @@ final class SubscriptionsViewModel: ObservableObject {
             await load()
             if let updated = subscriptions.first(where: { $0.id == id }) {
                 cancelNotifications(for: updated)
-                if updated.isActive && updated.billingCycle.isRecurring {
+                if updated.isActive {
                     scheduleNotifications(for: updated)
                 }
             }
@@ -291,7 +290,7 @@ final class SubscriptionsViewModel: ObservableObject {
         guard let horizon = cal.date(byAdding: .month, value: 12, to: now) else { return }
 
         let infos: [SubScheduleInfo] = subscriptions
-            .filter { $0.isActive && $0.billingCycle.isRecurring }
+            .filter { $0.isActive }
             .compactMap { sub in
                 let dates = paymentDates(for: sub, from: now, to: horizon, calendar: cal)
                 guard !dates.isEmpty else { return nil }
@@ -321,7 +320,7 @@ final class SubscriptionsViewModel: ObservableObject {
     }
 
     private func scheduleNotifications(for subscription: Subscription) {
-        guard subscription.isActive, subscription.billingCycle.isRecurring else { return }
+        guard subscription.isActive else { return }
         let cal = Calendar.current
         let now = Date()
         guard let horizon = cal.date(byAdding: .month, value: 12, to: now) else { return }
