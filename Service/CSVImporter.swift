@@ -94,7 +94,9 @@ enum CSVImporter {
         return ParseResult(items: items, failed: failed)
     }
 
-    /// Parses a subscriptions CSV (header: ID,Title,Category,Amount,Currency,BillingCycle,StartDate,EndDate,IsActive,CreatedAt)
+    /// Parses a subscriptions CSV (header: ID,Title,Category,Amount,Currency,BillingCycle,StartDate,EndDate,IsActive,CreatedAt,IconName).
+    /// IconName was added later — a CSV exported by an older version of the app (only 10 columns)
+    /// still parses, with the missing icon falling back to nil (the app's own default icon).
     static func parseSubscriptions(_ csv: String) -> ParseResult<Subscription> {
         let lines = splitLines(csv).dropFirst()
         var items: [Subscription] = []
@@ -117,6 +119,7 @@ enum CSVImporter {
             let category: String? = f[2].isEmpty ? nil : f[2]
             let endDate: Date? = f[7].isEmpty ? nil : fmt.date(from: f[7])
             let isActive = f[8].lowercased() == "true"
+            let iconName: String? = (f.count > 10 && !f[10].isEmpty) ? f[10] : nil
 
             items.append(Subscription(
                 id: id,
@@ -126,7 +129,7 @@ enum CSVImporter {
                 billingCycle: cycle,
                 startDate: startDate,
                 category: category,
-                iconName: nil,
+                iconName: iconName,
                 isActive: isActive,
                 endDate: endDate,
                 createdAt: createdAt
@@ -177,9 +180,27 @@ enum CSVImporter {
 
     // MARK: - Helpers
 
-    /// Splits CSV text into non-empty lines, handling \r\n and \n.
+    /// Splits CSV text into non-empty rows, handling \r\n and \n — but only treats a newline as a
+    /// row boundary when it's outside an open quoted field, so a title/category containing a
+    /// literal newline (RFC-4180-quoted by CSVExporter) survives as part of one row instead of
+    /// being torn into two malformed lines before parseRow ever sees it.
     private static func splitLines(_ csv: String) -> [String] {
-        csv.components(separatedBy: .newlines).filter { !$0.isEmpty }
+        var rows: [String] = []
+        var current = ""
+        var inQuotes = false
+        for ch in csv {
+            if ch == "\"" {
+                inQuotes.toggle()
+                current.append(ch)
+            } else if ch.isNewline && !inQuotes {
+                if !current.isEmpty { rows.append(current) }
+                current = ""
+            } else {
+                current.append(ch)
+            }
+        }
+        if !current.isEmpty { rows.append(current) }
+        return rows
     }
 
     private static func isoFormatter() -> ISO8601DateFormatter {

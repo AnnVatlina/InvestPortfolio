@@ -184,8 +184,8 @@ struct CSVImporterDepositsRoundTripTests {
 @Suite("CSVImporter — subscriptions round-trip")
 struct CSVImporterSubscriptionsRoundTripTests {
 
-    @Test("Every exported field survives round-trip except iconName")
-    func fullRoundTripExceptIcon() {
+    @Test("Every exported field survives round-trip, including iconName")
+    func fullRoundTrip() {
         let original = sub(
             title: "Netflix", amount: 15.49, currency: .USD, cycle: .monthly,
             startDate: wholeSecondDate(2026, 2, 15), category: "Streaming",
@@ -205,12 +205,22 @@ struct CSVImporterSubscriptionsRoundTripTests {
         #expect(recovered.category == original.category)
         #expect(recovered.isActive == original.isActive)
         #expect(recovered.createdAt == original.createdAt)
+        #expect(recovered.iconName == original.iconName)
     }
 
-    @Test("KNOWN LIMITATION: iconName is always nil after a round-trip, since CSV has no column for it")
-    func iconNameIsLostOnRoundTrip() {
-        let original = sub(iconName: "gamecontroller.fill")
+    @Test("Nil iconName round-trips as nil, not empty string")
+    func nilIconNameRoundTrips() {
+        let original = sub(iconName: nil)
         let result = CSVImporter.parseSubscriptions(CSVExporter.csv(for: [original]))
+        #expect(result.items.first?.iconName == nil)
+    }
+
+    @Test("A subscription CSV exported before IconName existed (10 columns) still parses, with iconName nil")
+    func legacyTenColumnRowStillParses() {
+        let csv = "ID,Title,Category,Amount,Currency,BillingCycle,StartDate,EndDate,IsActive,CreatedAt\n" +
+                  "\(UUID().uuidString),Netflix,Streaming,9.99,USD,monthly,2026-01-01T00:00:00Z,,true,2026-01-01T00:00:00Z"
+        let result = CSVImporter.parseSubscriptions(csv)
+        #expect(result.failed == 0)
         #expect(result.items.first?.iconName == nil)
     }
 
@@ -300,17 +310,13 @@ struct CSVImporterMalformedRowsTests {
     }
 }
 
-// MARK: - Known limitation: embedded newlines
+// MARK: - Embedded newlines
 
-@Suite("CSVImporter — embedded newlines (known limitation)")
+@Suite("CSVImporter — embedded newlines")
 struct CSVImporterEmbeddedNewlineTests {
 
-    @Test("KNOWN LIMITATION: a title containing a literal newline does not round-trip — the row is dropped and counted as failed")
-    func titleWithNewlineIsDroppedNotCorrupted() {
-        // CSVExporter correctly RFC4180-quotes the embedded newline, but CSVImporter's
-        // line-splitter runs before the quote-aware row parser, so a quoted newline
-        // is treated as a line break. The record is lost (counted as failed), but
-        // this does not cascade into corrupting the deposits around it.
+    @Test("A title containing a literal newline round-trips intact, without corrupting neighboring rows")
+    func titleWithNewlineRoundTrips() {
         let before = dep(title: "Before")
         let broken = dep(title: "Line1\nLine2")
         let after = dep(title: "After")
@@ -318,9 +324,8 @@ struct CSVImporterEmbeddedNewlineTests {
         let csv = CSVExporter.csv(for: [before, broken, after])
         let result = CSVImporter.parseDeposits(csv)
 
-        #expect(result.failed > 0)
-        #expect(result.items.map(\.title) == ["Before", "After"])
-        #expect(!result.items.contains { $0.title.contains("Line1") })
+        #expect(result.failed == 0)
+        #expect(result.items.map(\.title) == ["Before", "Line1\nLine2", "After"])
     }
 }
 

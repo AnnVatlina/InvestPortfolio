@@ -148,7 +148,7 @@ struct CSVExporterSubscriptionsTests {
     @Test("Header row matches the documented column order")
     func headerRow() {
         let csv = CSVExporter.csv(for: [Subscription]())
-        #expect(csv == "ID,Title,Category,Amount,Currency,BillingCycle,StartDate,EndDate,IsActive,CreatedAt")
+        #expect(csv == "ID,Title,Category,Amount,Currency,BillingCycle,StartDate,EndDate,IsActive,CreatedAt,IconName")
     }
 
     @Test("isActive renders as lowercase true/false")
@@ -168,13 +168,11 @@ struct CSVExporterSubscriptionsTests {
         #expect(csv.contains("\"Music, Video\""))
     }
 
-    @Test("iconName is not present anywhere in the exported CSV")
-    func iconNameIsDropped() {
-        // Documents a real limitation: the CSV schema has no iconName column,
-        // so exporting and re-importing a subscription always loses its custom icon.
+    @Test("iconName is present in the exported CSV")
+    func iconNameIsIncluded() {
         let s = sub(iconName: "gamecontroller.fill")
         let csv = CSVExporter.csv(for: [s])
-        #expect(!csv.contains("gamecontroller.fill"))
+        #expect(csv.contains("gamecontroller.fill"))
     }
 }
 

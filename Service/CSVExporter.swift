@@ -55,7 +55,7 @@ enum CSVExporter {
     // MARK: - Subscriptions
 
     static func csv(for subscriptions: [Subscription]) -> String {
-        var rows: [String] = ["ID,Title,Category,Amount,Currency,BillingCycle,StartDate,EndDate,IsActive,CreatedAt"]
+        var rows: [String] = ["ID,Title,Category,Amount,Currency,BillingCycle,StartDate,EndDate,IsActive,CreatedAt,IconName"]
         let fmt = iso8601Formatter()
         for s in subscriptions {
             rows.append([
@@ -68,7 +68,8 @@ enum CSVExporter {
                 fmt.string(from: s.startDate),
                 s.endDate.map { fmt.string(from: $0) } ?? "",
                 s.isActive ? "true" : "false",
-                fmt.string(from: s.createdAt)
+                fmt.string(from: s.createdAt),
+                escape(s.iconName ?? "")
             ].joined(separator: ","))
         }
         return rows.joined(separator: "\n")
