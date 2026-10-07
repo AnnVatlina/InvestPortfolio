@@ -84,13 +84,17 @@ enum DividendReportParser {
         )
     }
 
-    // The report's comment column is free text (see Docs/dividends-feature.md), but every
-    // sample row — dividend, tax, and trade-commission comments alike — includes the
-    // security's ticker as an "EXCHANGE-SUFFIXED" token like "VCIT.US" or "BITO.US".
-    // Matches the first such token; returns nil if the comment doesn't contain one.
-    private static let tickerPattern = try! NSRegularExpression(pattern: #"\b[A-Z0-9]{1,10}\.[A-Z]{2,4}\b"#)
+    // The report's comment column is free text (see Docs/dividends-feature.md). Every row
+    // in the one real sample we've seen so far — dividend, tax, and trade-commission
+    // comments alike — embeds the security's ticker as an "EXCHANGE-SUFFIXED" token like
+    // "VCIT.US" or "BITO.US". This is a heuristic validated only against that one US-market
+    // sample: a security whose ticker uses a different suffix length, no suffix at all, or
+    // some other convention entirely (e.g. MOEX-listed securities) won't necessarily match.
+    // Matches the first such token; returns nil if the comment doesn't contain one — that's
+    // not an error, `ticker` is always optional.
+    private static let tickerPattern = try! NSRegularExpression(pattern: #"\b[A-Z0-9]{1,10}\.[A-Z]{1,5}\b"#)
 
-    private static func ticker(fromComment comment: String) -> String? {
+    static func ticker(fromComment comment: String) -> String? {
         let range = NSRange(comment.startIndex..., in: comment)
         guard let match = tickerPattern.firstMatch(in: comment, range: range),
               let swiftRange = Range(match.range, in: comment)

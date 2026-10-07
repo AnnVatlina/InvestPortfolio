@@ -112,6 +112,13 @@ private func assertUTCDate(_ date: Date, year: Int, month: Int, day: Int, hour: 
         assertUTCDate(other.date, year: 2026, month: 6, day: 27, hour: 0, minute: 0)
     }
 
+    @Test func tickerExtractionIsNotLimitedToDotUSSuffixes() {
+        // The pattern isn't hardcoded to the one exchange suffix seen in our sample report —
+        // it matches any 1-5 letter uppercase suffix, e.g. a hypothetical MOEX-style ".ME".
+        #expect(DividendReportParser.ticker(fromComment: "Dividends on security (Sberbank (SBER.ME)), record date 2026-10-01.") == "SBER.ME")
+        #expect(DividendReportParser.ticker(fromComment: "Dividends on security (Some UK Co (FOO.L)), record date 2026-10-01.") == "FOO.L")
+    }
+
     @Test func commentWithoutARecognizableTickerLeavesTickerNil() throws {
         let result = try DividendReportParser.parse(fileURL: makeFixtureReportURL())
 
