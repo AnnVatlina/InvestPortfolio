@@ -47,6 +47,12 @@
 		953C627E305FA42500D5C07B /* Settings.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9557F9782F810AB10086715E /* Settings.swift */; };
 		9557F9792F810AB10086715E /* Settings.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9557F9782F810AB10086715E /* Settings.swift */; };
 		95892D362F95F07500A30CA9 /* Color+Brand.swift in Sources */ = {isa = PBXBuildFile; fileRef = 95892D352F95F07500A30CA9 /* Color+Brand.swift */; };
+		95A0139C307668FF008E1354 /* BrokerOperationType.swift in Sources */ = {isa = PBXBuildFile; fileRef = 95A0139B307668FF008E1354 /* BrokerOperationType.swift */; };
+		95A0139D307668FF008E1354 /* BrokerOperationType.swift in Sources */ = {isa = PBXBuildFile; fileRef = 95A0139B307668FF008E1354 /* BrokerOperationType.swift */; };
+		95A0139F30766966008E1354 /* BrokerOperation.swift in Sources */ = {isa = PBXBuildFile; fileRef = 95A0139E30766966008E1354 /* BrokerOperation.swift */; };
+		95A013A030766966008E1354 /* BrokerOperation.swift in Sources */ = {isa = PBXBuildFile; fileRef = 95A0139E30766966008E1354 /* BrokerOperation.swift */; };
+		95A013A23076696E008E1354 /* BrokerOperationsRepository.swift in Sources */ = {isa = PBXBuildFile; fileRef = 95A013A13076696E008E1354 /* BrokerOperationsRepository.swift */; };
+		95A013A33076696E008E1354 /* BrokerOperationsRepository.swift in Sources */ = {isa = PBXBuildFile; fileRef = 95A013A13076696E008E1354 /* BrokerOperationsRepository.swift */; };
 		95A86BD02F82B8BD009B94CF /* AppSchema.swift in Sources */ = {isa = PBXBuildFile; fileRef = 95A86BCF2F82B8BD009B94CF /* AppSchema.swift */; };
 		95A86BD22F82BBA2009B94CF /* LanguageBundle.swift in Sources */ = {isa = PBXBuildFile; fileRef = 95A86BD12F82BBA2009B94CF /* LanguageBundle.swift */; };
 		95A86BD42F82BDF8009B94CF /* CSVExporter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 95A86BD32F82BDF8009B94CF /* CSVExporter.swift */; };
@@ -143,6 +149,9 @@
 		953C6264305FA13400D5C07B /* HomeQueries.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomeQueries.swift; sourceTree = "<group>"; };
 		9557F9782F810AB10086715E /* Settings.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Settings.swift; sourceTree = "<group>"; };
 		95892D352F95F07500A30CA9 /* Color+Brand.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Color+Brand.swift"; sourceTree = "<group>"; };
+		95A0139B307668FF008E1354 /* BrokerOperationType.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BrokerOperationType.swift; sourceTree = "<group>"; };
+		95A0139E30766966008E1354 /* BrokerOperation.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BrokerOperation.swift; sourceTree = "<group>"; };
+		95A013A13076696E008E1354 /* BrokerOperationsRepository.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BrokerOperationsRepository.swift; sourceTree = "<group>"; };
 		95A86BCF2F82B8BD009B94CF /* AppSchema.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppSchema.swift; sourceTree = "<group>"; };
 		95A86BD12F82BBA2009B94CF /* LanguageBundle.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LanguageBundle.swift; sourceTree = "<group>"; };
 		95A86BD32F82BDF8009B94CF /* CSVExporter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CSVExporter.swift; sourceTree = "<group>"; };
@@ -302,6 +311,9 @@
 				952BB1BE3060ED0900686092 /* DepositInterestType.swift */,
 				952BB1C13060ED0900686092 /* CapitalizationPeriod.swift */,
 				952BB1E83060F23500686092 /* DepositTransaction.swift */,
+				95A0139B307668FF008E1354 /* BrokerOperationType.swift */,
+				95A0139E30766966008E1354 /* BrokerOperation.swift */,
+				95A013A13076696E008E1354 /* BrokerOperationsRepository.swift */,
 			);
 			path = Model;
 			sourceTree = "<group>";
@@ -511,6 +523,7 @@
 				95D967FA2F04193400079C66 /* HomeTabView.swift in Sources */,
 				952BB1C23060ED0900686092 /* CapitalizationPeriod.swift in Sources */,
 				950800052F0406560041AD54 /* DepositsViewModel.swift in Sources */,
+				95A013A33076696E008E1354 /* BrokerOperationsRepository.swift in Sources */,
 				95AD90822F8252890064CD19 /* SubscriptionsRepository.swift in Sources */,
 				95892D362F95F07500A30CA9 /* Color+Brand.swift in Sources */,
 				9557F9792F810AB10086715E /* Settings.swift in Sources */,
@@ -521,9 +534,11 @@
 				95E87C1F2F9493A600E238D5 /* CSVImporter.swift in Sources */,
 				9508000D2F0406770041AD54 /* DepositsRepository.swift in Sources */,
 				952BB1BF3060ED0900686092 /* DepositInterestType.swift in Sources */,
+				95A0139D307668FF008E1354 /* BrokerOperationType.swift in Sources */,
 				95D967FE2F04193500079C66 /* Color+TertiaryLabel.swift in Sources */,
 				95AD90862F8252A50064CD19 /* SubscriptionsViewModel.swift in Sources */,
 				95E87C232F94A28C00E238D5 /* OnboardingView.swift in Sources */,
+				95A013A030766966008E1354 /* BrokerOperation.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -549,10 +564,13 @@
 			buildActionMask = 2147483647;
 			files = (
 				953C6266305FA31F00D5C07B /* AppSchema.swift in Sources */,
+				95A0139C307668FF008E1354 /* BrokerOperationType.swift in Sources */,
+				95A013A23076696E008E1354 /* BrokerOperationsRepository.swift in Sources */,
 				953C6267305FA31F00D5C07B /* Deposit.swift in Sources */,
 				953C6268305FA31F00D5C07B /* SubscriptionBillingCycle.swift in Sources */,
 				953C6269305FA31F00D5C07B /* HomeQueries.swift in Sources */,
 				953C626A305FA31F00D5C07B /* DepositCurrency.swift in Sources */,
+				95A0139F30766966008E1354 /* BrokerOperation.swift in Sources */,
 				953C627E305FA42500D5C07B /* Settings.swift in Sources */,
 				953C626B305FA31F00D5C07B /* Subscription.swift in Sources */,
 				952BB1EA3060F23500686092 /* DepositTransaction.swift in Sources */,

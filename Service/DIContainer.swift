@@ -57,6 +57,7 @@ final class DIContainer: ObservableObject {
                 DepositTransaction.self,
                 Settings.self,
                 Subscription.self,
+                BrokerOperation.self,
             configurations: config
         )
         return DIContainer(modelContainer: container)
