@@ -78,9 +78,24 @@ enum DividendReportParser {
             type: operationType(fromRawLabel: rawLabel),
             rawOperationLabel: rawLabel,
             comment: comment,
+            ticker: ticker(fromComment: comment),
             amount: amount,
             currency: currency
         )
+    }
+
+    // The report's comment column is free text (see Docs/dividends-feature.md), but every
+    // sample row — dividend, tax, and trade-commission comments alike — includes the
+    // security's ticker as an "EXCHANGE-SUFFIXED" token like "VCIT.US" or "BITO.US".
+    // Matches the first such token; returns nil if the comment doesn't contain one.
+    private static let tickerPattern = try! NSRegularExpression(pattern: #"\b[A-Z0-9]{1,10}\.[A-Z]{2,4}\b"#)
+
+    private static func ticker(fromComment comment: String) -> String? {
+        let range = NSRange(comment.startIndex..., in: comment)
+        guard let match = tickerPattern.firstMatch(in: comment, range: range),
+              let swiftRange = Range(match.range, in: comment)
+        else { return nil }
+        return String(comment[swiftRange])
     }
 
     private static func operationType(fromRawLabel rawLabel: String) -> BrokerOperationType {

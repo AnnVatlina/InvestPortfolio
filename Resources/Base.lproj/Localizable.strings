@@ -2,6 +2,7 @@
 "app.name" = "Rentivo";
 "common.ok" = "OK";
 "common.cancel" = "Cancel";
+"common.done" = "Done";
 "common.error" = "Error";
 "common.retry" = "Retry";
 "common.percentSign" = "%";
@@ -189,6 +190,9 @@
 "dividends.type.tax" = "Tax";
 "dividends.type.commission" = "Commission";
 "dividends.type.other" = "Other";
+"dividends.detail.ticker" = "Ticker";
+"dividends.detail.comment" = "Comment";
+"dividends.detail.operationNumber" = "Operation Number";
 
 // MARK: - Home
 "home.loading" = "Loading...";

@@ -29,6 +29,11 @@ final class BrokerOperation {
     var rawOperationLabel: String = ""
 
     var comment: String = ""
+
+    // Extracted from `comment` by the parser (e.g. "VCIT.US") — optional because the
+    // comment's free-text format doesn't always contain a recognizable ticker.
+    var ticker: String? = nil
+
     var amount: Decimal = 0
 
     // Stored as String for the same reason as typeRaw — see comment above.
@@ -55,6 +60,7 @@ final class BrokerOperation {
         type: BrokerOperationType,
         rawOperationLabel: String,
         comment: String,
+        ticker: String? = nil,
         amount: Decimal,
         currency: DepositCurrency,
         importedAt: Date = Date()
@@ -65,6 +71,7 @@ final class BrokerOperation {
         self.typeRaw = type.rawValue
         self.rawOperationLabel = rawOperationLabel
         self.comment = comment
+        self.ticker = ticker
         self.amount = amount
         self.currencyRaw = currency.rawValue
         self.importedAt = importedAt

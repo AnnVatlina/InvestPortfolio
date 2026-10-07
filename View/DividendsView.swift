@@ -21,6 +21,7 @@ struct DividendsView: View {
     @Environment(\.locale) private var locale
     @State private var showFileImporter = false
     @State private var showDeleteConfirmation = false
+    @State private var selectedOperation: BrokerOperation?
 
     var body: some View {
         Group {
@@ -97,6 +98,9 @@ struct DividendsView: View {
         } message: {
             Text(vm.operationError ?? "")
         }
+        .sheet(item: $selectedOperation) { operation in
+            DividendDetailSheet(operation: operation)
+        }
         .task { await vm.load() }
         .refreshable { await vm.load() }
     }
@@ -122,6 +126,8 @@ struct DividendsView: View {
                 Section(monthTitle(section.month)) {
                     ForEach(section.operations) { operation in
                         OperationRow(operation: operation)
+                            .contentShape(Rectangle())
+                            .onTapGesture { selectedOperation = operation }
                     }
                 }
             }
@@ -173,6 +179,37 @@ struct DividendsView: View {
     }
 }
 
+// MARK: - Display helpers shared by the row and the detail sheet
+
+extension BrokerOperation {
+    fileprivate var displayTypeLabel: String {
+        switch type {
+        case .dividend:   return LanguageBundle.string("dividends.type.dividend")
+        case .tax:        return LanguageBundle.string("dividends.type.tax")
+        case .commission: return LanguageBundle.string("dividends.type.commission")
+        case .other:      return rawOperationLabel.trimmingCharacters(in: .whitespaces)
+        }
+    }
+
+    fileprivate var displayIconName: String {
+        switch type {
+        case .dividend:   return "banknote.fill"
+        case .tax:        return "percent"
+        case .commission: return "arrow.left.arrow.right"
+        case .other:      return "questionmark.circle"
+        }
+    }
+
+    fileprivate var displayIconColor: Color {
+        switch type {
+        case .dividend:   return .green
+        case .tax:        return .orange
+        case .commission: return .red
+        case .other:      return .secondary
+        }
+    }
+}
+
 // MARK: - Row
 
 private struct OperationRow: View {
@@ -181,19 +218,26 @@ private struct OperationRow: View {
 
     var body: some View {
         HStack(spacing: 12) {
-            Image(systemName: iconName)
+            Image(systemName: operation.displayIconName)
                 .font(.system(size: 18))
-                .foregroundColor(iconColor)
+                .foregroundColor(operation.displayIconColor)
                 .frame(width: 32, height: 32)
-                .background(iconColor.opacity(0.15))
+                .background(operation.displayIconColor.opacity(0.15))
                 .clipShape(Circle())
 
             VStack(alignment: .leading, spacing: 2) {
-                Text(typeLabel)
-                    .font(.subheadline).fontWeight(.medium)
-                Text(operation.comment)
-                    .font(.caption).foregroundColor(.secondary)
-                    .lineLimit(1)
+                if let ticker = operation.ticker {
+                    Text(ticker)
+                        .font(.subheadline).fontWeight(.semibold)
+                    Text(operation.displayTypeLabel)
+                        .font(.caption).foregroundColor(.secondary)
+                } else {
+                    Text(operation.displayTypeLabel)
+                        .font(.subheadline).fontWeight(.medium)
+                    Text(operation.comment)
+                        .font(.caption).foregroundColor(.secondary)
+                        .lineLimit(1)
+                }
                 Text(operation.date.formatted(Date.FormatStyle(date: .abbreviated, time: .omitted).locale(locale)))
                     .font(.caption2).foregroundColor(.secondary)
             }
@@ -206,31 +250,64 @@ private struct OperationRow: View {
         }
         .padding(.vertical, 2)
     }
+}
 
-    private var typeLabel: String {
-        switch operation.type {
-        case .dividend:   return LanguageBundle.string("dividends.type.dividend")
-        case .tax:        return LanguageBundle.string("dividends.type.tax")
-        case .commission: return LanguageBundle.string("dividends.type.commission")
-        case .other:      return operation.rawOperationLabel.trimmingCharacters(in: .whitespaces)
-        }
-    }
+// MARK: - Detail sheet
 
-    private var iconName: String {
-        switch operation.type {
-        case .dividend:   return "banknote.fill"
-        case .tax:        return "percent"
-        case .commission: return "arrow.left.arrow.right"
-        case .other:      return "questionmark.circle"
-        }
-    }
+/// Read-only — there's nothing to edit on an imported broker operation. Exists mainly
+/// to show the full comment, which the list row truncates to one line.
+private struct DividendDetailSheet: View {
+    let operation: BrokerOperation
+    @Environment(\.dismiss) private var dismiss
+    @Environment(\.locale) private var locale
 
-    private var iconColor: Color {
-        switch operation.type {
-        case .dividend:   return .green
-        case .tax:        return .orange
-        case .commission: return .red
-        case .other:      return .secondary
+    var body: some View {
+        NavigationStack {
+            Form {
+                Section {
+                    HStack(spacing: 12) {
+                        Image(systemName: operation.displayIconName)
+                            .font(.system(size: 20))
+                            .foregroundColor(operation.displayIconColor)
+                            .frame(width: 36, height: 36)
+                            .background(operation.displayIconColor.opacity(0.15))
+                            .clipShape(Circle())
+                        VStack(alignment: .leading, spacing: 2) {
+                            Text(operation.ticker ?? operation.displayTypeLabel).font(.headline)
+                            if operation.ticker != nil {
+                                Text(operation.displayTypeLabel)
+                                    .font(.caption).foregroundColor(.secondary)
+                            }
+                            Text(operation.date.formatted(Date.FormatStyle(date: .long, time: .shortened).locale(locale)))
+                                .font(.caption).foregroundColor(.secondary)
+                        }
+                        Spacer()
+                        Text(formattedAmount(operation.amount, currency: operation.currency))
+                            .font(.title3).fontWeight(.semibold)
+                            .foregroundColor(operation.amount < 0 ? .red : .green)
+                    }
+                    .padding(.vertical, 4)
+                }
+
+                Section(LanguageBundle.string("dividends.detail.comment")) {
+                    Text(operation.comment)
+                        .textSelection(.enabled)
+                }
+
+                Section {
+                    if let ticker = operation.ticker {
+                        LabeledContent(LanguageBundle.string("dividends.detail.ticker"), value: ticker)
+                    }
+                    LabeledContent(LanguageBundle.string("dividends.detail.operationNumber"), value: "\(operation.operationNumber)")
+                }
+            }
+            .navigationTitle(operation.ticker ?? operation.displayTypeLabel)
+            .navigationBarTitleDisplayMode(.inline)
+            .toolbar {
+                ToolbarItem(placement: .confirmationAction) {
+                    Button(LanguageBundle.string("common.done")) { dismiss() }
+                }
+            }
         }
     }
 }

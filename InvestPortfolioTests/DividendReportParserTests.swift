@@ -17,7 +17,7 @@ import ZIPFoundation
 /// Shared strings referenced by index from the sheet fixture below.
 private let fixtureSharedStrings = [
     "Операция №", "Дата", "Операция", "Комментарий", "Сумма", "Валюта",  // 0-5: header
-    "Дивиденды", "dividend comment", "USD",                              // 6-8
+    "Дивиденды", "Dividends on security (Vanguard ETF (VCIT.US)), record date 2026-10-01.", "USD",  // 6-8
     "Налоги", "tax comment",                                             // 9-10
     " Комиссия за сделки ", "commission comment",                        // 11-12
     "НеизвестныйТип", "other comment"                                    // 13-14
@@ -87,7 +87,8 @@ private func assertUTCDate(_ date: Date, year: Int, month: Int, day: Int, hour: 
 
         let dividend = try #require(result.operations.first { $0.operationNumber == 100001 })
         #expect(dividend.type == .dividend)
-        #expect(dividend.comment == "dividend comment")
+        #expect(dividend.comment == "Dividends on security (Vanguard ETF (VCIT.US)), record date 2026-10-01.")
+        #expect(dividend.ticker == "VCIT.US")
         #expect(dividend.amount == Decimal(string: "7.14"))
         #expect(dividend.currency == .USD)
         assertUTCDate(dividend.date, year: 2026, month: 10, day: 6, hour: 12, minute: 0)
@@ -109,6 +110,14 @@ private func assertUTCDate(_ date: Date, year: Int, month: Int, day: Int, hour: 
         #expect(other.type == .other)
         #expect(other.rawOperationLabel == "НеизвестныйТип")   // preserved verbatim, not lost
         assertUTCDate(other.date, year: 2026, month: 6, day: 27, hour: 0, minute: 0)
+    }
+
+    @Test func commentWithoutARecognizableTickerLeavesTickerNil() throws {
+        let result = try DividendReportParser.parse(fileURL: makeFixtureReportURL())
+
+        let tax = try #require(result.operations.first { $0.operationNumber == 100002 })
+        #expect(tax.comment == "tax comment")
+        #expect(tax.ticker == nil)
     }
 
     @Test func rowMissingARequiredFieldIsSkippedNotThrown() throws {
