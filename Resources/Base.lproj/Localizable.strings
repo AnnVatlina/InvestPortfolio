@@ -177,6 +177,19 @@
 "settings.export.transactions" = "Export Transaction History";
 "settings.export.error" = "Failed to create export file";
 
+// MARK: - Dividends
+"dividends.title" = "Dividends";
+"dividends.loading" = "Loading dividends...";
+"dividends.empty" = "No dividends yet";
+"dividends.import.action" = "Import Report";
+"dividends.deleteAll.action" = "Delete All";
+"dividends.deleteAll.confirm.title" = "Delete all dividends?";
+"dividends.totals.title" = "Totals";
+"dividends.type.dividend" = "Dividend";
+"dividends.type.tax" = "Tax";
+"dividends.type.commission" = "Commission";
+"dividends.type.other" = "Other";
+
 // MARK: - Home
 "home.loading" = "Loading...";
 "home.upcomingPayments.title" = "Upcoming Payments";

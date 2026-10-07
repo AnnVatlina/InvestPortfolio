@@ -178,6 +178,19 @@
 "settings.export.transactions" = "Экспорт истории операций";
 "settings.export.error" = "Не удалось создать файл экспорта";
 
+// MARK: - Dividends
+"dividends.title" = "Дивиденды";
+"dividends.loading" = "Загрузка дивидендов...";
+"dividends.empty" = "Дивидендов пока нет";
+"dividends.import.action" = "Импортировать отчёт";
+"dividends.deleteAll.action" = "Удалить все";
+"dividends.deleteAll.confirm.title" = "Удалить все дивиденды?";
+"dividends.totals.title" = "Итого";
+"dividends.type.dividend" = "Дивиденды";
+"dividends.type.tax" = "Налог";
+"dividends.type.commission" = "Комиссия";
+"dividends.type.other" = "Другое";
+
 // MARK: - Auth (Rentivo)
 
 // MARK: - Home

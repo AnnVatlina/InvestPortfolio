@@ -48,6 +48,9 @@
 		9557F9792F810AB10086715E /* Settings.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9557F9782F810AB10086715E /* Settings.swift */; };
 		956CDF87307687560000F299 /* ZIPFoundation in Frameworks */ = {isa = PBXBuildFile; productRef = 956CDF86307687560000F299 /* ZIPFoundation */; };
 		956CDF89307687680000F299 /* ZIPFoundation in Frameworks */ = {isa = PBXBuildFile; productRef = 956CDF88307687680000F299 /* ZIPFoundation */; };
+		956CDF8B307688900000F299 /* DividendsService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 956CDF8A307688900000F299 /* DividendsService.swift */; };
+		956CDF8D3076889B0000F299 /* DividendsViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 956CDF8C3076889B0000F299 /* DividendsViewModel.swift */; };
+		956CDF8F307688B40000F299 /* DividendsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 956CDF8E307688B40000F299 /* DividendsView.swift */; };
 		95892D362F95F07500A30CA9 /* Color+Brand.swift in Sources */ = {isa = PBXBuildFile; fileRef = 95892D352F95F07500A30CA9 /* Color+Brand.swift */; };
 		95A0139C307668FF008E1354 /* BrokerOperationType.swift in Sources */ = {isa = PBXBuildFile; fileRef = 95A0139B307668FF008E1354 /* BrokerOperationType.swift */; };
 		95A0139D307668FF008E1354 /* BrokerOperationType.swift in Sources */ = {isa = PBXBuildFile; fileRef = 95A0139B307668FF008E1354 /* BrokerOperationType.swift */; };
@@ -152,6 +155,9 @@
 		953C6263305FA09900D5C07B /* InvestPortfolioWidgetsExtension.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = InvestPortfolioWidgetsExtension.entitlements; sourceTree = "<group>"; };
 		953C6264305FA13400D5C07B /* HomeQueries.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomeQueries.swift; sourceTree = "<group>"; };
 		9557F9782F810AB10086715E /* Settings.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Settings.swift; sourceTree = "<group>"; };
+		956CDF8A307688900000F299 /* DividendsService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DividendsService.swift; sourceTree = "<group>"; };
+		956CDF8C3076889B0000F299 /* DividendsViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DividendsViewModel.swift; sourceTree = "<group>"; };
+		956CDF8E307688B40000F299 /* DividendsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DividendsView.swift; sourceTree = "<group>"; };
 		95892D352F95F07500A30CA9 /* Color+Brand.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Color+Brand.swift"; sourceTree = "<group>"; };
 		95A0139B307668FF008E1354 /* BrokerOperationType.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BrokerOperationType.swift; sourceTree = "<group>"; };
 		95A0139E30766966008E1354 /* BrokerOperation.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BrokerOperation.swift; sourceTree = "<group>"; };
@@ -277,6 +283,7 @@
 				9539C4212F93FC9D003A105C /* AnalyticsViewModel.swift */,
 				953C6245305EFFDB00D5C07B /* HomeViewModel.swift */,
 				952BB1EB3060F87900686092 /* DepositDetailViewModel.swift */,
+				956CDF8C3076889B0000F299 /* DividendsViewModel.swift */,
 			);
 			path = ViewModel;
 			sourceTree = "<group>";
@@ -302,6 +309,7 @@
 				95E87C202F94A27D00E238D5 /* SampleDataService.swift */,
 				95BDABCE3070E1B200423EA3 /* NotificationDelegate.swift */,
 				95A013A530766B2C008E1354 /* DividendReportParser.swift */,
+				956CDF8A307688900000F299 /* DividendsService.swift */,
 			);
 			path = Service;
 			sourceTree = "<group>";
@@ -372,6 +380,7 @@
 				95E87C222F94A28C00E238D5 /* OnboardingView.swift */,
 				95892D352F95F07500A30CA9 /* Color+Brand.swift */,
 				952BB1ED3060F8B300686092 /* DepositDetailView.swift */,
+				956CDF8E307688B40000F299 /* DividendsView.swift */,
 			);
 			path = View;
 			sourceTree = "<group>";
@@ -542,16 +551,19 @@
 				95D967FA2F04193400079C66 /* HomeTabView.swift in Sources */,
 				952BB1C23060ED0900686092 /* CapitalizationPeriod.swift in Sources */,
 				950800052F0406560041AD54 /* DepositsViewModel.swift in Sources */,
+				956CDF8D3076889B0000F299 /* DividendsViewModel.swift in Sources */,
 				95A013A33076696E008E1354 /* BrokerOperationsRepository.swift in Sources */,
 				95AD90822F8252890064CD19 /* SubscriptionsRepository.swift in Sources */,
 				95892D362F95F07500A30CA9 /* Color+Brand.swift in Sources */,
 				9557F9792F810AB10086715E /* Settings.swift in Sources */,
 				9508000F2F04077F0041AD54 /* DepositCurrency.swift in Sources */,
 				95A86BD22F82BBA2009B94CF /* LanguageBundle.swift in Sources */,
+				956CDF8F307688B40000F299 /* DividendsView.swift in Sources */,
 				95A013A630766B2C008E1354 /* DividendReportParser.swift in Sources */,
 				95A86BD42F82BDF8009B94CF /* CSVExporter.swift in Sources */,
 				1A283CB0A1273797A2EDF575 /* MainTabView.swift in Sources */,
 				95E87C1F2F9493A600E238D5 /* CSVImporter.swift in Sources */,
+				956CDF8B307688900000F299 /* DividendsService.swift in Sources */,
 				9508000D2F0406770041AD54 /* DepositsRepository.swift in Sources */,
 				952BB1BF3060ED0900686092 /* DepositInterestType.swift in Sources */,
 				95A0139D307668FF008E1354 /* BrokerOperationType.swift in Sources */,
