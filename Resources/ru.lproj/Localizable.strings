@@ -226,3 +226,18 @@
 "a11y.icon.podcast" = "Подкасты";
 "a11y.icon.shopping" = "Покупки";
 "a11y.icon.phone" = "Телефон";
+
+// MARK: - Coverage
+"home.coverage.title" = "Доход и подписки";
+"home.coverage.income" = "Доход в месяц";
+"home.coverage.subscriptions" = "Подписки в месяц";
+"home.coverage.percent" = "Покрытие";
+"home.coverage.byCurrency" = "По валютам";
+"home.coverage.rates.missing.format" = "Не учтено в итогах: %@. Нажмите, чтобы задать курсы.";
+
+// MARK: - Base currency & rates
+"settings.baseCurrency.title" = "Базовая валюта";
+"settings.baseCurrency.footer" = "Покрытие на главном экране показывается в этой валюте.";
+"settings.rates.title" = "Курсы валют";
+"settings.rates.footer.format" = "Сколько %@ стоит одна единица валюты. Оставьте пустым, чтобы исключить валюту из итогов.";
+"settings.rates.placeholder" = "Курс";

@@ -15,4 +15,16 @@ enum SubscriptionBillingCycle: String, CaseIterable, Codable, Equatable, Identif
 
     /// True for subscriptions that repeat on a schedule.
     var isRecurring: Bool { self != .oneTime }
+
+    /// Multiplier that turns one payment into its average monthly cost.
+    /// One-time purchases have no recurring cost, so they contribute 0.
+    var monthlyFactor: Double {
+        switch self {
+        case .weekly:    return 52.0 / 12.0
+        case .monthly:   return 1
+        case .quarterly: return 1.0 / 3.0
+        case .yearly:    return 1.0 / 12.0
+        case .oneTime:   return 0
+        }
+    }
 }

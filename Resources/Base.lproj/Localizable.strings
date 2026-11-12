@@ -223,3 +223,18 @@
 "a11y.icon.podcast" = "Podcast";
 "a11y.icon.shopping" = "Shopping";
 "a11y.icon.phone" = "Phone";
+
+// MARK: - Coverage
+"home.coverage.title" = "Income vs. subscriptions";
+"home.coverage.income" = "Income per month";
+"home.coverage.subscriptions" = "Subscriptions per month";
+"home.coverage.percent" = "Covered";
+"home.coverage.byCurrency" = "By currency";
+"home.coverage.rates.missing.format" = "Not included in the totals: %@. Tap to set rates.";
+
+// MARK: - Base currency & rates
+"settings.baseCurrency.title" = "Base currency";
+"settings.baseCurrency.footer" = "Coverage on the home screen is shown in this currency.";
+"settings.rates.title" = "Exchange rates";
+"settings.rates.footer.format" = "How many %@ one unit of each currency is worth. Leave blank to exclude a currency from totals.";
+"settings.rates.placeholder" = "Rate";

@@ -3,14 +3,21 @@
 //
 //  Created by Anna on 26.12.25.
 //
-//  Home: nearest upcoming subscription payments and currently open deposits —
-//  the two things worth checking at a glance, without duplicating the tabs below.
+//  Home: income-vs-subscriptions coverage, nearest upcoming subscription payments and
+//  currently open deposits — the things worth checking at a glance, without
+//  duplicating the tabs below.
 //
 
 import SwiftUI
 
 struct HomeTabView: View {
     @StateObject private var vm: HomeViewModel
+    @AppStorage(CurrencySettings.baseCurrencyKey) private var baseCurrencyRaw: String = CurrencySettings.defaultBaseCurrency.rawValue
+    @AppStorage(CurrencySettings.ratesKey) private var ratesJSON: String = CurrencySettings.defaultRatesJSON
+
+    private var converter: CurrencyConverter {
+        CurrencySettings.converter(baseRaw: baseCurrencyRaw, ratesJSON: ratesJSON)
+    }
 
     init(container: DIContainer) {
         _vm = StateObject(wrappedValue: HomeViewModel(
@@ -26,6 +33,7 @@ struct HomeTabView: View {
                     ProgressView("home.loading")
                         .padding(.top, 40)
                 } else {
+                    coverageCard
                     upcomingPaymentsCard
                     openDepositsCard
                 }
@@ -46,6 +54,91 @@ struct HomeTabView: View {
         }
         .task { await vm.load() }
         .refreshable { await vm.load() }
+    }
+
+    // MARK: - Coverage
+
+    @ViewBuilder
+    private var coverageCard: some View {
+        let breakdown = vm.coverageBreakdown
+        if !breakdown.isEmpty {
+            let converter = converter
+            let missing = vm.missingRates(converter: converter)
+            let base = converter.base.rawValue
+
+            VStack(alignment: .leading, spacing: 12) {
+                Text("home.coverage.title")
+                    .font(.headline)
+
+                coverageRow("home.coverage.income", amount: vm.monthlyIncome(converter: converter), currency: base)
+                coverageRow("home.coverage.subscriptions", amount: vm.monthlySubscriptions(converter: converter), currency: base)
+
+                // No percentage without subscriptions: dividing by zero says nothing.
+                if let coverage = vm.coverage(converter: converter) {
+                    HStack {
+                        Text("home.coverage.percent")
+                            .font(.subheadline.weight(.semibold))
+                        Spacer()
+                        Text(coverage, format: .percent.precision(.fractionLength(0)))
+                            .font(.title3.weight(.semibold))
+                            .monospacedDigit()
+                    }
+                }
+
+                if !missing.isEmpty {
+                    NavigationLink {
+                        CurrenciesSettingsView()
+                    } label: {
+                        Label(
+                            String(
+                                format: String(localized: "home.coverage.rates.missing.format"),
+                                missing.map(\.rawValue).joined(separator: ", ")
+                            ),
+                            systemImage: "exclamationmark.triangle.fill"
+                        )
+                        .font(.footnote)
+                        .foregroundStyle(.orange)
+                        .multilineTextAlignment(.leading)
+                    }
+                }
+
+                Divider()
+
+                Text("home.coverage.byCurrency")
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
+
+                ForEach(breakdown) { line in
+                    HStack {
+                        Text(line.currency.rawValue)
+                            .font(.subheadline.weight(.medium))
+                        Spacer()
+                        Text("+\(String(format: "%.2f", line.income)) / −\(String(format: "%.2f", line.subscriptions))")
+                            .font(.subheadline)
+                            .monospacedDigit()
+                            .foregroundStyle(.secondary)
+                            .lineLimit(1)
+                            .minimumScaleFactor(0.7)
+                    }
+                }
+            }
+            .padding()
+            .background(Color(.secondarySystemGroupedBackground))
+            .cornerRadius(16)
+        }
+    }
+
+    private func coverageRow(_ title: LocalizedStringKey, amount: Double, currency: String) -> some View {
+        HStack {
+            Text(title)
+                .font(.subheadline)
+            Spacer()
+            Text("\(String(format: "%.2f", amount)) \(currency)")
+                .font(.subheadline)
+                .monospacedDigit()
+                .lineLimit(1)
+                .minimumScaleFactor(0.7)
+        }
     }
 
     // MARK: - Upcoming payments
