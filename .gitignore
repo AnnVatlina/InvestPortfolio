@@ -60,3 +60,10 @@ fastlane/report.xml
 fastlane/Preview.html
 fastlane/screenshots/**/*.png
 fastlane/test_output
+
+# Graphify (local only)
+.claude/
+CLAUDE.md
+graphify-out/
+.graphifyrc
+.graphifyignore
