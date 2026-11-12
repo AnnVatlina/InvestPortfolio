@@ -34,6 +34,12 @@ final class DIContainer: ObservableObject {
         )
     }
 
+    func makeDividendsService() -> any DividendsService {
+        DefaultDividendsService(
+            repository: SwiftDataBrokerOperationsRepository(modelContainer: modelContainer)
+        )
+    }
+
     // MARK: - Reset
 
     /// Deletes all user-created data from the local store.
@@ -41,8 +47,10 @@ final class DIContainer: ObservableObject {
         let context = ModelContext(modelContainer)
         let deposits = try context.fetch(FetchDescriptor<Deposit>())
         let subscriptions = try context.fetch(FetchDescriptor<Subscription>())
+        let brokerOperations = try context.fetch(FetchDescriptor<BrokerOperation>())
         deposits.forEach { context.delete($0) }
         subscriptions.forEach { context.delete($0) }
+        brokerOperations.forEach { context.delete($0) }
         try context.save()
     }
 
@@ -57,6 +65,7 @@ final class DIContainer: ObservableObject {
                 DepositTransaction.self,
                 Settings.self,
                 Subscription.self,
+                BrokerOperation.self,
             configurations: config
         )
         return DIContainer(modelContainer: container)

@@ -46,10 +46,18 @@ struct MainTabView: View {
             .tabItem { Label("analytics.title", systemImage: "chart.bar.fill") }
             .tag(3)
 
+            // 4: Dividends
+            NavigationStack {
+                DividendsView(container: container)
+            }
+            .tabItem { Label("dividends.title", systemImage: "chart.line.uptrend.xyaxis") }
+            .tag(4)
+
         }
         .onAppear {
-            // Settings moved into the dashboard toolbar — a saved index of 4 is no longer valid
-            if !(0...3).contains(selectedIndex) { selectedIndex = 0 }
+            // Settings used to be tab 4 (moved into the dashboard toolbar); 4 is now
+            // Dividends, so a stale saved index from that era still lands validly here.
+            if !(0...4).contains(selectedIndex) { selectedIndex = 0 }
         }
 
     }
