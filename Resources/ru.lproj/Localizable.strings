@@ -163,6 +163,8 @@
 "analytics.chart.empty" = "Нет данных за этот год";
 "analytics.legend.income" = "Доходы";
 "analytics.legend.expenses" = "Расходы";
+"analytics.dividends.subtitle" = "Доход от дивидендов, налоги и комиссии — отдельно от вкладов и подписок";
+"analytics.dividends.byYear.title" = "По годам";
 
 // MARK: - Import
 "settings.import.title" = "Импорт данных";

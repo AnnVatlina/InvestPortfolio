@@ -14,7 +14,8 @@ struct AnalyticsView: View {
     init(container: DIContainer) {
         _vm = StateObject(wrappedValue: AnalyticsViewModel(
             depositsService: container.makeDepositsService(),
-            subscriptionsService: container.makeSubscriptionsService()
+            subscriptionsService: container.makeSubscriptionsService(),
+            dividendsService: container.makeDividendsService()
         ))
     }
 
@@ -57,6 +58,12 @@ struct AnalyticsView: View {
 
                             // Block 4: monthly chart
                             chartSection(currency: cur)
+
+                            // Block 5: dividends — a separate section with its own
+                            // numbers, deliberately not mixed into the blocks above.
+                            if vm.hasDividendActivity(currency: cur) {
+                                dividendsSection(currency: cur)
+                            }
                         }
                     }
                 }
@@ -231,6 +238,72 @@ struct AnalyticsView: View {
         }
     }
 
+    // MARK: - Dividends (separate section)
+
+    private func dividendsSection(currency: DepositCurrency) -> some View {
+        VStack(alignment: .leading, spacing: 16) {
+            Divider().padding(.top, 4)
+            sectionHeader(title: "dividends.title", subtitle: "analytics.dividends.subtitle")
+
+            if vm.isPastOrCurrentYear {
+                dividendRow(
+                    caption: "analytics.todate.title",
+                    income: vm.dividendIncomeToDate(currency: currency),
+                    expense: vm.dividendExpenseToDate(currency: currency),
+                    net: vm.dividendNetToDate(currency: currency),
+                    currency: currency
+                )
+            }
+            dividendRow(
+                caption: "analytics.month.title",
+                income: vm.monthDividendIncome(currency: currency),
+                expense: vm.monthDividendExpense(currency: currency),
+                net: vm.monthDividendNet(currency: currency),
+                currency: currency
+            )
+            dividendRow(
+                caption: "analytics.year.title",
+                income: vm.totalDividendIncome(currency: currency),
+                expense: vm.totalDividendExpense(currency: currency),
+                net: vm.dividendNetBalance(currency: currency),
+                currency: currency
+            )
+
+            dividendsChartSection(currency: currency)
+
+            let yearlyPoints = vm.dividendYearlyPoints(currency: currency)
+            if !yearlyPoints.isEmpty {
+                dividendYearlyBreakdown(points: yearlyPoints, currency: currency)
+            }
+        }
+    }
+
+    private func dividendYearlyBreakdown(points: [YearlyDividendPoint], currency: DepositCurrency) -> some View {
+        VStack(alignment: .leading, spacing: 16) {
+            Text("analytics.dividends.byYear.title").font(.subheadline.bold())
+            ForEach(points) { point in
+                dividendRow(
+                    caption: LocalizedStringKey(String(point.year)),
+                    income: point.income,
+                    expense: point.expense,
+                    net: point.net,
+                    currency: currency
+                )
+            }
+        }
+    }
+
+    private func dividendRow(caption: LocalizedStringKey, income: Double, expense: Double, net: Double, currency: DepositCurrency) -> some View {
+        VStack(alignment: .leading, spacing: 6) {
+            Text(caption).font(.caption).foregroundStyle(.secondary)
+            HStack(spacing: 12) {
+                summaryCard(title: "analytics.income", value: income, currency: currency.rawValue, color: .teal)
+                summaryCard(title: "analytics.expenses", value: expense, currency: currency.rawValue, color: .orange)
+                summaryCard(title: "analytics.net", value: net, currency: currency.rawValue, color: net >= 0 ? .green : .red)
+            }
+        }
+    }
+
     // MARK: - Section header
 
     private func sectionHeader(title: LocalizedStringKey, subtitle: LocalizedStringKey) -> some View {
@@ -265,11 +338,36 @@ struct AnalyticsView: View {
     // MARK: - Chart
 
     private func chartSection(currency: DepositCurrency) -> some View {
-        VStack(alignment: .leading, spacing: 12) {
-            Text("analytics.chart.title").font(.headline)
+        let points = vm.monthlyPoints(currency: currency)
+        let hasData = points.contains { $0.income > 0 || $0.expense > 0 }
+        let entries: [(month: Date, series: String, value: Double)] = points.flatMap { pt in
+            var rows: [(Date, String, Double)] = []
+            if pt.income > 0 { rows.append((pt.month, "income", pt.income)) }
+            if pt.expense > 0 { rows.append((pt.month, "expense", pt.expense)) }
+            return rows
+        }
+        return monthlyChartCard(title: "analytics.chart.title", hasData: hasData, entries: entries)
+    }
 
-            let points = vm.monthlyPoints(currency: currency)
-            let hasData = points.contains { $0.income > 0 || $0.expense > 0 }
+    // MARK: - Dividends monthly chart (separate from chartSection above)
+
+    private func dividendsChartSection(currency: DepositCurrency) -> some View {
+        let points = vm.dividendMonthlyPoints(currency: currency)
+        let hasData = points.contains { $0.income > 0 || $0.expense > 0 }
+        let entries: [(month: Date, series: String, value: Double)] = points.flatMap { pt in
+            var rows: [(Date, String, Double)] = []
+            if pt.income > 0 { rows.append((pt.month, "income", pt.income)) }
+            if pt.expense > 0 { rows.append((pt.month, "expense", pt.expense)) }
+            return rows
+        }
+        return monthlyChartCard(title: "dividends.title", hasData: hasData, entries: entries)
+    }
+
+    /// Shared bar-chart card used by both the deposits/subscriptions chart and the
+    /// separate dividends chart — same look, independent data.
+    private func monthlyChartCard(title: LocalizedStringKey, hasData: Bool, entries: [(month: Date, series: String, value: Double)]) -> some View {
+        VStack(alignment: .leading, spacing: 12) {
+            Text(title).font(.headline)
 
             if !hasData {
                 Text("analytics.chart.empty")
@@ -282,13 +380,6 @@ struct AnalyticsView: View {
                 // doesn't break the color scale mapping
                 let incomeKey = "income"
                 let expenseKey = "expense"
-
-                let entries: [(month: Date, series: String, value: Double)] = points.flatMap { pt in
-                    var rows: [(Date, String, Double)] = []
-                    if pt.income > 0 { rows.append((pt.month, incomeKey, pt.income)) }
-                    if pt.expense > 0 { rows.append((pt.month, expenseKey, pt.expense)) }
-                    return rows
-                }
 
                 Chart {
                     ForEach(entries.indices, id: \.self) { i in

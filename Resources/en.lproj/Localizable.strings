@@ -163,6 +163,8 @@
 "analytics.chart.empty" = "No data for this year";
 "analytics.legend.income" = "Income";
 "analytics.legend.expenses" = "Expenses";
+"analytics.dividends.subtitle" = "Dividend income, taxes and commissions — separate from deposits and subscriptions";
+"analytics.dividends.byYear.title" = "By Year";
 
 // MARK: - Import
 "settings.import.title" = "Import Data";

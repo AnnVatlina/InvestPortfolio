@@ -37,18 +37,40 @@ private func sub(
                  isActive: isActive, endDate: endDate)
 }
 
+private func brokerOp(
+    operationNumber: Int = Int.random(in: 1...Int.max),
+    date: Date = Date(),
+    type: BrokerOperationType = .dividend,
+    amount: Decimal = 10,
+    currency: DepositCurrency = .USD
+) -> BrokerOperation {
+    BrokerOperation(
+        operationNumber: operationNumber,
+        date: date,
+        type: type,
+        rawOperationLabel: "",
+        comment: "",
+        amount: amount,
+        currency: currency
+    )
+}
+
 @MainActor
 private func makeVM(
     deposits: [Deposit] = [],
-    subscriptions: [Subscription] = []
+    subscriptions: [Subscription] = [],
+    brokerOperations: [BrokerOperation] = []
 ) async -> AnalyticsViewModel {
     let depRepo = InMemoryDepositsRepository()
     for d in deposits { try? await depRepo.add(d) }
     let subRepo = InMemorySubscriptionsRepository()
     for s in subscriptions { try? await subRepo.add(s) }
+    let opsRepo = InMemoryBrokerOperationsRepository()
+    try? await opsRepo.addAll(brokerOperations)
     return AnalyticsViewModel(
         depositsService: DefaultDepositsService(repository: depRepo),
-        subscriptionsService: DefaultSubscriptionsService(repository: subRepo)
+        subscriptionsService: DefaultSubscriptionsService(repository: subRepo),
+        dividendsService: DefaultDividendsService(repository: opsRepo)
     )
 }
 
@@ -172,6 +194,91 @@ struct AnalyticsViewModelComputationTests {
         let income   = vm.totalIncome(currency: .RUB)
         let expenses = vm.totalExpenses(currency: .RUB)
         #expect(vm.netBalance(currency: .RUB) == income - expenses)
+    }
+
+    @Test("Dividend broker operations count toward the separate dividend totals, not totalIncome/totalExpenses")
+    func dividendsAreSeparateFromDepositSubscriptionTotals() async {
+        let year = Calendar.current.component(.year, from: Date())
+        let openDate = Calendar.current.date(byAdding: .day, value: -60, to: Date())!
+        let vm = await makeVM(
+            deposits: [dep(amount: 100_000, currency: .USD, annualRate: 10.0, openDate: openDate)],
+            brokerOperations: [
+                brokerOp(date: date(year: year, month: 3), type: .dividend, amount: 7.14, currency: .USD),
+                brokerOp(date: date(year: year, month: 3), type: .tax, amount: -2.14, currency: .USD),
+                brokerOp(date: date(year: year, month: 3), type: .commission, amount: -2.18, currency: .USD)
+            ]
+        )
+        vm.selectedYear = year
+        await vm.load()
+
+        // The dividend-specific totals pick up the broker operations.
+        #expect(abs(vm.totalDividendIncome(currency: .USD) - 7.14) < 0.001)
+        #expect(abs(vm.totalDividendExpense(currency: .USD) - 4.32) < 0.001)
+
+        // The existing deposits/subscriptions totals must stay exactly what they'd be
+        // without any broker operations at all — dividends are a separate section, not
+        // folded into these numbers.
+        let depositOnlyVM = await makeVM(deposits: [dep(amount: 100_000, currency: .USD, annualRate: 10.0, openDate: openDate)])
+        depositOnlyVM.selectedYear = year
+        await depositOnlyVM.load()
+        #expect(vm.totalIncome(currency: .USD) == depositOnlyVM.totalIncome(currency: .USD))
+        #expect(vm.totalExpenses(currency: .USD) == 0)
+    }
+
+    @Test("totalEarnedToDate/totalPaidToDate are unaffected by broker operations")
+    func toDateTotalsExcludeBrokerOperations() async {
+        let year = Calendar.current.component(.year, from: Date())
+        let vm = await makeVM(brokerOperations: [
+            brokerOp(date: Date(), type: .dividend, amount: 7.14, currency: .USD),
+            brokerOp(date: Date(), type: .tax, amount: -2.14, currency: .USD)
+        ])
+        vm.selectedYear = year
+        await vm.load()
+        #expect(vm.totalEarnedToDate(currency: .USD) == 0)
+        #expect(vm.totalPaidToDate(currency: .USD) == 0)
+
+        // The dividend-specific to-date accessors pick them up instead.
+        #expect(abs(vm.dividendIncomeToDate(currency: .USD) - 7.14) < 0.001)
+        #expect(abs(vm.dividendExpenseToDate(currency: .USD) - 2.14) < 0.001)
+    }
+
+    @Test("hasDividendActivity is false for a currency with no broker operations")
+    func hasDividendActivityFalseWhenNoData() async {
+        let vm = await makeVM()
+        await vm.load()
+        #expect(vm.hasDividendActivity(currency: .USD) == false)
+    }
+
+    @Test("activeCurrencies includes a currency that only has broker operations")
+    func activeCurrenciesIncludeBrokerOperationCurrency() async {
+        let year = Calendar.current.component(.year, from: Date())
+        let vm = await makeVM(brokerOperations: [
+            brokerOp(date: date(year: year, month: 1), type: .dividend, amount: 5, currency: .EUR)
+        ])
+        vm.selectedYear = year
+        await vm.load()
+        #expect(vm.activeCurrencies.map(\.rawValue).contains("EUR"))
+    }
+
+    @Test("dividendYearlyPoints returns one row per year with activity, skipping years with none")
+    func dividendYearlyPointsSkipsEmptyYears() async throws {
+        let currentYear = Calendar.current.component(.year, from: Date())
+        let pastYear = currentYear - 2
+        let vm = await makeVM(brokerOperations: [
+            brokerOp(date: date(year: pastYear, month: 6), type: .dividend, amount: 5, currency: .USD),
+            brokerOp(date: date(year: currentYear, month: 2), type: .dividend, amount: 12, currency: .USD),
+            brokerOp(date: date(year: currentYear, month: 2), type: .tax, amount: -3, currency: .USD)
+        ])
+        await vm.load()
+        let points = vm.dividendYearlyPoints(currency: .USD)
+        let years = points.map(\.year)
+        #expect(years.contains(pastYear))
+        #expect(years.contains(currentYear))
+        #expect(!years.contains(currentYear - 1))   // no activity that year — skipped
+
+        let currentYearPoint = try #require(points.first { $0.year == currentYear })
+        #expect(abs(currentYearPoint.income - 12) < 0.001)
+        #expect(abs(currentYearPoint.expense - 3) < 0.001)
     }
 }
 
