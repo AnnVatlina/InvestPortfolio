@@ -2,6 +2,7 @@
 "app.name" = "Rentivo";
 "common.ok" = "OK";
 "common.cancel" = "Cancel";
+"common.done" = "Done";
 "common.error" = "Error";
 "common.retry" = "Retry";
 "common.percentSign" = "%";
@@ -162,6 +163,8 @@
 "analytics.chart.empty" = "No data for this year";
 "analytics.legend.income" = "Income";
 "analytics.legend.expenses" = "Expenses";
+"analytics.dividends.subtitle" = "Dividend income, taxes and commissions — separate from deposits and subscriptions";
+"analytics.dividends.byYear.title" = "By Year";
 
 // MARK: - Import
 "settings.import.title" = "Import Data";
@@ -177,6 +180,22 @@
 "settings.export.subscriptions" = "Export Subscriptions";
 "settings.export.transactions" = "Export Transaction History";
 "settings.export.error" = "Failed to create export file";
+
+// MARK: - Dividends
+"dividends.title" = "Dividends";
+"dividends.loading" = "Loading dividends...";
+"dividends.empty" = "No dividends yet";
+"dividends.import.action" = "Import Report";
+"dividends.deleteAll.action" = "Delete All";
+"dividends.deleteAll.confirm.title" = "Delete all dividends?";
+"dividends.totals.title" = "Totals";
+"dividends.type.dividend" = "Dividend";
+"dividends.type.tax" = "Tax";
+"dividends.type.commission" = "Commission";
+"dividends.type.other" = "Other";
+"dividends.detail.ticker" = "Ticker";
+"dividends.detail.comment" = "Comment";
+"dividends.detail.operationNumber" = "Operation Number";
 
 // MARK: - Auth (Rentivo)
 

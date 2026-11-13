@@ -33,7 +33,8 @@ struct InvestPortfolioApp: App {
             Deposit.self,
             DepositTransaction.self,
             Settings.self,
-            Subscription.self
+            Subscription.self,
+            BrokerOperation.self
         ])
         let storeURL = Self.sharedStoreURL()
         let config = ModelConfiguration(url: storeURL)

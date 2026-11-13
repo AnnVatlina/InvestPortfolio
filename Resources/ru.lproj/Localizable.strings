@@ -2,6 +2,7 @@
 "app.name" = "Rentivo";
 "common.ok" = "ОК";
 "common.cancel" = "Отмена";
+"common.done" = "Готово";
 "common.error" = "Ошибка";
 "common.retry" = "Повторить";
 "common.percentSign" = "%";
@@ -162,6 +163,8 @@
 "analytics.chart.empty" = "Нет данных за этот год";
 "analytics.legend.income" = "Доходы";
 "analytics.legend.expenses" = "Расходы";
+"analytics.dividends.subtitle" = "Доход от дивидендов, налоги и комиссии — отдельно от вкладов и подписок";
+"analytics.dividends.byYear.title" = "По годам";
 
 // MARK: - Import
 "settings.import.title" = "Импорт данных";
@@ -177,6 +180,22 @@
 "settings.export.subscriptions" = "Экспорт подписок";
 "settings.export.transactions" = "Экспорт истории операций";
 "settings.export.error" = "Не удалось создать файл экспорта";
+
+// MARK: - Dividends
+"dividends.title" = "Дивиденды";
+"dividends.loading" = "Загрузка дивидендов...";
+"dividends.empty" = "Дивидендов пока нет";
+"dividends.import.action" = "Импортировать отчёт";
+"dividends.deleteAll.action" = "Удалить все";
+"dividends.deleteAll.confirm.title" = "Удалить все дивиденды?";
+"dividends.totals.title" = "Итого";
+"dividends.type.dividend" = "Дивиденды";
+"dividends.type.tax" = "Налог";
+"dividends.type.commission" = "Комиссия";
+"dividends.type.other" = "Другое";
+"dividends.detail.ticker" = "Тикер";
+"dividends.detail.comment" = "Комментарий";
+"dividends.detail.operationNumber" = "Номер операции";
 
 // MARK: - Auth (Rentivo)
 
