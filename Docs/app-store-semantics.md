@@ -68,9 +68,15 @@ Rentivo — всё о ваших деньгах в одном приложени
 • Фильтры: активные, отменённые, оплаченные разовые платежи
 • Уведомление в день списания — никаких сюрпризов
 
+📈 ДИВИДЕНДЫ
+• Импорт отчёта Freedom24 (.xlsx): дивиденды, налоги, комиссии
+• Повторный импорт не создаёт дублей
+• Отдельный блок в аналитике
+
 📊 АНАЛИТИКА
 • Графики дохода и расходов по месяцам
 • Сравнение: сколько зарабатывают вклады vs. тратят подписки
+• Карточка на главном экране: покрывает ли доход по вкладам ваши подписки — в одной валюте по вашим курсам
 • Поддержка нескольких лет с переключением по вкладкам
 
 ⚙️ УДОБСТВА
@@ -100,9 +106,15 @@ Rentivo — all your money, one app.
 • Filter: active, cancelled, one-time purchases already paid
 • Payment-day reminder — no surprise charges
 
+📈 DIVIDENDS
+• Import a Freedom24 report (.xlsx): dividends, taxes, commissions
+• Re-importing never creates duplicates
+• Its own section in Analytics
+
 📊 ANALYTICS
 • Monthly income & expense charts
 • Income from deposits vs. cost of subscriptions — side by side
+• Home screen card: does your deposit income cover your subscriptions — in one currency, using your own rates
 • Multi-year support with tab switching
 
 ⚙️ EXTRAS

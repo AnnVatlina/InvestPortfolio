@@ -91,7 +91,7 @@ struct HomeTabView: View {
                     } label: {
                         Label(
                             String(
-                                format: String(localized: "home.coverage.rates.missing.format"),
+                                format: LanguageBundle.string("home.coverage.rates.missing.format"),
                                 missing.map(\.rawValue).joined(separator: ", ")
                             ),
                             systemImage: "exclamationmark.triangle.fill"

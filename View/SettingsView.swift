@@ -191,7 +191,7 @@ struct CurrenciesSettingsView: View {
                             Text(currency.rawValue)
                             Spacer()
                             TextField(
-                                String(localized: "settings.rates.placeholder"),
+                                LanguageBundle.string("settings.rates.placeholder"),
                                 text: rateBinding(for: currency)
                             )
                             // .decimalPad only offers the separator matching the device's
@@ -208,7 +208,7 @@ struct CurrenciesSettingsView: View {
                     Text("settings.rates.title")
                 } footer: {
                     Text(String(
-                        format: String(localized: "settings.rates.footer.format"),
+                        format: LanguageBundle.string("settings.rates.footer.format"),
                         baseCurrency.rawValue
                     ))
                 }

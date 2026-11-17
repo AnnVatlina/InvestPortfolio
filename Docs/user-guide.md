@@ -25,11 +25,23 @@ Rentivo — приложение для личных финансов на iPhon
 
 ### Главный экран
 
-Открывается сразу после первого запуска. Показывает две карточки:
+Открывается сразу после первого запуска. Показывает три карточки:
+- **Доход и подписки** — покрывает ли доход по вкладам ваши регулярные подписки (см. ниже)
 - **Ближайшие платежи** — до 5 подписок с самой близкой датой следующего платежа
 - **Открытые вклады** — вклады, которые ещё не закрыты, отсортированные по дате закрытия
 
 Потяните экран вниз, чтобы обновить данные. Шестерёнка в правом верхнем углу открывает Настройки.
+
+#### Карточка «Доход и подписки»
+
+Отвечает на главный вопрос: хватает ли пассивного дохода на регулярные расходы. Всё показывается в **основной валюте** (по умолчанию USD):
+- **Доход в месяц** — проценты по вкладам, накопленные за текущий календарный месяц
+- **Подписки в месяц** — средняя месячная стоимость активных регулярных подписок (недельные, квартальные и годовые пересчитываются в месяц). Разовые покупки и отменённые подписки не учитываются
+- **Покрытие** — доход, делённый на подписки, в процентах. Если подписок нет, процент не показывается
+
+Ниже — разбивка по исходным валютам.
+
+Если для какой-то валюты не задан курс, её суммы **не входят в итог** — вместо неверного числа карточка показывает, какого курса не хватает. Нажмите на предупреждение, чтобы сразу открыть настройки валют. Если нет ни дохода, ни подписок, карточка скрыта. Дивиденды в доход здесь не входят.
 
 ![Главный экран](screenshots/home.png)
 
@@ -149,6 +161,19 @@ Rentivo — приложение для личных финансов на iPhon
 
 ---
 
+### Дивиденды
+
+Вкладка для дивидендов, налогов и комиссий по брокерскому счёту. Данные берутся только из отчёта **Freedom24 (Tradernet) в формате `.xlsx`** — вручную добавить операцию нельзя.
+
+- **Импортировать отчёт** — выберите файл `.xlsx`. После импорта показывается сводка: сколько операций добавлено, сколько пропущено как дубликаты, сколько строк не удалось прочитать
+- **Повторный импорт безопасен** — операции сопоставляются по номеру из отчёта, поэтому загрузка того же файла или отчёта за более широкий период добавляет только новые операции
+- **Список и итоги** — операции сгруппированы по месяцам, итоги — по типам (дивиденды, налоги, комиссии) и валютам. В деталях операции видны тикер, комментарий и номер операции
+- **Удалить все** — удаляет все импортированные операции, перед этим просит подтверждение
+
+Дивиденды также показываются отдельным блоком на экране «Аналитика» и не смешиваются с доходом по вкладам и расходами на подписки.
+
+---
+
 ### Аналитика
 
 Сравнение доходов от вкладов и расходов на подписки по месяцам.
@@ -180,6 +205,10 @@ Rentivo — приложение для личных финансов на iPhon
 Выберите, какие валюты отображаются в формах добавления и в аналитике. Минимум одна валюта должна быть включена.
 
 Доступные валюты: **USD, EUR, RUB, GEL, BYN**
+
+**Основная валюта** — в ней карточка «Доход и подписки» на главном экране показывает итоги. По умолчанию USD.
+
+**Курсы валют** — приложение работает без интернета и само курсы не загружает, поэтому для каждой включённой валюты, кроме основной, укажите курс: сколько единиц основной валюты стоит одна единица этой. Например, при основной валюте USD для GEL введите `0.37`. Допустим и точка, и запятая. Пустое поле исключает валюту из итогов.
 
 #### Данные (экспорт/импорт)
 
@@ -219,6 +248,12 @@ CSV-файлы вкладов, экспортированные более ст�
 **Что будет, если закрыть безотзывный вклад досрочно?**
 Приложение честно предупредит, сколько процентов вы потеряете, и пересчитает доход по ставке «до востребования» (которую вы указали при создании вклада), а не по основной ставке.
 
+**Что будет, если после обновления данные не откроются?**
+Приложение не удаляет их: старая база сохраняется в хранилище приложения под именем вида `default.store.backup-ГГГГММДД-ЧЧММСС`, а при запуске вы увидите сообщение об этом. Приложение при этом стартует с пустой базой — чтобы вернуть данные, обратитесь в поддержку. Если базу не удалось даже сохранить, приложение работает в памяти и предупредит, что новые данные не сохранятся.
+
+**Почему на главном экране написано, что не хватает курса?**
+Для валюты с вкладами или подписками не задан курс к основной валюте. Задайте его в Настройки → Валюты — до тех пор эта валюта не входит в итоги карточки «Доход и подписки».
+
 **Как создать резервную копию?**
 Используйте Настройки → Данные → Экспорт. Сохраните все три CSV-файла (вклады, подписки, история операций) в надёжное место.
 
@@ -255,11 +290,23 @@ When you open the app for the first time, you'll be offered two options:
 
 ### Home Screen
 
-Shown right after first launch. Two cards:
+Shown right after first launch. Three cards:
+- **Income vs. Subscriptions** — whether your deposit income covers your regular subscriptions (see below)
 - **Upcoming Payments** — up to 5 subscriptions with the nearest next-payment date
 - **Open Deposits** — deposits that haven't closed yet, sorted by close date
 
 Pull down to refresh. The gear icon in the top-right corner opens Settings.
+
+#### The "Income vs. Subscriptions" card
+
+Answers the main question: is passive income enough for regular expenses. Everything is shown in your **base currency** (USD by default):
+- **Income per month** — deposit interest accrued during the current calendar month
+- **Subscriptions per month** — average monthly cost of active recurring subscriptions (weekly, quarterly and yearly ones are converted to a month). One-time purchases and cancelled subscriptions are not counted
+- **Covered** — income divided by subscriptions, as a percentage. With no subscriptions, no percentage is shown
+
+A breakdown by original currency is shown below.
+
+If a currency has no exchange rate, its amounts are **left out of the totals** — instead of a silently wrong number, the card shows which rate is missing. Tap the warning to open the currency settings. With no income and no subscriptions the card is hidden. Dividends are not part of this income.
 
 ![Home screen](screenshots/home.png)
 
@@ -379,6 +426,19 @@ Below it, the full list with pagination (5 / 10 / all — via the menu in the se
 
 ---
 
+### Dividends
+
+A tab for dividends, taxes and commissions on your brokerage account. Data comes only from a **Freedom24 (Tradernet) `.xlsx` report** — operations can't be added manually.
+
+- **Import Report** — pick an `.xlsx` file. A summary is shown afterwards: how many operations were added, how many were skipped as duplicates, and how many rows couldn't be read
+- **Re-importing is safe** — operations are matched by the number in the report, so loading the same file, or a report covering a wider period, adds only new operations
+- **List and totals** — operations are grouped by month, with totals per type (dividends, taxes, commissions) and currency. The operation details show the ticker, comment and operation number
+- **Delete All** — removes every imported operation, after asking for confirmation
+
+Dividends also appear as a separate section in **Analytics** and are not mixed with deposit income or subscription costs.
+
+---
+
 ### Analytics
 
 Compare income from deposits with subscription expenses, month by month.
@@ -410,6 +470,10 @@ Switch between **Русский** and **English**. Takes effect immediately, ind
 Choose which currencies appear in add forms and analytics. At least one currency must remain enabled.
 
 Available currencies: **USD, EUR, RUB, GEL, BYN**
+
+**Base currency** — the currency the "Income vs. Subscriptions" card on the Home screen shows its totals in. USD by default.
+
+**Exchange rates** — the app works offline and doesn't download rates, so for each enabled currency other than the base one, enter how many units of the base currency one unit of it is worth. For example, with USD as the base currency, enter `0.37` for GEL. Either a dot or a comma works. Leaving a field empty excludes that currency from the totals.
 
 #### Data (export/import)
 
@@ -448,6 +512,12 @@ With simple interest, income is calculated only from the deposit's original amou
 
 **What happens if I close a non-revocable deposit early?**
 The app warns you exactly how much interest you'd lose, and recalculates the income using the early-withdrawal rate you set when creating the deposit, instead of the main rate.
+
+**What happens if my data can't be opened after an update?**
+The app doesn't delete it: the old database is kept in the app's storage under a name like `default.store.backup-YYYYMMDD-HHMMSS`, and you'll see a message about it on launch. The app starts with an empty database in the meantime — contact support to get your data back. If the database couldn't even be moved aside, the app runs in memory and warns you that new data won't be saved.
+
+**Why does the Home screen say a rate is missing?**
+A currency you have deposits or subscriptions in has no exchange rate to the base currency. Set it in Settings → Currencies — until then that currency is left out of the "Income vs. Subscriptions" totals.
 
 **How do I back up my data?**
 Use Settings → Data → Export. Save all three CSV files (deposits, subscriptions, transaction history) somewhere safe.
