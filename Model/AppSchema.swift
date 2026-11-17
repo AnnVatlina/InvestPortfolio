@@ -9,6 +9,21 @@
 import Foundation
 import SwiftData
 
+/// The one list of persisted models, shared by the app and the widget extension.
+/// Both open the same store file — if their lists drift apart, the process with the
+/// smaller list can try to "migrate" the shared store down to its own shape.
+enum AppModels {
+    static var schema: Schema {
+        Schema([
+            Deposit.self,
+            DepositTransaction.self,
+            Settings.self,
+            Subscription.self,
+            BrokerOperation.self
+        ])
+    }
+}
+
 @Model
 final class Subscription {
     var id: UUID = UUID()

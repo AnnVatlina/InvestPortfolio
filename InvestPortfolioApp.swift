@@ -29,30 +29,45 @@ struct InvestPortfolioApp: App {
             ?? "en"
         LanguageBundle.set(languageCode: savedLocale)
 
-        let schema = Schema([
-            Deposit.self,
-            DepositTransaction.self,
-            Settings.self,
-            Subscription.self,
-            BrokerOperation.self
-        ])
+        let schema = AppModels.schema
         let storeURL = Self.sharedStoreURL()
         let config = ModelConfiguration(url: storeURL)
         let modelContainer: ModelContainer
         do {
             modelContainer = try ModelContainer(for: schema, configurations: config)
         } catch {
-            // Store file is inaccessible (e.g. after a Bundle ID change) — delete and recreate it.
-            try? FileManager.default.removeItem(at: storeURL)
-            try? FileManager.default.removeItem(at: storeURL.appendingPathExtension("shm"))
-            try? FileManager.default.removeItem(at: storeURL.appendingPathExtension("wal"))
-            do {
-                modelContainer = try ModelContainer(for: schema, configurations: config)
-            } catch {
-                fatalError("Не удалось создать ModelContainer: \(error)")
-            }
+            // The store couldn't be opened (failed migration, inaccessible file, ...).
+            // Never delete it: move it aside so the data survives, tell the user, and start
+            // empty. If even the move fails, run in memory and leave the files untouched.
+            modelContainer = Self.recoverContainer(schema: schema, config: config, storeURL: storeURL)
         }
         _container = StateObject(wrappedValue: DIContainer(modelContainer: modelContainer))
+    }
+
+    private static func recoverContainer(
+        schema: Schema,
+        config: ModelConfiguration,
+        storeURL: URL
+    ) -> ModelContainer {
+        let defaults = UserDefaults.standard
+        do {
+            let backup = try StoreRecovery.backUpStore(at: storeURL)
+            let container = try ModelContainer(for: schema, configurations: config)
+            if let backup {
+                defaults.set(
+                    StoreRecovery.Notice.backedUp(fileName: backup.lastPathComponent).rawValue,
+                    forKey: StoreRecovery.noticeKey
+                )
+            }
+            return container
+        } catch {
+            defaults.set(StoreRecovery.Notice.unavailable.rawValue, forKey: StoreRecovery.noticeKey)
+            let memoryConfig = ModelConfiguration(isStoredInMemoryOnly: true)
+            guard let container = try? ModelContainer(for: schema, configurations: memoryConfig) else {
+                fatalError("Не удалось создать ModelContainer: \(error)")
+            }
+            return container
+        }
     }
 
     /// The store lives in the App Group container so the widget extension can read the same

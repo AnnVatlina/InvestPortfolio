@@ -241,3 +241,8 @@
 "settings.rates.title" = "Exchange rates";
 "settings.rates.footer.format" = "How many %@ one unit of each currency is worth. Leave blank to exclude a currency from totals.";
 "settings.rates.placeholder" = "Rate";
+
+// MARK: - Store recovery
+"store.recovery.title" = "Your data couldn't be opened";
+"store.recovery.backedUp.format" = "After the update the database couldn't be opened. It was not deleted: it was saved as \"%@\" in the app's storage. The app has started empty. Contact support to restore your data.";
+"store.recovery.unavailable" = "The database couldn't be opened and couldn't be moved aside. Nothing you enter now will be saved. Your existing data was not deleted — restart the app or contact support.";
