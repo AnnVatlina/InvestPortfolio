@@ -78,6 +78,9 @@
 		95E87C1F2F9493A600E238D5 /* CSVImporter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 95E87C1E2F9493A600E238D5 /* CSVImporter.swift */; };
 		95E87C212F94A27D00E238D5 /* SampleDataService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 95E87C202F94A27D00E238D5 /* SampleDataService.swift */; };
 		95DA00022FD0000100000001 /* CurrencyConverter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 95DA00012FD0000100000001 /* CurrencyConverter.swift */; };
+		95DA00102FD0000100000001 /* StoreRecovery.swift in Sources */ = {isa = PBXBuildFile; fileRef = 95DA000F2FD0000100000001 /* StoreRecovery.swift */; };
+		95DA00122FD0000100000001 /* StoreRecoveryTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 95DA00112FD0000100000001 /* StoreRecoveryTests.swift */; };
+		95DA00142FD0000100000001 /* DividendsServiceTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 95DA00132FD0000100000001 /* DividendsServiceTests.swift */; };
 		95DA00062FD0000100000001 /* CurrencyConverterTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 95DA00052FD0000100000001 /* CurrencyConverterTests.swift */; };
 		95E87C232F94A28C00E238D5 /* OnboardingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 95E87C222F94A28C00E238D5 /* OnboardingView.swift */; };
 		95F8B8142F06E0B0001CD71A /* Localizable.strings in Resources */ = {isa = PBXBuildFile; fileRef = 953C14A32F056E61003998D2 /* Localizable.strings */; };
@@ -184,6 +187,9 @@
 		95E87C1E2F9493A600E238D5 /* CSVImporter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CSVImporter.swift; sourceTree = "<group>"; };
 		95E87C202F94A27D00E238D5 /* SampleDataService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SampleDataService.swift; sourceTree = "<group>"; };
 		95DA00012FD0000100000001 /* CurrencyConverter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CurrencyConverter.swift; sourceTree = "<group>"; };
+		95DA000F2FD0000100000001 /* StoreRecovery.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StoreRecovery.swift; sourceTree = "<group>"; };
+		95DA00112FD0000100000001 /* StoreRecoveryTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StoreRecoveryTests.swift; sourceTree = "<group>"; };
+		95DA00132FD0000100000001 /* DividendsServiceTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DividendsServiceTests.swift; sourceTree = "<group>"; };
 		95DA00052FD0000100000001 /* CurrencyConverterTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CurrencyConverterTests.swift; sourceTree = "<group>"; };
 		95E87C222F94A28C00E238D5 /* OnboardingView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OnboardingView.swift; sourceTree = "<group>"; };
 		B26A38B2C0B92497C74625F2 /* SubscriptionViewModelTests.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = SubscriptionViewModelTests.swift; sourceTree = "<group>"; };
@@ -258,6 +264,8 @@
 				95DA00092FD0000100000001 /* CSVExporterTests.swift */,
 				953C6247305EFFF400D5C07B /* HomeViewModelTests.swift */,
 				95DA00052FD0000100000001 /* CurrencyConverterTests.swift */,
+				95DA00112FD0000100000001 /* StoreRecoveryTests.swift */,
+				95DA00132FD0000100000001 /* DividendsServiceTests.swift */,
 				952BB1C43060EE7B00686092 /* DepositsServiceTests.swift */,
 				952BA339306157B50096F63B /* DepositDetailViewModelTests.swift */,
 				95A013A730766B46008E1354 /* DividendReportParserTests.swift */,
@@ -313,6 +321,7 @@
 				95E87C1E2F9493A600E238D5 /* CSVImporter.swift */,
 				95E87C202F94A27D00E238D5 /* SampleDataService.swift */,
 				95DA00012FD0000100000001 /* CurrencyConverter.swift */,
+				95DA000F2FD0000100000001 /* StoreRecovery.swift */,
 				95BDABCE3070E1B200423EA3 /* NotificationDelegate.swift */,
 				95A013A530766B2C008E1354 /* DividendReportParser.swift */,
 				956CDF8A307688900000F299 /* DividendsService.swift */,
@@ -546,6 +555,7 @@
 				950800132F040B6C0041AD54 /* RootView.swift in Sources */,
 				95E87C212F94A27D00E238D5 /* SampleDataService.swift in Sources */,
 				95DA00022FD0000100000001 /* CurrencyConverter.swift in Sources */,
+				95DA00102FD0000100000001 /* StoreRecovery.swift in Sources */,
 				952BB1EC3060F87900686092 /* DepositDetailViewModel.swift in Sources */,
 				9539C4222F93FC9D003A105C /* AnalyticsViewModel.swift in Sources */,
 				953C6265305FA13400D5C07B /* HomeQueries.swift in Sources */,
@@ -593,6 +603,8 @@
 				95DA000C2FD0000100000001 /* CSVImporterTests.swift in Sources */,
 				953C6248305EFFF400D5C07B /* HomeViewModelTests.swift in Sources */,
 				95DA00062FD0000100000001 /* CurrencyConverterTests.swift in Sources */,
+				95DA00122FD0000100000001 /* StoreRecoveryTests.swift in Sources */,
+				95DA00142FD0000100000001 /* DividendsServiceTests.swift in Sources */,
 				95DA000A2FD0000100000001 /* CSVExporterTests.swift in Sources */,
 				9523DDAB2FBB85F400E24324 /* DepositsViewModelTests.swift in Sources */,
 				518517179F516B8CCFD2E88F /* SubscriptionServiceTests.swift in Sources */,

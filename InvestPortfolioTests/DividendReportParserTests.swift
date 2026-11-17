@@ -47,7 +47,8 @@ private func fixtureSharedStringsXML() -> String {
 
 /// Zips the two XML fixtures together into a throwaway .xlsx — our parser only ever
 /// looks up these two paths by name, so no other OOXML scaffolding is needed.
-private func makeFixtureReportURL() throws -> URL {
+/// Internal (not private): DividendsServiceTests reuses it to import a real file.
+func makeFixtureReportURL() throws -> URL {
     let archiveURL = FileManager.default.temporaryDirectory.appendingPathComponent(UUID().uuidString + ".xlsx")
     let archive = try Archive(url: archiveURL, accessMode: .create)
 
